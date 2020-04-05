@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Project>
-<ProjectName>C:\Users\sli\Documents\SOL_SOLUTION\PANDA3\logiciel\AndroidFilaire\TestUSBTerminal\TestUSBTerminal\\TestUSBTerminal</ProjectName>
+<ProjectName>C:\Users\sli\Documents\SOL_SOLUTION\PANDA3\logiciel\AndroidFilaire\TestUSBTerminal\\TestUSBTerminal</ProjectName>
 <ProjectNature>C</ProjectNature> 
 <CMSIS>..\Drivers\CMSIS</CMSIS>
 <HAL_Driver>C:\STM32Cube\Repository\STM32Cube_FW_F4_V1.21.0\Drivers\CMSIS</HAL_Driver>
@@ -9,6 +9,8 @@
 
 <filestoremove>
     <file>
+    <name>..\Src\eth.c</name>
+    <name>..\Drivers\STM32F4xx_HAL_Driver\Src\stm32f4xx_hal_eth.c</name>
     </file>
 </filestoremove>
 
@@ -32,7 +34,7 @@
     <usedDebug>true</usedDebug>
     	<debugprobe>swd</debugprobe>
     <optimization></optimization>
-    <icfloc>1</icfloc>
+    <icfloc>0</icfloc>
     <Adefines>
         <define></define>
     </Adefines>   
