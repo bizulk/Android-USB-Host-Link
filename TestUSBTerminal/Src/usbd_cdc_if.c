@@ -51,7 +51,7 @@
 #include "usbd_cdc_if.h"
 
 /* USER CODE BEGIN INCLUDE */
-
+#include <string.h>
 /* USER CODE END INCLUDE */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -127,7 +127,8 @@ uint8_t UserRxBufferFS[APP_RX_DATA_SIZE];
 uint8_t UserTxBufferFS[APP_TX_DATA_SIZE];
 
 /* USER CODE BEGIN PRIVATE_VARIABLES */
-
+/** Store LineCodingReceived by peer to use it when asked for */
+uint8_t  _tLineCoding[7] = {0};
 /* USER CODE END PRIVATE_VARIABLES */
 
 /**
@@ -251,11 +252,12 @@ static int8_t CDC_Control_FS(uint8_t cmd, uint8_t* pbuf, uint16_t length)
   /* 6      | bDataBits  |   1   | Number Data bits (5, 6, 7, 8 or 16).          */
   /*******************************************************************************/
     case CDC_SET_LINE_CODING:
-
+    memcpy( _tLineCoding, pbuf, sizeof(_tLineCoding) );
     break;
 
     case CDC_GET_LINE_CODING:
-
+    // normalement length == taille buffer
+    memcpy( pbuf, _tLineCoding, sizeof(_tLineCoding) );
     break;
 
     case CDC_SET_CONTROL_LINE_STATE:
@@ -293,6 +295,9 @@ static int8_t CDC_Receive_FS(uint8_t* Buf, uint32_t *Len)
   /* USER CODE BEGIN 6 */
   USBD_CDC_SetRxBuffer(&hUsbDeviceFS, &Buf[0]);
   USBD_CDC_ReceivePacket(&hUsbDeviceFS);
+  // CIO - Add code here
+  // Echo the received chars
+  CDC_Transmit_FS(Buf, *Len);
   return (USBD_OK);
   /* USER CODE END 6 */
 }
