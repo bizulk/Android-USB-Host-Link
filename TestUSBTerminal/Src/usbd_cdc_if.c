@@ -52,6 +52,7 @@
 
 /* USER CODE BEGIN INCLUDE */
 #include <string.h>
+#include <stdio.h>
 /* USER CODE END INCLUDE */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -298,6 +299,8 @@ static int8_t CDC_Receive_FS(uint8_t* Buf, uint32_t *Len)
   // CIO - Add code here
   // Echo the received chars
   CDC_Transmit_FS(Buf, *Len);
+  // Try de stlink debug interface
+  printf("received %lu char\n", *Len);
   return (USBD_OK);
   /* USER CODE END 6 */
 }

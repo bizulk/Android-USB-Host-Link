@@ -9,8 +9,6 @@
 
 <filestoremove>
     <file>
-    <name>..\Src\eth.c</name>
-    <name>..\Drivers\STM32F4xx_HAL_Driver\Src\stm32f4xx_hal_eth.c</name>
     </file>
 </filestoremove>
 
@@ -26,7 +24,7 @@
   <config>
     <name>TestUSBTerminal</name>				
     <device>STM32F429ZITx</device>		 
-    <heapSize>0x200</heapSize>
+    <heapSize>0x400</heapSize>
     <stackSize>0x400</stackSize>
     
     	<board>NUCLEO-F429ZI</board>
