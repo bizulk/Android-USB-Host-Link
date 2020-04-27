@@ -40,19 +40,20 @@ inline uint8_t proto_getArgsSize(proto_Command command) {
 ///     proto_State etat = {0};
 typedef struct proto_State proto_State;
 
-/// Handler appelé quand une trame est complètement reçue
+/// Callback appelé quand une trame est complètement reçue
 /// @param[inout] userdata L'utilisateur de la bibliothèque choisit ce qu'il y met et comment l'interpréter
 /// @param[in] command La commande demandée
 /// @param[in] args Les arguments liés à la commande demandée (de taille proto_getArgsSize(command) )
 typedef void(*proto_OnReception)(void* userdata, proto_Command command, uint8_t const* args);
 
-/// Indique quel handler sera appelé quand une trame est complètement reçue.
+/// Indique quel callback sera appelé quand une trame est complètement reçue.
 /// @param[inout] state L'état à modifier
-/// @param[in] onReception Le handler à appeler, NULL si rien à appeler
+/// @param[in] callback Le callback à appeler, NULL si rien à appeler
 /// @param[in] userdata Sera passé tel quel à onReception
-void proto_setReceiver(proto_State* state, proto_OnReception onReception, void* userdata);
+void proto_setReceiver(proto_State* state, proto_OnReception callback, void* userdata);
 
-/// Interprète des octets reçus.
+/// Interprète des octets reçus. Appelle le callback spécifié avec
+/// proto_setReceiver chaque fois qu'une trame est finie de lire.
 /// @param[inout] state L'état qui va interpréter les octets.
 /// @param[in] blob Les octets reçus à interpréter.
 /// @param[in] size Le nombre d'octets reçus
