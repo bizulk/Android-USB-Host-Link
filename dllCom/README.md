@@ -13,3 +13,7 @@ Résultat attendu (après une seconde d'attente) :
 Fd ouverts
 Read: 'Hello, World!'
 ```
+
+### libcomm
+Bibliothèque implémentant le protocole de communication, complètement
+découplé des appels système qui accèdent à la liaison série physique.
