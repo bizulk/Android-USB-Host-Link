@@ -1,7 +1,10 @@
 #ifndef CIO_TSE_PROTOCOMM
 #define CIO_TSE_PROTOCOMM
+/// SLI ajouter une entete de fichier, avec une note d'intégration pour l'utilisation.
 
 #include <stdint.h>
+#include <assert.h>
+#include <stddef.h>
 
 /// Une trame est définie par :
 /// [HEADER 1 octet] [CRC 1 octet] [COMMAND 1 octet] [ARGS ? octets]
@@ -9,40 +12,43 @@
 /// Le CRC est calculé sur [COMMAND] [ARGS]
 /// Tous les octets avant le Header sont ignorés.
 
-enum { proto_HEADER = 0x12,      ///< La valeur du Header
-       proto_COMMAND_OFFSET = 2, ///< La position de l'octet de commande
-       proto_ARGS_OFFSET = 3,    ///< La position du premier argument dans la trame
+enum {
+    proto_MAX_ARGS = 2 ///< Maximum d'arguments, toute commande confondue
 };
 
-/// Utilisé pour allouer un buffer dans lequel recevoir une trame
-enum { proto_FRAME_MAXSIZE = 8 };
+typedef struct proto_Frame {
+    uint8_t header;
+    uint8_t crc;
+    uint8_t command;
+    uint8_t args[proto_MAX_ARGS];
+} proto_Frame;
+
+enum { 
+    proto_HEADER = 0x12,      ///< La valeur du Header
+    proto_COMMAND_OFFSET =    ///< La position de l'octet de commande
+        offsetof(proto_Frame, command), 
+    proto_ARGS_OFFSET =       ///< La position du premier argument dans la trame
+        offsetof(proto_Frame, args),
+    proto_FRAME_MAXSIZE =     ///< Utilisé pour allouer un buffer dans lequel recevoir une trame
+        sizeof(proto_Frame),
+};
 
 /// Les différentes possibilités pour [COMMAND]
 typedef enum proto_Command {
     // Commandes du MASTER
-        proto_SET,     ///< On veut envoyer une donnée à la cible
-        proto_GET,     ///< On veut lire une donnée de la cible
+        proto_SET,     ///< On veut envoyer une donnée à la cible   : args = [REGISTRE] [VALEUR]
+        proto_GET,     ///< On veut lire une donnée de la cible     : args = [REGISTRE]
 	// Commandes du SLAVE
-        proto_REPLY,   ///< La cible répond à la demande de lecture
-        proto_ERROR,   ///< La cible a décelé une erreur
+        proto_REPLY,   ///< La cible répond à la demande de lecture : args = [VALEUR]
+        proto_ERROR,   ///< La cible a décelé une erreur            : args = [NUM ERREUR]
     // Notifications : recevables par le callback mais non transmis physiquement
-        proto_BAD_CRC, ///< la trame reçue a un CRC invalide
+        proto_BAD_CRC, ///< la trame reçue a un CRC invalide        : args = [CRC_RECU] [CRC_CALCULE]
     // Nombre de commandes possibles
         proto_LAST,    ///< le nombre de commandes disponibles
 } proto_Command;
 
 /// Retourne le nombre d'octets d'arguments lié à cette commande
-inline uint8_t proto_getArgsSize(proto_Command command) {
-    static uint8_t lut[proto_LAST] = {
-        2, // proto_SET     : [REGISTRE] [VALEUR]
-        1, // proto_GET     : [REGISTRE]
-        1, // proto_REPLY   : [VALEUR]
-        1, // proto_ERROR   : [NUM ERREUR]
-        2  // proto_BAD_CRC : [RECU] [CALCULE]
-    };
-    return command < proto_LAST ? lut[command] : 0;
-	}
-}
+uint8_t proto_getArgsSize(proto_Command command);
 
 /// Encapsule l'état de l'algorithme analysant les trames.
 /// La définition est fournie plus bas dans le header pour
@@ -73,13 +79,12 @@ void proto_setReceiver(proto_State* state, proto_OnReception callback, void* use
 /// @returns le nombre de trames finies de lire
 int proto_readBlob(proto_State* state, uint8_t const* blob, uint8_t size);
 
-/// Construit une trame dans le buffer donné. Ecrit exactement
-/// proto_ARGS_OFFSET + proto_getArgsSize(command) octets dans le buffer.
-/// @param[out] buffer Le buffer de sortie où sera écrite la trame
+/// Construit une trame et l'écrit dans le stockage donné en argument.
+/// Les octets d'arguments non utilisés sont mis à zéro.
+/// @param[out] frame  Là où sera écrite la trame
 /// @param[in] command La commande de la trame.
 /// @param[in] args    Les arguments de la trame, de taille proto_getArgsSize(command)
-/// @returns le nombre d'octets écrits
-int proto_makeFrame(uint8_t* buffer, proto_Command command, uint8_t const* args);
+void proto_makeFrame(proto_Frame* frame, proto_Command command, uint8_t const* args);
 
 
 /// Chaque implémentation d'un IO Device devrait fournir une instance de
@@ -88,7 +93,7 @@ int proto_makeFrame(uint8_t* buffer, proto_Command command, uint8_t const* args)
 /// devoir tout le temps vérifier si ce n'est pas NULL).
 /// On peut utiliser proto_openNothing, proto_readNothing,
 /// proto_writeNothing et proto_closeNothing si on ne veut pas implémenter
-/// 
+/// certaines de ces fonctions, sans laisser pour autant les pointeurs nuls.
 typedef struct proto_IfaceIODevice {
     /// Ouvre un canal de communication.
     /// @param[in] channel Descripteur de la communication ("COM1", "/dev/ttyS0", "/dev/ptmx", etc)
@@ -115,10 +120,10 @@ typedef struct proto_IfaceIODevice {
     void (*close)(void* iodata);
 } proto_IfaceIODevice;
 
-inline void* proto_openNothing(char const*) { return NULL; }
-inline uint8_t proto_readNothing(void*, uint8_t*, uint16_t) { return 0; }
-inline void proto_writeNothing(void*, uint8_t const*, uint8_t) {}
-inline void proot_closeNothing(void*) {}
+inline void* proto_openNothing(char const* channel) { return NULL; }
+inline uint8_t proto_readNothing(void* iodata, uint8_t* buffer, uint16_t timeout_ms) { return 0; }
+inline void proto_writeNothing(void* iodata, uint8_t const* buffer, uint8_t size) {}
+inline void proot_closeNothing(void* iodata) {}
 
 
 
@@ -128,8 +133,8 @@ inline void proot_closeNothing(void*) {}
 struct proto_State {
     proto_OnReception priv_callback;
     void* priv_userdata;
-    uint8_t priv_frameBuffer[proto_FRAME_MAXSIZE];
-    uint8_t priv_frameSize;
+    proto_Frame priv_frame;
+    uint8_t priv_nbBytes;
 };
 
 
