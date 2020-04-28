@@ -3,63 +3,53 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="tests.MainPage">
     <StackLayout Margin="0,0,0,0"
-                 BackgroundColor="MediumSlateBlue">
-        <Grid Margin="0,100,0,0">
+                 BackgroundColor="MidnightBlue">
+        <Grid Margin="0,0,0,0">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="0.5*" />
-                <ColumnDefinition Width="0.5*" />
+                <ColumnDefinition Width="0.3*" />
+                <ColumnDefinition Width="0.3*" />
             </Grid.ColumnDefinitions>
             <Grid.RowDefinitions>
                 <RowDefinition Height="38" />
                 <RowDefinition Height="38" />
+                <RowDefinition Height="38" />
+                <RowDefinition Height="38" />
+                <RowDefinition Height="38" />
+                <RowDefinition Height="38" />
+                <RowDefinition Height="38" />
+                <RowDefinition Height="38" />
             </Grid.RowDefinitions>
-            <Label Text="Value 1"
+            <Label Text="Titre - Version"
+                   TextColor="White"
+                   HorizontalTextAlignment="Center"
+                   BackgroundColor="Black"
+                   Grid.ColumnSpan="3"
+                   />
+            <Label Grid.Row="2"
+                   Text="Value 1"
                    HeightRequest="20"
                    TextColor="White"
                    BackgroundColor="Black"/>
             <Label Grid.Column="1"
+                   Grid.Row="2"
                    Text="Value" 
                    TextColor="White"
                    BackgroundColor="Black"/>
             <Editor Grid.Column="2"
+                    Grid.Row="2"
                     />
-            <Label Grid.Row="1"
+            <Label Grid.Row="3"
                    Text="Value 2"
                    TextColor="White"
                    BackgroundColor="Black"/>
             <Label Grid.Column="1"
-                   Grid.Row="1"
+                   Grid.Row="3"
                    Text="Value"
                    TextColor="White"
                    BackgroundColor="Black"/>
-            <Editor Grid.Row="1" 
-                    Grid.Column="2"
-                    />
+            <Editor Grid.Row="3"
+                    Grid.Column="2"/>
         </Grid>
-        <Grid Margin="0,300,0,20">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="0.5*" />
-                <ColumnDefinition Width="0.5*" />
-            </Grid.ColumnDefinitions>
-            <Grid.RowDefinitions>
-                <RowDefinition Height="50" />
-                <RowDefinition Height="50" />
-            </Grid.RowDefinitions>
-            <Button Text="Receive"
-                    BackgroundColor="Gray"
-                    TextColor="White"
-                />
-            <Button Grid.Column="1"
-                    Text="Send"
-                    BackgroundColor="Gray"
-                    TextColor="White"/>
-            <Button Grid.Row="1"
-                    Text="Send"
-                    BackgroundColor="Gray"
-                    TextColor="White"/>
-        </Grid>
-
-
     </StackLayout>
 </ContentPage>
 
