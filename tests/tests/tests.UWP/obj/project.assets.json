@@ -7495,11 +7495,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\alexa\\Documents\\Fise 2\\Ping\\AndroidFilaire\\tests\\tests\\tests.UWP\\tests.UWP.csproj",
+      "projectUniqueName": "C:\\Users\\alexa\\source\\repos\\tests\\tests\\tests.UWP\\tests.UWP.csproj",
       "projectName": "tests.UWP",
-      "projectPath": "C:\\Users\\alexa\\Documents\\Fise 2\\Ping\\AndroidFilaire\\tests\\tests\\tests.UWP\\tests.UWP.csproj",
+      "projectPath": "C:\\Users\\alexa\\source\\repos\\tests\\tests\\tests.UWP\\tests.UWP.csproj",
       "packagesPath": "C:\\Users\\alexa\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\alexa\\Documents\\Fise 2\\Ping\\AndroidFilaire\\tests\\tests\\tests.UWP\\obj\\",
+      "outputPath": "C:\\Users\\alexa\\source\\repos\\tests\\tests\\tests.UWP\\obj\\",
       "projectStyle": "PackageReference",
       "skipContentFileWrite": true,
       "fallbackFolders": [
@@ -7519,8 +7519,8 @@
       "frameworks": {
         "uap10.0.16299": {
           "projectReferences": {
-            "C:\\Users\\alexa\\Documents\\Fise 2\\Ping\\AndroidFilaire\\tests\\tests\\tests\\tests.csproj": {
-              "projectPath": "C:\\Users\\alexa\\Documents\\Fise 2\\Ping\\AndroidFilaire\\tests\\tests\\tests\\tests.csproj"
+            "C:\\Users\\alexa\\source\\repos\\tests\\tests\\tests\\tests.csproj": {
+              "projectPath": "C:\\Users\\alexa\\source\\repos\\tests\\tests\\tests\\tests.csproj"
             }
           }
         }

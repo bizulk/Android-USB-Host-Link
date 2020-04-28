@@ -60,24 +60,33 @@
                     Grid.Column="0"
                     Grid.ColumnSpan="2"
                     Text="Receive"
+                    IsEnabled="False"
+                    x:Name="receiveButton"
                     BackgroundColor="Gray"
                 />
             <Button Grid.Row="6"
                     Grid.Column="2"
                     Grid.ColumnSpan="2"
                     Text="Send"
+                    IsEnabled="False"
+                    x:Name="sendButton"
                     BackgroundColor="Gray"
                 />
             <Button Grid.Row="7"
                     Grid.Column="0"
                     Grid.ColumnSpan="2"
                     Text="Connect"
+                    IsEnabled="True"
                     BackgroundColor="Gray"
+                    x:Name="connectButton"
+                    Clicked="OnButtonConnectClicked"
                 />
             <Button Grid.Row="7"
                     Grid.Column="2"
                     Grid.ColumnSpan="2"
                     Text="Disconnect"
+                    IsEnabled="False"
+                    x:Name="disconnectButton"
                     BackgroundColor="Gray"
                 />
         </Grid>

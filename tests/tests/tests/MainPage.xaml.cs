@@ -9,23 +9,42 @@ namespace tests
 {
     public partial class MainPage : ContentPage
     {
+        bool isConnected = false;
         public MainPage()
         {
             InitializeComponent();
         }
 
-        /*void OnButtonClicked(object sender, EventArgs e)
+        void OnButtonSendClicked(object sender, EventArgs e)
         {
-            (sender as Button).Text = "Sah quel plaisir";
-        }*/
-        void OnEntry(object sender, TextChangedEventArgs e)
-        {
-            string old = e.OldTextValue;
-            string newt = e.NewTextValue; 
+            //To Indent 
+
         }
-        void Completed(object sender, EventArgs e)
+        void OnButtonReceiveClicked(object sender, EventArgs e)
         {
-            string text = ((Entry)sender).Text;
+            //To Indent
+        }
+        void OnButtonConnectClicked(object sender, EventArgs e)
+        {
+            //To Indent (method to connect)
+            if (isConnected == true)
+            {
+                connectButton.IsEnabled = false;
+                receiveButton.IsEnabled = true;
+                sendButton.IsEnabled = true;
+                disconnectButton.IsEnabled = true;
+            }
+        }
+        void OnButtonDisconnectClicked(object sender, EventArgs e)
+        {
+            //To Indent (method to disconnect)
+            if (isConnected == false)
+            {
+                connectButton.IsEnabled = true;
+                receiveButton.IsEnabled = false;
+                sendButton.IsEnabled = false;
+                disconnectButton.IsEnabled = false;
+            }
         }
     }
 }

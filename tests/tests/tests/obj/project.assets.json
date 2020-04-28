@@ -350,11 +350,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\alexa\\Documents\\Fise 2\\Ping\\AndroidFilaire\\tests\\tests\\tests\\tests.csproj",
+      "projectUniqueName": "C:\\Users\\alexa\\source\\repos\\tests\\tests\\tests\\tests.csproj",
       "projectName": "tests",
-      "projectPath": "C:\\Users\\alexa\\Documents\\Fise 2\\Ping\\AndroidFilaire\\tests\\tests\\tests\\tests.csproj",
+      "projectPath": "C:\\Users\\alexa\\source\\repos\\tests\\tests\\tests\\tests.csproj",
       "packagesPath": "C:\\Users\\alexa\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\alexa\\Documents\\Fise 2\\Ping\\AndroidFilaire\\tests\\tests\\tests\\obj\\",
+      "outputPath": "C:\\Users\\alexa\\source\\repos\\tests\\tests\\tests\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"

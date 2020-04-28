@@ -1,2 +1,10 @@
 
 .metadata/
+
+tests/tests/tests/bin/Debug/
+
+tests/tests/tests/obj/Debug/
+
+tests/tests/tests.Android/bin/Debug/
+
+tests/tests/tests.Android/obj/Debug/
