@@ -1,8 +1,13 @@
 #ifndef CIO_TSE_PROTOCOMM
 #define CIO_TSE_PROTOCOMM
+/// SLI ajouter une entete de fichier, avec une note d'intégration pour l'utilisation.
+/// OK pour l'API. Attention dans une première version pour l'applicatif c'est la DLL qui réalise les accès au device,
+// il faut ajouter dans un autre fichier un open/close readfRame (bloquant en réception, timeout possible), et writeFrame (bloquant)
 
 #include <stdint.h>
 
+/// SLI : définir au moins l'entete avec une structure, comme proposé dans la spec.
+/// 	Etant donnée l'information : je remplacerais l'enum par un define 
 /// Une trame est définie par :
 /// [HEADER 1 octet] [CRC 1 octet] [COMMAND 1 octet] [ARGS ? octets]
 /// Le nombre d'octets pour l'argument dépend de la commande
@@ -12,6 +17,7 @@
 /// Utilisé pour allouer un buffer sur le tas dans lequel recevoir une trame
 enum { proto_FRAME_MAXSIZE = 8 };
 
+/// SLI OK. je remplacerais RESULT par REPLY, par habitude j'ajoute une valeur LAST pour le contrôle de validite
 /// Les différentes possibilités pour [COMMAND]
 typedef enum proto_Command {
 	proto_SET = 's',    ///< On veut envoyer une donnée à la cible
@@ -20,6 +26,7 @@ typedef enum proto_Command {
 	proto_ERROR = 'e',  ///< La cible a décelé une erreur
 } proto_Command;
 
+/// SLI OK. Si tu veux être sûr que ce soit inliné il faut ajouter 'static'. Note : avec un enum LAST, il est possible d'avoir une table plutôt qu'une fonction.
 /// Retourne le nombre d'octets d'arguments lié à cette commande
 inline uint8_t proto_getArgsSize(proto_Command command) {
 	switch (command) {
@@ -60,6 +67,7 @@ void proto_setReceiver(proto_State* state, proto_OnReception callback, void* use
 /// @returns 1 si on a fini de lire au moins une trame avec cet appel, 0 sinon
 int proto_readBlob(proto_State* state, uint8_t const* blob, uint8_t size);
 
+/// SLI j'appelerais plutôt cette fonction makeFrame. C'est possible aussi de lui fournir le buffer plutôt que d'en utiliser un interne
 /// Construit une trame dans un buffer interne et retourne un pointeur
 /// vers ce buffer interne. Le buffer est de taille proto_FRAME_MAXSIZE,
 /// mais il n'y a que proto_getArgsSize(command) octets constituant la trame,
