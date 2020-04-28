@@ -556,7 +556,7 @@
   },
   "libraries": {
     "Xamarin.Forms/3.4.0.1008975": {
-      "sha512": "tM9syeev45u92OFENGjq+Zw8WiEwLJFiXe317XpL9SY2RRk9sm2fc1lDVjzwz0da+5ZP5fi24NAPsPQdxBdMwQ==",
+      "sha512": "036/h8HtzRFgTrfhY57IeHoYRsPTO2XTA6uUFdmZzw2QR1sdszfofhI9HrCJTRx6fCzmjPg5Cxk5chYrjKarNw==",
       "type": "package",
       "path": "xamarin.forms/3.4.0.1008975",
       "files": [
@@ -714,20 +714,20 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\alexa\\.nuget\\packages\\": {}
+    "C:\\Users\\sli\\.nuget\\packages\\": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\alexa\\Documents\\Fise 2\\Ping\\AndroidFilaire\\tests\\tests\\tests.iOS\\tests.iOS.csproj",
+      "projectUniqueName": "C:\\Users\\sli\\Documents\\SOL_SOLUTION\\PANDA3\\logiciel\\AndroidFilaire\\tests\\tests\\tests.iOS\\tests.iOS.csproj",
       "projectName": "tests.iOS",
-      "projectPath": "C:\\Users\\alexa\\Documents\\Fise 2\\Ping\\AndroidFilaire\\tests\\tests\\tests.iOS\\tests.iOS.csproj",
-      "packagesPath": "C:\\Users\\alexa\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\alexa\\Documents\\Fise 2\\Ping\\AndroidFilaire\\tests\\tests\\tests.iOS\\obj\\",
+      "projectPath": "C:\\Users\\sli\\Documents\\SOL_SOLUTION\\PANDA3\\logiciel\\AndroidFilaire\\tests\\tests\\tests.iOS\\tests.iOS.csproj",
+      "packagesPath": "C:\\Users\\sli\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\sli\\Documents\\SOL_SOLUTION\\PANDA3\\logiciel\\AndroidFilaire\\tests\\tests\\tests.iOS\\obj\\",
       "projectStyle": "PackageReference",
       "skipContentFileWrite": true,
       "configFilePaths": [
-        "C:\\Users\\alexa\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Users\\sli\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [
@@ -740,8 +740,8 @@
       "frameworks": {
         "xamarinios10": {
           "projectReferences": {
-            "C:\\Users\\alexa\\Documents\\Fise 2\\Ping\\AndroidFilaire\\tests\\tests\\tests\\tests.csproj": {
-              "projectPath": "C:\\Users\\alexa\\Documents\\Fise 2\\Ping\\AndroidFilaire\\tests\\tests\\tests\\tests.csproj"
+            "C:\\Users\\sli\\Documents\\SOL_SOLUTION\\PANDA3\\logiciel\\AndroidFilaire\\tests\\tests\\tests\\tests.csproj": {
+              "projectPath": "C:\\Users\\sli\\Documents\\SOL_SOLUTION\\PANDA3\\logiciel\\AndroidFilaire\\tests\\tests\\tests\\tests.csproj"
             }
           }
         }
