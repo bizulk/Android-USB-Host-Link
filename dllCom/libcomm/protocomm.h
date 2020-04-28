@@ -3,7 +3,6 @@
 /// SLI ajouter une entete de fichier, avec une note d'intégration pour l'utilisation.
 
 #include <stdint.h>
-#include <assert.h>
 #include <stddef.h>
 
 /// Une trame est définie par :
@@ -38,14 +37,22 @@ typedef enum proto_Command {
     // Commandes du MASTER
         proto_SET,     ///< On veut envoyer une donnée à la cible   : args = [REGISTRE] [VALEUR]
         proto_GET,     ///< On veut lire une donnée de la cible     : args = [REGISTRE]
-	// Commandes du SLAVE
+    // Commandes du SLAVE
         proto_REPLY,   ///< La cible répond à la demande de lecture : args = [VALEUR]
         proto_ERROR,   ///< La cible a décelé une erreur            : args = [NUM ERREUR]
     // Notifications : recevables par le callback mais non transmis physiquement
-        proto_BAD_CRC, ///< la trame reçue a un CRC invalide        : args = [CRC_RECU] [CRC_CALCULE]
+        proto_NOTIF_BAD_CRC, ///< la trame reçue a un CRC invalide        : args = [CRC_RECU] [CRC_CALCULE]
     // Nombre de commandes possibles
         proto_LAST,    ///< le nombre de commandes disponibles
 } proto_Command;
+
+/// Erreurs possibles pour la cible
+typedef enum proto_Error {
+    proto_UNKNOWN,
+    proto_INVALID_CRC,         ///< la cible a eu une erreur de CRC sur la trame qu'elle a reçue
+    proto_INVALID_REGISTER,  ///< la cible ne possède pas le registre demandé
+    proto_INVALID_VALUE,     ///< la cible ne peut pas mettre cette valeur dans le registre
+} proto_Error;
 
 /// Retourne le nombre d'octets d'arguments lié à cette commande
 uint8_t proto_getArgsSize(proto_Command command);
