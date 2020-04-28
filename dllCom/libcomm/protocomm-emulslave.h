@@ -3,6 +3,10 @@
 
 #include "protocomm.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /// Structure de données utiles pour l'émulation de l'esclave.
 /// Les attributs préfixés priv_ ne doivent pas être accédés
 /// (violation de l'encapsulation).
@@ -19,5 +23,9 @@ void proto_initData_EmulSlave(proto_Data_EmulSlave* iodata);
 /// Retourne un pointeur vers le Device. Le iodata à passer
 /// dans les fonctions est un pointeur vers un proto_Data_EmulSlave.
 proto_Device proto_getDevice_EmulSlave();
+
+#ifdef __cplusplus
+} // extern "C"
+#endif
 
 #endif

@@ -3,56 +3,60 @@
 /// SLI ajouter une entete de fichier, avec une note d'intégration pour l'utilisation.
 
 #if 0
-// Exemple d'utilisation pour un master
+    // Exemple d'utilisation pour un master
 
-// master_receive sera appelé quand on a reçu une trame
-void master_receive(void* userdata, proto_Command command, uint8_t const* args) {
-    switch (command) {
-    case proto_REPLY:
-        *(uint8_t*)userdata = args[0];
-        break;
-    case proto_NOTIF_BAD_CRC:
-        printf("Mauvais CRC... reçu=%d, calculé=%d\n", args[0], args[1]);
-        break;
-    case proto_ERROR:
-        printf("Erreur reçue : %d\n", args[0]);
-        break;
+    // master_receive sera appelé quand on a reçu une trame
+    void master_receive(void* userdata, proto_Command command, uint8_t const* args) {
+        switch (command) {
+        case proto_REPLY:
+            *(uint8_t*)userdata = args[0];
+            break;
+        case proto_NOTIF_BAD_CRC:
+            printf("Mauvais CRC... reçu=%d, calculé=%d\n", args[0], args[1]);
+            break;
+        case proto_ERROR:
+            printf("Erreur reçue : %d\n", args[0]);
+            break;
+        }
     }
-}
 
-int monMain() {
-    // remplacer IMPLEM par l'implémentation choisie (par exemple EmulSlave)
-    proto_Data_IMPLEM devicedata;
-    proto_initData_IMPLEM(&devicedata);
-    proto_Device device = proto_getDevice_IMPLEM();
-    
-    proto_State etat = {0};
-    
-    uint8_t args[proto_MAX_ARGS];
-    uint8_t numeroRegistre = 5; // registre à modifier, ici on a choisi le registre n°5
-    
-    // Faire un SET
-    args[0] = numeroRegistre;
-    args[1] = 234; // pour mettre 234 dans le registre "numeroRegistre"
-    proto_writeFrame(proto_SET, args, device, &devicedata);    
-    
-    // Faire un GET
-    // Quand on reçoit proto_REPLY, on met la valeur récupérée dans registreLu
-    uint8_t valeurRegistre = 0;
-    proto_setReceiver(&state, master_receive, &valeurRegistre);
-    // on fait une requête GET
-    args[0] = numeroRegistre;
-    proto_writeFrame(proto_GET, args, device, &devicedata);
-    while (!proto_readBlob(&etat, device, &devicedata)); // tant qu'on a pas réussi à lire une trame, on réessaye
-    printf("Valeur du registre %d = %d\n", numeroRegistre, valeurRegistre);
-    
-}
+    int monMain() {
+        // remplacer IMPLEM par l'implémentation choisie (par exemple EmulSlave)
+        proto_Data_IMPLEM devicedata;
+        proto_initData_IMPLEM(&devicedata);
+        proto_Device device = proto_getDevice_IMPLEM();
+        
+        proto_State etat = {0};
+        
+        uint8_t args[proto_MAX_ARGS];
+        uint8_t numeroRegistre = 5; // registre à modifier, ici on a choisi le registre n°5
+        
+        // Faire un SET
+        args[0] = numeroRegistre;
+        args[1] = 234; // pour mettre 234 dans le registre "numeroRegistre"
+        proto_writeFrame(proto_SET, args, device, &devicedata);    
+        
+        // Faire un GET
+        // Quand on reçoit proto_REPLY, on met la valeur récupérée dans registreLu
+        uint8_t valeurRegistre = 0;
+        proto_setReceiver(&state, master_receive, &valeurRegistre);
+        // on fait une requête GET
+        args[0] = numeroRegistre;
+        proto_writeFrame(proto_GET, args, device, &devicedata);
+        while (!proto_readBlob(&etat, device, &devicedata)); // tant qu'on a pas réussi à lire une trame, on réessaye
+        printf("Valeur du registre %d = %d\n", numeroRegistre, valeurRegistre);
+        
+    }
 
-// Fin de l'exemple
+    // Fin de l'exemple
 #endif
 
 #include <stdint.h>
 #include <stddef.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /// Une trame est définie par :
 /// [HEADER 1 octet] [CRC 1 octet] [COMMAND 1 octet] [ARGS ? octets]
@@ -194,5 +198,8 @@ struct proto_State {
     uint8_t priv_nbBytes;
 };
 
+#ifdef __cplusplus
+} // extern "C"
+#endif
 
 #endif
