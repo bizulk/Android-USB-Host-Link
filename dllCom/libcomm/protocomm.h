@@ -33,7 +33,7 @@ inline uint8_t proto_getArgsSize(proto_Command command) {
 
 /// Encapsule l'état de l'algorithme analysant les trames.
 /// La définition est fournie plus bas dans le header pour
-/// pouvoir allouer l'état sur le tas. Cependant, il ne faut
+/// pouvoir allouer l'état sur la pile. Cependant, il ne faut
 /// pas accéder directement aux attributs de proto_State, mais
 /// utiliser les fonctions fournies !
 /// Pour initialiser proto_State :
