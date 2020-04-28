@@ -719,11 +719,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\alexa\\source\\repos\\tests\\tests\\tests.iOS\\tests.iOS.csproj",
+      "projectUniqueName": "C:\\Users\\alexa\\Documents\\Fise 2\\Ping\\AndroidFilaire\\tests\\tests\\tests.iOS\\tests.iOS.csproj",
       "projectName": "tests.iOS",
-      "projectPath": "C:\\Users\\alexa\\source\\repos\\tests\\tests\\tests.iOS\\tests.iOS.csproj",
+      "projectPath": "C:\\Users\\alexa\\Documents\\Fise 2\\Ping\\AndroidFilaire\\tests\\tests\\tests.iOS\\tests.iOS.csproj",
       "packagesPath": "C:\\Users\\alexa\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\alexa\\source\\repos\\tests\\tests\\tests.iOS\\obj\\",
+      "outputPath": "C:\\Users\\alexa\\Documents\\Fise 2\\Ping\\AndroidFilaire\\tests\\tests\\tests.iOS\\obj\\",
       "projectStyle": "PackageReference",
       "skipContentFileWrite": true,
       "configFilePaths": [
@@ -740,8 +740,8 @@
       "frameworks": {
         "xamarinios10": {
           "projectReferences": {
-            "C:\\Users\\alexa\\source\\repos\\tests\\tests\\tests\\tests.csproj": {
-              "projectPath": "C:\\Users\\alexa\\source\\repos\\tests\\tests\\tests\\tests.csproj"
+            "C:\\Users\\alexa\\Documents\\Fise 2\\Ping\\AndroidFilaire\\tests\\tests\\tests\\tests.csproj": {
+              "projectPath": "C:\\Users\\alexa\\Documents\\Fise 2\\Ping\\AndroidFilaire\\tests\\tests\\tests\\tests.csproj"
             }
           }
         }

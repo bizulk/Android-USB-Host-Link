@@ -6,8 +6,10 @@
                  BackgroundColor="MidnightBlue">
         <Grid Margin="0,0,0,0">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="0.3*" />
-                <ColumnDefinition Width="0.3*" />
+                <ColumnDefinition Width="0.25*" />
+                <ColumnDefinition Width="0.25*" />
+                <ColumnDefinition Width="0.25*" />
+                <ColumnDefinition Width="0.25*" />
             </Grid.ColumnDefinitions>
             <Grid.RowDefinitions>
                 <RowDefinition Height="38" />
@@ -23,7 +25,7 @@
                    TextColor="White"
                    HorizontalTextAlignment="Center"
                    BackgroundColor="Black"
-                   Grid.ColumnSpan="3"
+                   Grid.ColumnSpan="4"
                    />
             <Label Grid.Row="2"
                    Text="Value 1"
@@ -37,6 +39,7 @@
                    BackgroundColor="Black"/>
             <Editor Grid.Column="2"
                     Grid.Row="2"
+                     Grid.ColumnSpan="2"
                     />
             <Label Grid.Row="3"
                    Text="Value 2"
@@ -48,7 +51,35 @@
                    TextColor="White"
                    BackgroundColor="Black"/>
             <Editor Grid.Row="3"
-                    Grid.Column="2"/>
+                    Grid.Column="2"
+                    Grid.ColumnSpan="2"/>
+            <ContentView Grid.Row="5"
+                         Grid.ColumnSpan="4"
+                         BackgroundColor="White"/>
+            <Button Grid.Row="6"
+                    Grid.Column="0"
+                    Grid.ColumnSpan="2"
+                    Text="Receive"
+                    BackgroundColor="Gray"
+                />
+            <Button Grid.Row="6"
+                    Grid.Column="2"
+                    Grid.ColumnSpan="2"
+                    Text="Send"
+                    BackgroundColor="Gray"
+                />
+            <Button Grid.Row="7"
+                    Grid.Column="0"
+                    Grid.ColumnSpan="2"
+                    Text="Connect"
+                    BackgroundColor="Gray"
+                />
+            <Button Grid.Row="7"
+                    Grid.Column="2"
+                    Grid.ColumnSpan="2"
+                    Text="Disconnect"
+                    BackgroundColor="Gray"
+                />
         </Grid>
     </StackLayout>
 </ContentPage>

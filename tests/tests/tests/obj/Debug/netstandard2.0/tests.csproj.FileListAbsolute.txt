@@ -10,3 +10,15 @@ C:\Users\alexa\source\repos\tests\tests\tests\obj\Debug\netstandard2.0\tests.Ass
 C:\Users\alexa\source\repos\tests\tests\tests\obj\Debug\netstandard2.0\XamlC.stamp
 C:\Users\alexa\source\repos\tests\tests\tests\obj\Debug\netstandard2.0\tests.dll
 C:\Users\alexa\source\repos\tests\tests\tests\obj\Debug\netstandard2.0\tests.pdb
+C:\Users\alexa\Documents\Fise 2\Ping\AndroidFilaire\tests\tests\tests\bin\Debug\netstandard2.0\tests.deps.json
+C:\Users\alexa\Documents\Fise 2\Ping\AndroidFilaire\tests\tests\tests\bin\Debug\netstandard2.0\tests.dll
+C:\Users\alexa\Documents\Fise 2\Ping\AndroidFilaire\tests\tests\tests\bin\Debug\netstandard2.0\tests.pdb
+C:\Users\alexa\Documents\Fise 2\Ping\AndroidFilaire\tests\tests\tests\obj\Debug\netstandard2.0\tests.csprojAssemblyReference.cache
+C:\Users\alexa\Documents\Fise 2\Ping\AndroidFilaire\tests\tests\tests\obj\Debug\netstandard2.0\App.xaml.g.cs
+C:\Users\alexa\Documents\Fise 2\Ping\AndroidFilaire\tests\tests\tests\obj\Debug\netstandard2.0\MainPage.xaml.g.cs
+C:\Users\alexa\Documents\Fise 2\Ping\AndroidFilaire\tests\tests\tests\obj\Debug\netstandard2.0\tests.csproj.CoreCompileInputs.cache
+C:\Users\alexa\Documents\Fise 2\Ping\AndroidFilaire\tests\tests\tests\obj\Debug\netstandard2.0\tests.AssemblyInfoInputs.cache
+C:\Users\alexa\Documents\Fise 2\Ping\AndroidFilaire\tests\tests\tests\obj\Debug\netstandard2.0\tests.AssemblyInfo.cs
+C:\Users\alexa\Documents\Fise 2\Ping\AndroidFilaire\tests\tests\tests\obj\Debug\netstandard2.0\XamlC.stamp
+C:\Users\alexa\Documents\Fise 2\Ping\AndroidFilaire\tests\tests\tests\obj\Debug\netstandard2.0\tests.dll
+C:\Users\alexa\Documents\Fise 2\Ping\AndroidFilaire\tests\tests\tests\obj\Debug\netstandard2.0\tests.pdb

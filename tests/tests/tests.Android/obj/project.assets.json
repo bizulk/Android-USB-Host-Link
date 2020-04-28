@@ -800,11 +800,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\alexa\\source\\repos\\tests\\tests\\tests.Android\\tests.Android.csproj",
+      "projectUniqueName": "C:\\Users\\alexa\\Documents\\Fise 2\\Ping\\AndroidFilaire\\tests\\tests\\tests.Android\\tests.Android.csproj",
       "projectName": "tests.Android",
-      "projectPath": "C:\\Users\\alexa\\source\\repos\\tests\\tests\\tests.Android\\tests.Android.csproj",
+      "projectPath": "C:\\Users\\alexa\\Documents\\Fise 2\\Ping\\AndroidFilaire\\tests\\tests\\tests.Android\\tests.Android.csproj",
       "packagesPath": "C:\\Users\\alexa\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\alexa\\source\\repos\\tests\\tests\\tests.Android\\obj\\",
+      "outputPath": "C:\\Users\\alexa\\Documents\\Fise 2\\Ping\\AndroidFilaire\\tests\\tests\\tests.Android\\obj\\",
       "projectStyle": "PackageReference",
       "skipContentFileWrite": true,
       "configFilePaths": [
@@ -821,8 +821,8 @@
       "frameworks": {
         "monoandroid81": {
           "projectReferences": {
-            "C:\\Users\\alexa\\source\\repos\\tests\\tests\\tests\\tests.csproj": {
-              "projectPath": "C:\\Users\\alexa\\source\\repos\\tests\\tests\\tests\\tests.csproj"
+            "C:\\Users\\alexa\\Documents\\Fise 2\\Ping\\AndroidFilaire\\tests\\tests\\tests\\tests.csproj": {
+              "projectPath": "C:\\Users\\alexa\\Documents\\Fise 2\\Ping\\AndroidFilaire\\tests\\tests\\tests\\tests.csproj"
             }
           }
         }
