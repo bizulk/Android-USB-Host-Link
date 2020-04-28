@@ -48,7 +48,7 @@ static int proto_readByte(proto_State* state, uint8_t byte) {
 				// si le CRC ne correspond pas, on remplace la trame 
 				// actuelle par une notification de type BAD_CRC
 				uint8_t args[2] = { state->priv_frame.crc, crcCalc };
-				proto_makeFrame(&state->priv_frame, proto_BAD_CRC, args);
+				state->priv_nbBytes = proto_makeFrame(&state->priv_frame, proto_BAD_CRC, args);
 			}
 			return 1; // une trame a été reçue en entier
 		}
@@ -56,7 +56,7 @@ static int proto_readByte(proto_State* state, uint8_t byte) {
 	return 0; // la trame n'a pas été reçue en entier
 }
 
-int proto_readBlob(proto_State* state, uint8_t const* blob, uint8_t size) {
+int proto_interpretBlob(proto_State* state, uint8_t const* blob, uint8_t size) {
 	assert(state != NULL);
 	int nbFrameEnd = 0;
 	for (uint8_t i = 0; i < size; ++i) {
@@ -72,7 +72,7 @@ int proto_readBlob(proto_State* state, uint8_t const* blob, uint8_t size) {
 	return nbFrameEnd;
 }
 
-void proto_makeFrame(proto_Frame* frame, proto_Command command, uint8_t const* args) {
+uint8_t proto_makeFrame(proto_Frame* frame, proto_Command command, uint8_t const* args) {
 	assert(frame != NULL);
 	assert(args != NULL);
 	uint8_t nbArgs = proto_getArgsSize(command);
@@ -82,4 +82,25 @@ void proto_makeFrame(proto_Frame* frame, proto_Command command, uint8_t const* a
 	memcpy(frame->args, args, nbArgs); // on copie les arguments
 	memset(frame->args + nbArgs, 0, proto_MAX_ARGS - nbArgs); // et on met à zéro les autres octets
 	frame->crc = getCRC((uint8_t*)frame + proto_COMMAND_OFFSET, 1 + nbArgs);
+	return proto_ARGS_OFFSET + nbArgs;
 }
+
+int  proto_readBlob(proto_State* state,
+                    proto_IfaceIODevice const* iodevice, void* iodata) {
+	static uint8_t buffer[20];
+	uint8_t nbRead = iodevice->read(iodata, buffer, 20);
+	return proto_interpretBlob(state, buffer, nbRead);
+}
+
+/// Fonction d'aide pour envoyer directement une trame par le device.
+/// @param[in] command La commande de la trame.
+/// @param[in] args Les arguments de la trame, de taille proto_getArgsSize(command)
+/// @param[in] iodevice pointeur vers l'interface du IO Device
+/// @param[inout] iodata pointeur vers les données nécessaires pour le IO Device
+void proto_writeFrame(proto_Command command, uint8_t const* args,
+                      proto_IfaceIODevice const* iodevice, void* iodata) {
+    static proto_Frame frame;
+    uint8_t nbBytes = proto_makeFrame(&frame, command, args);
+    iodevice->write(iodata, (void*)&frame, nbBytes);
+}
+

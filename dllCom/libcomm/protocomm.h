@@ -77,55 +77,55 @@ void proto_setReceiver(proto_State* state, proto_OnReception callback, void* use
 /// @param[in] blob Les octets reçus à interpréter.
 /// @param[in] size Le nombre d'octets reçus
 /// @returns le nombre de trames finies de lire
-int proto_readBlob(proto_State* state, uint8_t const* blob, uint8_t size);
+int proto_interpretBlob(proto_State* state, uint8_t const* blob, uint8_t size);
 
 /// Construit une trame et l'écrit dans le stockage donné en argument.
 /// Les octets d'arguments non utilisés sont mis à zéro.
 /// @param[out] frame  Là où sera écrite la trame
 /// @param[in] command La commande de la trame.
 /// @param[in] args    Les arguments de la trame, de taille proto_getArgsSize(command)
-void proto_makeFrame(proto_Frame* frame, proto_Command command, uint8_t const* args);
+/// @returns le nombre d'octets composant la trame, <= à proto_FRAME_MAXSIZE
+uint8_t proto_makeFrame(proto_Frame* frame, proto_Command command, uint8_t const* args);
 
 
 /// Chaque implémentation d'un IO Device devrait fournir une instance de
 /// cette interface afin que le code utilisateur soit découplé du device.
+/// L'initialisation et la destruction du Device ne sont pas pris en compte
+/// dans l'interface car de toute façon, il faudra forcément modifier l'initialisation
+/// en changeant d'implémentation (changement de header, passer de "/dev/ptmx" à "COM1"...).
 /// Tous les pointeurs de fonction doivent être non-nuls (pour éviter de
 /// devoir tout le temps vérifier si ce n'est pas NULL).
-/// On peut utiliser proto_openNothing, proto_readNothing,
-/// proto_writeNothing et proto_closeNothing si on ne veut pas implémenter
-/// certaines de ces fonctions, sans laisser pour autant les pointeurs nuls.
 typedef struct proto_IfaceIODevice {
-    /// Ouvre un canal de communication.
-    /// @param[in] channel Descripteur de la communication ("COM1", "/dev/ttyS0", "/dev/ptmx", etc)
-    /// @returns pointeur utilisé en interne pour identifier cette communication
-    void* (*open)(char const* channel);
-    /// Lit N caractères (possiblement 0), en attendant un certain temps (possiblement 0).
-    /// 'timeout_ms' est une indication : on peut attendre plus (par exemple,
-    /// l'implémentation GNU/Linux a une précision de 100 ms), et on peut
-    /// attendre moins (par exemple, proto_readNothing retourne immédiatement).
-    /// @param[in] iodata pointeur qui a été retourné par open()
+    /// Lit N caractères (possiblement 0). La fonction peut être bloquante
+    /// temporairement (timeout) pour certains Device (exemple : GNU/Linux).
+    /// @param[in] iodata pointeur vers le type encapsulant le IO Device
     /// @param[out] buffer les octets lus seront écrits ici
-    /// @param[in] timeout_ms combien de millisecondes attendre avant de retourner
+    /// @param[in] bufferSize le nombre d'octets maximal à écrire dans le buffer
     /// @returns le nombre d'octets lus
-    uint8_t (*read)(void* iodata, uint8_t* buffer, uint16_t timeout_ms);
+    uint8_t (*read)(void* iodata, uint8_t* buffer, uint8_t bufferSize);
     
     /// Ecrit N caractères.
-    /// @param[in] iodata pointeur qui a été retourné par open()
+    /// @param[in] iodata pointeur vers le type encapsulant le IO Device
     /// @param[in] buffer octets à envoyer
     /// @param[în] size nombre d'octets à envoyer
     void (*write)(void* iodata, uint8_t const* buffer, uint8_t size);
-    
-    /// Ferme le canal de communication.
-    /// @param[in] iodata pointeur qui a été retourné par open()
-    void (*close)(void* iodata);
 } proto_IfaceIODevice;
 
-inline void* proto_openNothing(char const* channel) { return NULL; }
-inline uint8_t proto_readNothing(void* iodata, uint8_t* buffer, uint16_t timeout_ms) { return 0; }
-inline void proto_writeNothing(void* iodata, uint8_t const* buffer, uint8_t size) {}
-inline void proot_closeNothing(void* iodata) {}
+/// Fonction d'aide qui fait le lien entre le device et l'état.
+/// @param[in] state L'état qui va interpréter les octets lus.
+/// @param[in] iodevice pointeur vers l'interface du IO Device
+/// @param[inout] iodata pointeur vers les données nécessaires pour le IO Device
+/// @returns le nombre de trames finies de lire
+int proto_readBlob(proto_State* state,
+                   proto_IfaceIODevice const* iodevice, void* iodata);
 
-
+/// Fonction d'aide pour envoyer directement une trame par le device.
+/// @param[in] command La commande de la trame.
+/// @param[in] args Les arguments de la trame, de taille proto_getArgsSize(command)
+/// @param[in] iodevice pointeur vers l'interface du IO Device
+/// @param[inout] iodata pointeur vers les données nécessaires pour le IO Device
+void proto_writeFrame(proto_Command command, uint8_t const* args,
+                      proto_IfaceIODevice const* iodevice, void* iodata);
 
 /// Cette définition n'est fournie que dans le but d'allouer proto_State
 /// dans la pile : il ne faut pas accéder aux attributs directement !
