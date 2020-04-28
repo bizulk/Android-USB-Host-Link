@@ -22,7 +22,7 @@ int main() {
 	// Initialisation du device (code à changer en fonction du device)
 	proto_Data_EmulSlave devicedata;
 	proto_initData_EmulSlave(&devicedata);
-	proto_IfaceIODevice const* device = proto_getDevice_EmulSlave();
+	proto_Device device = proto_getDevice_EmulSlave();
 	// Maintenant qu'on a initialisé le device, le code suivant est
 	// indépendant du device sous-jacent
 	

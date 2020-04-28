@@ -2,6 +2,55 @@
 #define CIO_TSE_PROTOCOMM
 /// SLI ajouter une entete de fichier, avec une note d'intégration pour l'utilisation.
 
+#if 0
+// Exemple d'utilisation pour un master
+
+// master_receive sera appelé quand on a reçu une trame
+void master_receive(void* userdata, proto_Command command, uint8_t const* args) {
+    switch (command) {
+    case proto_REPLY:
+        *(uint8_t*)userdata = args[0];
+        break;
+    case proto_NOTIF_BAD_CRC:
+        printf("Mauvais CRC... reçu=%d, calculé=%d\n", args[0], args[1]);
+        break;
+    case proto_ERROR:
+        printf("Erreur reçue : %d\n", args[0]);
+        break;
+    }
+}
+
+int monMain() {
+    // remplacer IMPLEM par l'implémentation choisie (par exemple EmulSlave)
+    proto_Data_IMPLEM devicedata;
+    proto_initData_IMPLEM(&devicedata);
+    proto_Device device = proto_getDevice_IMPLEM();
+    
+    proto_State etat = {0};
+    
+    uint8_t args[proto_MAX_ARGS];
+    uint8_t numeroRegistre = 5; // registre à modifier, ici on a choisi le registre n°5
+    
+    // Faire un SET
+    args[0] = numeroRegistre;
+    args[1] = 234; // pour mettre 234 dans le registre "numeroRegistre"
+    proto_writeFrame(proto_SET, args, device, &devicedata);    
+    
+    // Faire un GET
+    // Quand on reçoit proto_REPLY, on met la valeur récupérée dans registreLu
+    uint8_t valeurRegistre = 0;
+    proto_setReceiver(&state, master_receive, &valeurRegistre);
+    // on fait une requête GET
+    args[0] = numeroRegistre;
+    proto_writeFrame(proto_GET, args, device, &devicedata);
+    while (!proto_readBlob(&etat, device, &devicedata)); // tant qu'on a pas réussi à lire une trame, on réessaye
+    printf("Valeur du registre %d = %d\n", numeroRegistre, valeurRegistre);
+    
+}
+
+// Fin de l'exemple
+#endif
+
 #include <stdint.h>
 #include <stddef.h>
 
@@ -117,6 +166,7 @@ typedef struct proto_IfaceIODevice {
     /// @param[în] size nombre d'octets à envoyer
     void (*write)(void* iodata, uint8_t const* buffer, uint8_t size);
 } proto_IfaceIODevice;
+typedef proto_IfaceIODevice const* proto_Device;
 
 /// Fonction d'aide qui fait le lien entre le device et l'état.
 /// @param[in] state L'état qui va interpréter les octets lus.
@@ -124,7 +174,7 @@ typedef struct proto_IfaceIODevice {
 /// @param[inout] iodata pointeur vers les données nécessaires pour le IO Device
 /// @returns le nombre de trames finies de lire
 int proto_readBlob(proto_State* state,
-                   proto_IfaceIODevice const* iodevice, void* iodata);
+                   proto_Device iodevice, void* iodata);
 
 /// Fonction d'aide pour envoyer directement une trame par le device.
 /// @param[in] command La commande de la trame.
@@ -132,7 +182,7 @@ int proto_readBlob(proto_State* state,
 /// @param[in] iodevice pointeur vers l'interface du IO Device
 /// @param[inout] iodata pointeur vers les données nécessaires pour le IO Device
 void proto_writeFrame(proto_Command command, uint8_t const* args,
-                      proto_IfaceIODevice const* iodevice, void* iodata);
+                      proto_Device iodevice, void* iodata);
 
 /// Cette définition n'est fournie que dans le but d'allouer proto_State
 /// dans la pile : il ne faut pas accéder aux attributs directement !

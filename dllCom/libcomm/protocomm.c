@@ -87,14 +87,14 @@ uint8_t proto_makeFrame(proto_Frame* frame, proto_Command command, uint8_t const
 }
 
 int proto_readBlob(proto_State* state,
-                   proto_IfaceIODevice const* iodevice, void* iodata) {
+                   proto_Device iodevice, void* iodata) {
 	static uint8_t buffer[20];
 	uint8_t nbRead = iodevice->read(iodata, buffer, 20);
 	return proto_interpretBlob(state, buffer, nbRead);
 }
 
 void proto_writeFrame(proto_Command command, uint8_t const* args,
-                      proto_IfaceIODevice const* iodevice, void* iodata) {
+                      proto_Device iodevice, void* iodata) {
     static proto_Frame frame;
     uint8_t nbBytes = proto_makeFrame(&frame, command, args);
     iodevice->write(iodata, (void*)&frame, nbBytes);

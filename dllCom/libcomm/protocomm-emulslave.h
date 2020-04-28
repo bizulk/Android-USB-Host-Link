@@ -18,6 +18,6 @@ void proto_initData_EmulSlave(proto_Data_EmulSlave* iodata);
 
 /// Retourne un pointeur vers le Device. Le iodata à passer
 /// dans les fonctions est un pointeur vers un proto_Data_EmulSlave.
-proto_IfaceIODevice const* proto_getDevice_EmulSlave();
+proto_Device proto_getDevice_EmulSlave();
 
 #endif

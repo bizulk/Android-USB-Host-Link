@@ -74,7 +74,7 @@ void proto_initData_EmulSlave(proto_Data_EmulSlave* iodata) {
 	memset(iodata, 0, sizeof(*iodata));
 }
 
-proto_IfaceIODevice const* proto_getDevice_EmulSlave() {
+proto_Device proto_getDevice_EmulSlave() {
 	static proto_IfaceIODevice emulslave_device = {
 		.write = emulslave_write, .read = emulslave_read
 	};
