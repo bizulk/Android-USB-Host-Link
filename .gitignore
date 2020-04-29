@@ -5,10 +5,10 @@ obj
 *.user
 Debug
 
-tests/tests/tests/bin/Debug/
+IHM/IHM/IHM/bin/Debug/
 
-tests/tests/tests/obj/Debug/
+IHM/IHM/IHM//obj/Debug/
 
-tests/tests/tests.Android/bin/Debug/
+IHM/IHM/IHM/IHM.Android/bin/Debug/
 
-tests/tests/tests.Android/obj/Debug/
+IHM/IHM/IHM/IHM.Android/obj/Debug/
