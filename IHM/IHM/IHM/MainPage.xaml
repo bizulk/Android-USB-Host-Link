@@ -1,0 +1,105 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="IHM.MainPage">
+    <StackLayout Margin="0,0,0,0"
+                 BackgroundColor="MidnightBlue">
+        <Grid Margin="0,0,0,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="0.25*" />
+                <ColumnDefinition Width="0.25*" />
+                <ColumnDefinition Width="0.25*" />
+                <ColumnDefinition Width="0.25*" />
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="38" />
+                <RowDefinition Height="38" />
+                <RowDefinition Height="38" />
+                <RowDefinition Height="38" />
+                <RowDefinition Height="38" />
+                <RowDefinition Height="38" />
+                <RowDefinition Height="38" />
+                <RowDefinition Height="38" />
+            </Grid.RowDefinitions>
+            <Label Text="Titre - Version"
+                   TextColor="White"
+                   HorizontalTextAlignment="Center"
+                   BackgroundColor="Black"
+                   Grid.ColumnSpan="4"
+                   />
+            <Label Grid.Row="2"
+                   Text="Value 1"
+                   HeightRequest="20"
+                   TextColor="White"
+                   BackgroundColor="Black"/>
+            <Label Grid.Column="1"
+                   Grid.Row="2"
+                   Text="Value" 
+                   TextColor="White"
+                   BackgroundColor="Black"/>
+            <Editor Grid.Column="2"
+                    Grid.Row="2"
+                     Grid.ColumnSpan="2"
+                    />
+            <Label Grid.Row="3"
+                   Text="Value 2"
+                   TextColor="White"
+                   BackgroundColor="Black"/>
+            <Label Grid.Column="1"
+                   Grid.Row="3"
+                   Text="Value"
+                   TextColor="White"
+                   BackgroundColor="Black"/>
+            <Editor Grid.Row="3"
+                    Grid.Column="2"
+                    Grid.ColumnSpan="2"/>
+            <Editor Grid.Row="4"
+                    Grid.RowSpan="2"
+                    Grid.ColumnSpan="4"
+                    BackgroundColor="White"
+                    IsEnabled="False"
+                    x:Name="log"
+                    FontSize="8"
+                    TextColor="Black"
+                    />
+            <Button Grid.Row="6"
+                    Grid.Column="0"
+                    Grid.ColumnSpan="2"
+                    Text="Receive"
+                    IsEnabled="False"
+                    x:Name="receiveButton"
+                    BackgroundColor="Gray"
+                    Clicked="OnButtonReceiveClicked"
+                />
+            <Button Grid.Row="6"
+                    Grid.Column="2"
+                    Grid.ColumnSpan="2"
+                    Text="Send"
+                    IsEnabled="False"
+                    x:Name="sendButton"
+                    BackgroundColor="Gray"
+                    Clicked="OnButtonSendClicked"
+                />
+            <Button Grid.Row="7"
+                    Grid.Column="0"
+                    Grid.ColumnSpan="2"
+                    Text="Connect"
+                    IsEnabled="True"
+                    BackgroundColor="Gray"
+                    x:Name="connectButton"
+                    Clicked="OnButtonConnectClicked"
+                />
+            <Button Grid.Row="7"
+                    Grid.Column="2"
+                    Grid.ColumnSpan="2"
+                    Text="Disconnect"
+                    IsEnabled="False"
+                    x:Name="disconnectButton"
+                    BackgroundColor="Gray"
+                    Clicked="OnButtonDisconnectClicked"
+                />
+        </Grid>
+    </StackLayout>
+</ContentPage>
+    
+

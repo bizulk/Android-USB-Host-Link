@@ -1,2 +1,14 @@
 
 .metadata/
+.vs
+obj
+*.user
+Debug
+
+IHM/IHM/IHM/bin/Debug/
+
+IHM/IHM/IHM//obj/Debug/
+
+IHM/IHM/IHM/IHM.Android/bin/Debug/
+
+IHM/IHM/IHM/IHM.Android/obj/Debug/
