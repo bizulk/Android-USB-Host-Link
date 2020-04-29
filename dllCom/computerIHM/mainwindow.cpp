@@ -83,16 +83,16 @@ void MainWindow::callBack(proto_Command command, const uint8_t * args){
         break;
     case proto_STATUS:
         switch (args[0]) {
-        case 0:
+        case proto_NO_ERROR:
             errorLog = "";
             break;
-        case 1:
+        case proto_INVALID_CRC:
             errorLog = "Il y a eu un problème de CRC.";
             break;
-        case 2:
+        case proto_INVALID_REGISTER:
             errorLog = "Ce registre n'existe pas.";
             break;
-        case 3:
+        case proto_INVALID_VALUE:
             errorLog = "Il est impossible de mettre cette valeur dans le registre.";
             break;
         }
