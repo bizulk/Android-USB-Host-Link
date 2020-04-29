@@ -20,7 +20,7 @@ typedef struct proto_Data_EmulSlave {
 /// Pour initaliser les données du device d'émulation de l'esclave
 void proto_initData_EmulSlave(proto_Data_EmulSlave* iodata);
 
-/// Retourne un pointeur vers le Device. Le iodata à passer
+/// Retourne le Device (= pointeur vers l'interface read/write). Le iodata à passer
 /// dans les fonctions est un pointeur vers un proto_Data_EmulSlave.
 proto_Device proto_getDevice_EmulSlave();
 
