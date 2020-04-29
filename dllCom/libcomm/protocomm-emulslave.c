@@ -18,21 +18,22 @@ static void emulslave_callback(void* userdata, proto_Command command, uint8_t co
 	proto_Data_EmulSlave* data = userdata;
 	switch (command) {
 	case proto_SET: // quand le MASTER demande de changer une valeur
-		if (args[0] < 20)
+		if (args[0] < 20) {
 			data->registers[args[0]] = args[1];
-		else
-			pushFrame1arg(data, proto_ERROR, proto_INVALID_REGISTER);
+			pushFrame1arg(data, proto_STATUS, proto_NO_ERROR);
+		} else
+			pushFrame1arg(data, proto_STATUS, proto_INVALID_REGISTER);
 		break;
 		
 	case proto_GET: // quand le MASTER demande d'accéder à une valeur
 		if (args[0] < 20)
 			pushFrame1arg(data, proto_REPLY, data->registers[args[0]]);
 		else
-			pushFrame1arg(data, proto_ERROR, proto_INVALID_REGISTER);
+			pushFrame1arg(data, proto_STATUS, proto_INVALID_REGISTER);
 		break;
 		
 	case proto_NOTIF_BAD_CRC: // quand la bibliothèque a détecté un mauvais CRC
-		pushFrame1arg(data, proto_ERROR, proto_INVALID_CRC);
+		pushFrame1arg(data, proto_STATUS, proto_INVALID_CRC);
 		break;
 		
 	default:

@@ -30,11 +30,11 @@ void slave_receive(void* userdata, proto_Command command, uint8_t const* args_in
 		break;
 	case proto_SET:
 		args_out[0] = proto_INVALID_REGISTER;
-		proto_writeFrame(proto_ERROR, args_out, devInfo->device, devInfo->iodata);
+		proto_writeFrame(proto_STATUS, args_out, devInfo->device, devInfo->iodata);
 		break;
 	case proto_NOTIF_BAD_CRC:
 		args_out[0] = proto_INVALID_CRC;
-		proto_writeFrame(proto_ERROR, args_out, devInfo->device, devInfo->iodata);
+		proto_writeFrame(proto_STATUS, args_out, devInfo->device, devInfo->iodata);
 		break;
 	default:
 		break;
@@ -66,7 +66,7 @@ int slaveThreadFunc(void* data) {
 //============ CODE MASTER ============
 // Le master reçoit une réponse et l'écrit dans *userdata.
 // userdata doit être un pointeur vers un uint8_t.
-uint8_t master_lastError = -1;
+proto_Status master_lastStatus = proto_NO_ERROR;
 void master_receive(void* userdata, proto_Command command, uint8_t const* args) {
 	switch (command) {
 	case proto_REPLY:
@@ -75,8 +75,8 @@ void master_receive(void* userdata, proto_Command command, uint8_t const* args) 
 	case proto_NOTIF_BAD_CRC:
 		printf("Mauvais CRC... reçu=%d, calculé=%d\n", args[0], args[1]);
 		break;
-	case proto_ERROR:
-		master_lastError = args[0];
+	case proto_STATUS:
+		master_lastStatus = args[0];
 		break;
 	}
 }
@@ -140,15 +140,16 @@ int main() {
 	while (!proto_readBlob(&state, deviceMaster, &master));
 	// On a normalement reçu une erreur : l'esclave utilisé dans ce
 	// programme n'accepte pas les commandes SET !
-	assert(master_lastError == proto_INVALID_REGISTER);
+	assert(master_lastStatus == proto_INVALID_REGISTER);
 	
-	master_lastError = -1; // réinitialisation
+	master_lastStatus = proto_NO_ERROR; // réinitialisation
 	
 	args[0] = 28; // on veut lire le "registre" 28
 	proto_writeFrame(proto_GET, args, deviceMaster, &master);
 	while (!proto_readBlob(&state, deviceMaster, &master));
 	// On a normalement reçu 28*3 (cf. implémentation de l'esclave)
 	assert(output == 28*3);
+	assert(master_lastStatus == proto_NO_ERROR); // il n'y a pas eu d'erreur
 	
 	puts("Tout s'est bien passé !");
 	

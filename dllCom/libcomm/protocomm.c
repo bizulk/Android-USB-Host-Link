@@ -13,7 +13,7 @@ uint8_t proto_getArgsSize(proto_Command command) {
         2, // proto_SET     : [REGISTRE] [VALEUR]
         1, // proto_GET     : [REGISTRE]
         1, // proto_REPLY   : [VALEUR]
-        1, // proto_ERROR   : [NUM ERREUR]
+        1, // proto_STATUS  : [proto_Status]
         2  // proto_NOTIF_BAD_CRC : [RECU] [CALCULE]
     };
     uint8_t nbArgs = command < proto_LAST ? lut[command] : 0;

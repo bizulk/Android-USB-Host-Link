@@ -39,21 +39,17 @@ int main() {
 	
 	// L'esclave a bien pris en compte la demande
 	assert(devicedata.registers[5] == 175);
-	{
-		uint8_t buffer[5];
-		uint8_t nbRead = device->read(&devicedata, buffer, 5);
-		assert(nbRead == 0); // l'esclave ne nous a envoyé aucune donnée
-	}
 	
 	devicedata.registers[13] = 218; // on écrit directement sur l'esclave
-	
 	// On fait une demande de lecture
 	args[0] = 13; // registre à lire
 	proto_writeFrame(proto_GET, args, device, &devicedata);
 	
 	int nbFrameCompleted = proto_readBlob(&state, device, &devicedata);
-	assert(nbFrameCompleted == 1); // on a du recevoir une frame
-	assert(masterdata.nbReceived == 1); // le master aussi a vu une trame passer
+	// Cette commande a lu 2 trames ! Une trame de STATUS (retourné
+	// par SET) et une trame REPLY (retourné par GET)
+	assert(nbFrameCompleted == 2); // on a du recevoir une frame
+	assert(masterdata.nbReceived == 2); // le master aussi a vu une trame passer
 	
 	assert(masterdata.lastCommand == proto_REPLY); // on a bien reçu une trame de réponse
 	assert(masterdata.lastArgs[0] == 218); // on a bien reçu la valeur attendue
@@ -69,7 +65,7 @@ int main() {
 	assert(nbFrameCompleted == 1); // on a du recevoir une frame
 	assert(masterdata.nbReceived == 1); // le master aussi a vu une trame passer
 	
-	assert(masterdata.lastCommand == proto_ERROR); // on a reçu une erreur de la part de l'esclave
+	assert(masterdata.lastCommand == proto_STATUS); // on a reçu une erreur de la part de l'esclave
 	assert(masterdata.lastArgs[0] == proto_INVALID_REGISTER);
 	
 	puts("Tous les tests ont réussi !");

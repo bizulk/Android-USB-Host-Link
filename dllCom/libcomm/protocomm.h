@@ -14,8 +14,9 @@
         case proto_NOTIF_BAD_CRC:
             printf("Mauvais CRC... reçu=%d, calculé=%d\n", args[0], args[1]);
             break;
-        case proto_ERROR:
-            printf("Erreur reçue : %d\n", args[0]);
+        case proto_STATUS:
+            if (args[0] != proto_NO_ERROR)
+                printf("Erreur reçue : %d\n", args[0]);
             break;
         }
     }
@@ -92,7 +93,7 @@ typedef enum proto_Command {
         proto_GET,     ///< On veut lire une donnée de la cible     : args = [REGISTRE]
     // Commandes du SLAVE
         proto_REPLY,   ///< La cible répond à la demande de lecture : args = [VALEUR]
-        proto_ERROR,   ///< La cible a décelé une erreur            : args = [NUM ERREUR]
+        proto_STATUS,  ///< La cible répond OK ou une erreur        : args = [proto_Status]
     // Notifications : recevables par le callback mais non transmis physiquement
         proto_NOTIF_BAD_CRC, ///< la trame reçue a un CRC invalide        : args = [CRC_RECU] [CRC_CALCULE]
     // Nombre de commandes possibles
@@ -100,12 +101,12 @@ typedef enum proto_Command {
 } proto_Command;
 
 /// Erreurs possibles pour la cible
-typedef enum proto_Error {
-    proto_UNKNOWN,
+typedef enum proto_Status {
+    proto_NO_ERROR,
     proto_INVALID_CRC,         ///< la cible a eu une erreur de CRC sur la trame qu'elle a reçue
     proto_INVALID_REGISTER,  ///< la cible ne possède pas le registre demandé
     proto_INVALID_VALUE,     ///< la cible ne peut pas mettre cette valeur dans le registre
-} proto_Error;
+} proto_Status;
 
 /// Retourne le nombre d'octets d'arguments lié à cette commande
 uint8_t proto_getArgsSize(proto_Command command);
