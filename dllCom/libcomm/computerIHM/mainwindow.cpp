@@ -13,7 +13,6 @@ MainWindow::MainWindow(QWidget *parent)
     proto_initData_EmulSlave(&devicedata);
     etat = {0};
     valeurRegistre = 0;
-    //proto_setReceiver(&etat, master_receive, &valeurRegistre);
     proto_setReceiver(&etat, [] (void* instance, proto_Command cmd, const uint8_t * args) {
             static_cast<MainWindow*>(instance)->callBack(cmd, args);
         }, this);
@@ -26,9 +25,8 @@ MainWindow::~MainWindow()
 
 void MainWindow::on_GetRegister_clicked()
 {
-    numeroRegistre = ui->RegisterNumber->value();
-
     // on fait une requête GET
+    numeroRegistre = ui->RegisterNumber->value();
     args[0] = numeroRegistre;
     proto_writeFrame(proto_GET, args, device, &devicedata);
 
@@ -43,11 +41,12 @@ void MainWindow::on_GetRegister_clicked()
         if(errorLog == ""){
             ui->Result->addItem(QString("Valeur du registre ").append(QString::number(numeroRegistre)).append(" = ").append(QString::number(valeurRegistre)));
         }else{
-             ui->Result->addItem(QString("Erreur reçue : ").append(errorLog));
+            QListWidgetItem* item = new QListWidgetItem(QString("Erreur reçue : ").append(errorLog));
+            item->setForeground(Qt::red);
+            ui->Result->addItem(item);
         }
     else
         ui->Result->addItem("Nous n'avons pas reçu de trame complète en 500 millisecondes ...");
-
 }
 
 void MainWindow::on_SetRegister_clicked()
@@ -65,9 +64,12 @@ void MainWindow::on_SetRegister_clicked()
         std::this_thread::yield(); // on dit à l'OS qu'on peut attendre un peu
     }
     if(errorLog == "")
-        ui->Result->addItem(QString("La valeur a été attribuée."));
-    else
-        ui->Result->addItem(QString("Erreur reçue : ").append(errorLog));
+        ui->Result->addItem(QString("La valeur ").append(QString::number(args[1])).append(" a été attribuée au registre ").append(QString::number(args[0])));
+    else{
+        QListWidgetItem* item = new QListWidgetItem(QString("Erreur reçue : ").append(errorLog));
+        item->setForeground(Qt::red);
+        ui->Result->addItem(item);
+    }
 }
 
 void MainWindow::callBack(proto_Command command, const uint8_t * args){
