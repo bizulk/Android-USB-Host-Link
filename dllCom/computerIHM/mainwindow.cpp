@@ -1,8 +1,6 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
-#include <iostream>
 #include <thread>
-
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -11,7 +9,7 @@ MainWindow::MainWindow(QWidget *parent)
     ui->setupUi(this);
 
     proto_initData_EmulSlave(&devicedata);
-    etat = {0};
+    memset(&etat, 0, sizeof(etat));
     valeurRegistre = 0;
     proto_setReceiver(&etat, [] (void* instance, proto_Command cmd, const uint8_t * args) {
             static_cast<MainWindow*>(instance)->callBack(cmd, args);
