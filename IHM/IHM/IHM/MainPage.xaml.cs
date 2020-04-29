@@ -9,6 +9,8 @@ namespace IHM
     public partial class MainPage : ContentPage
     {
         bool isConnected = false;
+        bool isSending = false;
+        bool isReceiving = false;
         public MainPage()
         {
             InitializeComponent();
@@ -16,36 +18,64 @@ namespace IHM
 
         void OnButtonSendClicked(object sender, EventArgs e)
         {
-            //To Indent 
+            //To do : call method to send
+            if (isSending == true)
+            {
+                log.Text += "\n"+ DateTime.Now.ToString(" HH:mm") + " Sending";
+            }
+
+            if (isSending == false)
+            {
+                log.Text += "\n" + DateTime.Now.ToString(" HH:mm") + " Not Sending";
+            }
 
         }
         void OnButtonReceiveClicked(object sender, EventArgs e)
         {
-            //To Indent
+            //To do : call method to receive
+            if (isReceiving == true)
+            {
+                log.Text += "\n" + DateTime.Now.ToString(" HH:mm") + " Receiving";
+            }
+
+            if (isReceiving == false)
+            {
+                log.Text += "\n" + DateTime.Now.ToString(" HH:mm") + " Not Receiving";
+            }
         }
         void OnButtonConnectClicked(object sender, EventArgs e)
         {
-            //To Indent (method to connect)
+            //To do : call method to connect
 
-            if (isConnected == true)
+            if (isConnected == false) // On a inversé les true et false pour les tests
             {
+                log.Text += "\n" + DateTime.Now.ToString(" HH:mm") + " Connected";
                 connectButton.IsEnabled = false;
                 receiveButton.IsEnabled = true;
                 sendButton.IsEnabled = true;
                 disconnectButton.IsEnabled = true;
             }
-        }
-        void OnButtonDisconnectClicked(object sender, EventArgs e)
-        {
-            //To Indent (method to disconnect)
-
-            if (isConnected == false)
+            if (isConnected == true)
             {
-                connectButton.IsEnabled = true;
-                receiveButton.IsEnabled = false;
-                sendButton.IsEnabled = false;
-                disconnectButton.IsEnabled = false;
+                log.Text += "\n" + DateTime.Now.ToString(" HH:mm") + " Fail to connect";
             }
         }
+        void OnButtonDisconnectClicked(object sender, EventArgs e)
+            {
+                //To do : call method to disconnect
+
+                if (isConnected == false)
+                {
+                    log.Text += "\n" + DateTime.Now.ToString(" HH:mm") + " Disconnected";
+                    connectButton.IsEnabled = true;
+                    receiveButton.IsEnabled = false;
+                    sendButton.IsEnabled = false;
+                    disconnectButton.IsEnabled = false;
+                }
+                if (isConnected == true)
+                {
+                    log.Text += "\n" + DateTime.Now.ToString(" HH:mm") + " Fail to disconnect";
+                }
+            }
     }
 }

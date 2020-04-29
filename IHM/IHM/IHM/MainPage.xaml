@@ -53,9 +53,15 @@
             <Editor Grid.Row="3"
                     Grid.Column="2"
                     Grid.ColumnSpan="2"/>
-            <ContentView Grid.Row="5"
-                         Grid.ColumnSpan="4"
-                         BackgroundColor="White"/>
+            <Editor Grid.Row="4"
+                    Grid.RowSpan="2"
+                    Grid.ColumnSpan="4"
+                    BackgroundColor="White"
+                    IsEnabled="False"
+                    x:Name="log"
+                    FontSize="8"
+                    TextColor="Black"
+                    />
             <Button Grid.Row="6"
                     Grid.Column="0"
                     Grid.ColumnSpan="2"
@@ -63,6 +69,7 @@
                     IsEnabled="False"
                     x:Name="receiveButton"
                     BackgroundColor="Gray"
+                    Clicked="OnButtonReceiveClicked"
                 />
             <Button Grid.Row="6"
                     Grid.Column="2"
@@ -71,6 +78,7 @@
                     IsEnabled="False"
                     x:Name="sendButton"
                     BackgroundColor="Gray"
+                    Clicked="OnButtonSendClicked"
                 />
             <Button Grid.Row="7"
                     Grid.Column="0"
@@ -88,8 +96,10 @@
                     IsEnabled="False"
                     x:Name="disconnectButton"
                     BackgroundColor="Gray"
+                    Clicked="OnButtonDisconnectClicked"
                 />
         </Grid>
     </StackLayout>
 </ContentPage>
+    
 
