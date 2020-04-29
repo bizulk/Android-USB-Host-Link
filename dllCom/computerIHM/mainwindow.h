@@ -4,6 +4,7 @@
 #include <QMainWindow>
 #include <../libcomm/protocomm-emulslave.h>
 #include <../libcomm/protocomm.h>
+#include <stdio.h>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
