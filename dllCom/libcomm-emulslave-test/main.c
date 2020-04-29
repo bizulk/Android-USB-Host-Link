@@ -54,6 +54,7 @@ int main() {
 	assert(masterdata.lastCommand == proto_REPLY); // on a bien reçu une trame de réponse
 	assert(masterdata.lastArgs[0] == 218); // on a bien reçu la valeur attendue
 	
+	
 	// on réinitialise masterdata
 	masterdata.nbReceived = 0;
 	
@@ -67,6 +68,18 @@ int main() {
 	
 	assert(masterdata.lastCommand == proto_STATUS); // on a reçu une erreur de la part de l'esclave
 	assert(masterdata.lastArgs[0] == proto_INVALID_REGISTER);
+	
+	
+	proto_Frame frame = { 0 };
+	frame.header = proto_HEADER;
+	frame.crc = 0; // le CRC est pertinemment faux !
+	frame.command = proto_STATUS;
+	frame.args[0] = proto_NO_ERROR;
+	
+	proto_interpretBlob(&state, (void*)&frame, 4);
+	// Une erreur de CRC est normalement arrivée !
+	assert(masterdata.lastCommand == proto_NOTIF_BAD_CRC);
+	
 	
 	puts("Tous les tests ont réussi !");
 	
