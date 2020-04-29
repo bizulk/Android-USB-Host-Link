@@ -13,24 +13,24 @@ QT_END_NAMESPACE
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
-
+    // Mettre un minimum de commentaire svp !
     proto_Data_EmulSlave devicedata;
     proto_Device device = proto_getDevice_EmulSlave();
 
-    proto_State etat;
-
-    uint8_t args[proto_MAX_ARGS];
-    uint8_t numeroRegistre;
-    uint8_t valeurRegistre;
-
-    QString errorLog;
+    proto_State _etat;
+    // y'a vraiment besoin que ce soit un membre ?
+    uint8_t _args[proto_MAX_ARGS];
+    uint8_t _numeroRegistre;
+    uint8_t _valeurRegistre;
+    // Pas bien d'accord avec cette façon d'écrire le log, voir les commentaires dans l'implémentation;
+    QString _errorLog;
 
 public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
     // callBack sera appelé quand on a reçu une trame
-    void callBack(proto_Command, uint8_t const*);
+    void onProtoFrameRcvd(proto_Command, uint8_t const*);
 
 private:
     Ui::MainWindow *ui;
