@@ -2,8 +2,8 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
-#include <../protocomm-emulslave.h>
-#include <../protocomm.h>
+#include <../libcomm/protocomm-emulslave.h>
+#include <../libcomm/protocomm.h>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
