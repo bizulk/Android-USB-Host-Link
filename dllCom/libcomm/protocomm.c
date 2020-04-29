@@ -2,10 +2,18 @@
 #include <string.h>
 #include <assert.h>
 
-
 static uint8_t getCRC(uint8_t const* data, uint8_t size) {
-	//TODO: À implémenter
-	return 0;
+    // plus d'info : https://en.wikipedia.org/wiki/Cyclic_redundancy_check#Computation
+    // implémentation de base : https://stackoverflow.com/a/51777726
+    unsigned crc = 0; // l'accumulateur pour les divisions
+    while (size--) {
+        crc ^= *data++; // on prend un nouvel octet de la séquence
+        for (unsigned k = 0; k < 8; k++) // pour chacun des 8 bits, dans l'ordre:
+            crc = crc & 0x80 ? // si le bit "actuel" est 1
+                    (crc << 1) ^ 0x31 : // on applique la division polynomiale
+                    crc << 1; // sinon on passe au bit suivant
+    }
+    return crc & 0xff; // on ne garde que les 8 bits de poids faibles
 }
 
 uint8_t proto_getArgsSize(proto_Command command) {
