@@ -1,5 +1,9 @@
 {
   "version": 1,
+<<<<<<< HEAD
   "dgSpecHash": "Aq7ETLFljdzDE2PBjyIdKyH2xAmb7mws8WPEEK8amK50hZpNOCgtm32h0cb5uvAyQ4lYqb5HesVHeBCH5gw2FQ==",
+=======
+  "dgSpecHash": "p6MnboGbmB+GyAWiPfOZ0wFH8dRlPk4GjUSFB4mHCVhjSrm5ZsDu/MQD7R7OqViWr/eHzMsGK50lScpw4BxE0g==",
+>>>>>>> sli_revue
   "success": true
 }

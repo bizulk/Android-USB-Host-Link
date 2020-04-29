@@ -1,5 +1,9 @@
 
 .metadata/
+.vs
+obj
+*.user
+Debug
 
 tests/tests/tests/bin/Debug/
 
