@@ -59,6 +59,7 @@ void proto_finalizeData_GnuLinux(proto_Data_GnuLinux* iodata) {
 
 static void gnulinux_write(void* iodata, uint8_t const* buffer, uint8_t size) {
 	proto_Data_GnuLinux* data = iodata;
+	// SLI : attention write retourne le nombre d'octets effectivement écrit qui peut être < size. Faut faire une boucle.
 	write(data->fileDescriptor, buffer, size);
 }
 

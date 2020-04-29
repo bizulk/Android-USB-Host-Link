@@ -1,7 +1,11 @@
 #ifndef CIO_TSE_PROTOCOMM
 #define CIO_TSE_PROTOCOMM
 /// SLI ajouter une entete de fichier, avec une note d'intégration pour l'utilisation.
+/// Je propose de spliter ce fichier en deux : ce qui est utilisé uniquement pour le master, et ce qui est a utiliser pour l'implémentation d'un slave.
+/// C'est une API pour l'intégration soit dans le master soit dans le slave, les "sous-fonctions" doivent être placées dans le C pour restreinte la visiblité et rendre le code plus clair.
 
+
+/// SLI un ifdef sera plus indiqué, mais que fait ce code ici ?
 #if 0
     // Exemple d'utilisation pour un master
 
@@ -64,18 +68,22 @@ extern "C" {
 /// Le nombre d'octets pour l'argument dépend de la commande.
 /// Le CRC est calculé sur [COMMAND] [ARGS]
 /// Tous les octets avant le Header sont ignorés.
-
+/// SLI : j'insiste : pourquoi un enum ??!!
 enum {
     proto_MAX_ARGS = 2 ///< Maximum d'arguments, toute commande confondue
 };
 
+/* SLI le header c'est la structure qui est commune à la trame de requete et de réponse.
+	Mais dans notre cas pas besoin la construction trame est identique, faut adapter la taille réellement envoyée ou laisser du padding... ExPLCITER **ICI** SVP
+*/
 typedef struct proto_Frame {
-    uint8_t header;
-    uint8_t crc;
-    uint8_t command;
+    uint8_t header; // OK C'est plutôt un Start Of Frame : 
+    uint8_t crc; // renommer crc8 
+    uint8_t command; // est-ce que ce sont les valeurs proto_Command
     uint8_t args[proto_MAX_ARGS];
-} proto_Frame;
+} proto_Frame; /// SLI : juste est que pour les types on peut ajouter _t : proto_Frame_t
 
+// Si la frame est bien définie je ne vois pas trop l'intérêt de cet énum.
 enum { 
     proto_HEADER = 0x12,      ///< La valeur du Header
     proto_COMMAND_OFFSET =    ///< La position de l'octet de commande
@@ -86,6 +94,7 @@ enum {
         sizeof(proto_Frame),
 };
 
+/// Je comprends pas quels sont les échanges en cas d'erreur : il faut redemander, ou est que lorsque l'on a cmd=status il faut lire statut dans args.
 /// Les différentes possibilités pour [COMMAND]
 typedef enum proto_Command {
     // Commandes du MASTER
@@ -132,6 +141,7 @@ typedef void(*proto_OnReception)(void* userdata, proto_Command command, uint8_t 
 /// @param[in] userdata Sera passé tel quel à onReception
 void proto_setReceiver(proto_State* state, proto_OnReception callback, void* userdata);
 
+/// SLI c'est une sous fonction de readblob non ? Elle devrait être privée
 /// Interprète des octets reçus. Appelle le callback spécifié avec
 /// proto_setReceiver chaque fois qu'une trame est finie de lire.
 /// @param[inout] state L'état qui va interpréter les octets.
@@ -140,6 +150,7 @@ void proto_setReceiver(proto_State* state, proto_OnReception callback, void* use
 /// @returns le nombre de trames finies de lire
 int proto_interpretBlob(proto_State* state, uint8_t const* blob, uint8_t size);
 
+/// SLI pour l'instant rendre cette fonction privée : ie static dans le fichier C du slave.
 /// Construit une trame et l'écrit dans le stockage donné en argument.
 /// Les octets d'arguments non utilisés sont mis à zéro.
 /// @param[out] frame  Là où sera écrite la trame
@@ -148,7 +159,7 @@ int proto_interpretBlob(proto_State* state, uint8_t const* blob, uint8_t size);
 /// @returns le nombre d'octets composant la trame, <= à proto_FRAME_MAXSIZE
 uint8_t proto_makeFrame(proto_Frame* frame, proto_Command command, uint8_t const* args);
 
-
+/// SLI : Y'a pas d'open ni de close ??!! bon faut voir pour la suite....
 /// Chaque implémentation d'un IO Device devrait fournir une instance de
 /// cette interface afin que le code utilisateur soit découplé du device.
 /// L'initialisation et la destruction du Device ne sont pas pris en compte
@@ -181,6 +192,7 @@ typedef proto_IfaceIODevice const* proto_Device;
 int proto_readBlob(proto_State* state,
                    proto_Device iodevice, void* iodata);
 
+/// Cela m'éthode de voir le device en IO... cela pourrait faire parti de proto_State et posé une fois à l'init (&iodevice)
 /// Fonction d'aide pour envoyer directement une trame par le device.
 /// @param[in] command La commande de la trame.
 /// @param[in] args Les arguments de la trame, de taille proto_getArgsSize(command)

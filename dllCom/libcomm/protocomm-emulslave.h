@@ -1,6 +1,9 @@
 #ifndef CIO_TSE_PROTOCOMM_EMULSLAVE
 #define CIO_TSE_PROTOCOMM_EMULSLAVE
-
+/// SLI : il faudrait expliquer dans quelle genre d'émulation on est ?
+/// Si je comprends bien ça permet de tester le slave dans un contexte monothread, avec simplement la mise à disposition de la réponse.
+/// J'aurai bien aimé avoir une fonction qui permette de poper les trames de ce simulateur,
+/// et aussi une fonction d'interrogation des registres (c'est bête mais ça aide à comprendre ce qui est fait.
 #include "protocomm.h"
 
 #ifdef __cplusplus
@@ -22,7 +25,7 @@ void proto_initData_EmulSlave(proto_Data_EmulSlave* iodata);
 
 /// Retourne le Device (= pointeur vers l'interface read/write). Le iodata à passer
 /// dans les fonctions est un pointeur vers un proto_Data_EmulSlave.
-proto_Device proto_getDevice_EmulSlave();
+proto_Device proto_getDevice_EmulSlave(void);
 
 #ifdef __cplusplus
 } // extern "C"

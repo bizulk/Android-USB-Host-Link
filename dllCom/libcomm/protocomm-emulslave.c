@@ -10,6 +10,8 @@ static void pushFrame(proto_Data_EmulSlave* data, proto_Command command, uint8_t
 	}
 }
 
+/// SLI data -> appelle ca plutôt this plutôt
+/// Cette fonction sert à stacker les réponses qui devront être dépilés comment.
 static void pushFrame1arg(proto_Data_EmulSlave* data, proto_Command command, uint8_t arg1) {
 	pushFrame(data, command, &arg1);
 }
@@ -75,7 +77,8 @@ void proto_initData_EmulSlave(proto_Data_EmulSlave* iodata) {
 	memset(iodata, 0, sizeof(*iodata));
 }
 
-proto_Device proto_getDevice_EmulSlave() {
+proto_Device proto_getDevice_EmulSlave(void) {
+	/*  un global en amont faisait l'affaire, la tu as une visibilité local de ton device*/
 	static proto_IfaceIODevice emulslave_device = {
 		.write = emulslave_write, .read = emulslave_read
 	};
