@@ -2,18 +2,17 @@
 #include "ui_mainwindow.h"
 #include <thread>
 
+constexpr auto REQUEST_TOUT_MS = 500;
+
+
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
 
+    device = proto_getDevice_EmulSlave();
     proto_initData_EmulSlave(&devicedata);
-    memset(&etat, 0, sizeof(etat));
-    valeurRegistre = 0;
-    proto_setReceiver(&etat, [] (void* instance, proto_Command cmd, const uint8_t * args) {
-            static_cast<MainWindow*>(instance)->callBack(cmd, args);
-        }, this);
 }
 
 MainWindow::~MainWindow()
@@ -24,76 +23,51 @@ MainWindow::~MainWindow()
 void MainWindow::on_GetRegister_clicked()
 {
     // on fait une requête GET
-    numeroRegistre = ui->RegisterNumber->value();
-    args[0] = numeroRegistre;
-    proto_writeFrame(proto_GET, args, device, &devicedata);
-
-    int nbRead = 0;
-    auto start = std::chrono::steady_clock::now();
-    while (std::chrono::steady_clock::now() - start < std::chrono::milliseconds{500}) {
-        nbRead = proto_readBlob(&etat, device, &devicedata);
-        if (nbRead > 0) break;
-        std::this_thread::yield(); // on dit à l'OS qu'on peut attendre un peu
-    }
-    if (nbRead > 0)
-        if(errorLog == ""){
-            ui->Result->addItem(QString("Valeur du registre ").append(QString::number(numeroRegistre)).append(" = ").append(QString::number(valeurRegistre)));
-        }else{
-            QListWidgetItem* item = new QListWidgetItem(QString("Erreur reçue : ").append(errorLog));
-            item->setForeground(Qt::red);
-            ui->Result->addItem(item);
-        }
-    else
-        ui->Result->addItem("Nous n'avons pas reçu de trame complète en 500 millisecondes ...");
+    _numeroRegistre = ui->RegisterNumber->value();
+    proto_Status_t status = proto_cio_master_get(_numeroRegistre, &_valeurRegistre, REQUEST_TOUT_MS, device, &devicedata);
+    analyseStatus(proto_GET, status);
 }
 
 void MainWindow::on_SetRegister_clicked()
 {
-    numeroRegistre = ui->RegisterNumber->value();
-    args[0] = numeroRegistre;
-    args[1] = ui->ValueToSet->value();
-    proto_writeFrame(proto_SET, args, device, &devicedata);
-
-    int nbRead = 0;
-    auto start = std::chrono::steady_clock::now();
-    while (std::chrono::steady_clock::now() - start < std::chrono::milliseconds{500}) {
-        nbRead = proto_readBlob(&etat, device, &devicedata);
-        if (nbRead > 0) break;
-        std::this_thread::yield(); // on dit à l'OS qu'on peut attendre un peu
-    }
-    if(errorLog == "")
-        ui->Result->addItem(QString("La valeur ").append(QString::number(args[1])).append(" a été attribuée au registre ").append(QString::number(args[0])));
-    else{
-        QListWidgetItem* item = new QListWidgetItem(QString("Erreur reçue : ").append(errorLog));
-        item->setForeground(Qt::red);
-        ui->Result->addItem(item);
-    }
+    _numeroRegistre = ui->RegisterNumber->value();
+    _valeurRegistre = ui->ValueToSet->value();
+    proto_Status_t status = proto_cio_master_set(_numeroRegistre, _valeurRegistre, REQUEST_TOUT_MS, device, &devicedata);
+    analyseStatus(proto_SET, status);
 }
 
-void MainWindow::callBack(proto_Command command, const uint8_t * args){
-    switch (command) {
-    case proto_REPLY:
-        valeurRegistre = args[0];
-        errorLog = "";
-        break;
-    case proto_NOTIF_BAD_CRC:
-        ui->Result->addItem(QString("Mauvais CRC... reçu=").append(QString::number(args[0])).append(", calculé=").append(QString::number(args[1])));
-        break;
-    case proto_STATUS:
-        switch (args[0]) {
-        case proto_NO_ERROR:
-            errorLog = "";
+void MainWindow::analyseStatus(proto_Command_t command, proto_Status_t status){
+    QListWidgetItem* item = new QListWidgetItem();
+    switch (status) {
+    case proto_NO_ERROR:
+        switch (command) {
+        case proto_GET:
+            item->setText("Valeur du registre " + QString::number(_numeroRegistre) + " = " + QString::number(_valeurRegistre));
             break;
-        case proto_INVALID_CRC:
-            errorLog = "Il y a eu un problème de CRC.";
-            break;
-        case proto_INVALID_REGISTER:
-            errorLog = "Ce registre n'existe pas.";
-            break;
-        case proto_INVALID_VALUE:
-            errorLog = "Il est impossible de mettre cette valeur dans le registre.";
+        case proto_SET:
+            item->setText("La valeur " + QString::number(_valeurRegistre) + " a été attribuée au registre " + QString::number(_numeroRegistre));
             break;
         }
         break;
+    case proto_INVALID_CRC:
+        // SLI est-ce que l'on est pas en train d'afficher ça deux fois ?
+        item->setText("Erreur: Il y a eu un problème de CRC.");
+        item->setForeground(Qt::red);
+        break;
+    case proto_INVALID_REGISTER:
+        item->setText("Erreur: Ce registre n'existe pas.");
+        item->setForeground(Qt::red);
+        break;
+    case proto_INVALID_VALUE:
+        item->setText("Erreur: Il est impossible de mettre cette valeur dans le registre.");
+        item->setForeground(Qt::red);
+        break;
+    case proto_TIMEOUT:
+        item->setText("Erreur: Il s'est écoulé " + QString::number(REQUEST_TOUT_MS) + "ms sans recevoir de trame complète");
+        item->setForeground(Qt::red);
+        break;
+
     }
+    ui->Result->addItem(item);
+    ui->Result->setCurrentRow(ui->Result->count() - 1);
 }

@@ -16,12 +16,14 @@ DEFINES += QT_DEPRECATED_WARNINGS
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
+    ../libcomm/protocomm-details.c \
     ../libcomm/protocomm-emulslave.c \
     ../libcomm/protocomm.c \
     main.cpp \
     mainwindow.cpp
 
 HEADERS += \
+    ../libcomm/protocomm-details.h \
     ../libcomm/protocomm-emulslave.h \
     ../libcomm/protocomm.h \
     mainwindow.h

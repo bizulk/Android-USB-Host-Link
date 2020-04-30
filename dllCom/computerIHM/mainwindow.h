@@ -4,6 +4,7 @@
 #include <QMainWindow>
 #include <../libcomm/protocomm-emulslave.h>
 #include <../libcomm/protocomm.h>
+#include <../libcomm/protocomm-details.h>
 #include <stdio.h>
 
 QT_BEGIN_NAMESPACE
@@ -14,23 +15,19 @@ class MainWindow : public QMainWindow
 {
     Q_OBJECT
 
-    proto_Data_EmulSlave devicedata;
-    proto_Device device = proto_getDevice_EmulSlave();
+    // Variables qui permettent d'émuler l'esclave
+    proto_Data_EmulSlave_t devicedata;
+    proto_Device_t device;
 
-    proto_State etat;
-
-    uint8_t args[proto_MAX_ARGS];
-    uint8_t numeroRegistre;
-    uint8_t valeurRegistre;
-
-    QString errorLog;
+    uint8_t _numeroRegistre = 0;
+    uint8_t _valeurRegistre = 0;
 
 public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
-    // callBack sera appelé quand on a reçu une trame
-    void callBack(proto_Command, uint8_t const*);
+    // Fonction permettant d'analyser le statut et de remplir le log en fonction
+    void analyseStatus(proto_Command_t, proto_Status_t);
 
 private:
     Ui::MainWindow *ui;
