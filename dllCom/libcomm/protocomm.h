@@ -1,10 +1,10 @@
 #ifndef CIO_TSE_PROTOCOMM
 #define CIO_TSE_PROTOCOMM
-/// SLI ajouter une entete de fichier, avec une note d'intégration pour l'utilisation.
-/// Je propose de spliter ce fichier en deux : ce qui est utilisé uniquement pour le master, et ce qui est a utiliser pour l'implémentation d'un slave.
-/// C'est une API pour l'intégration soit dans le master soit dans le slave, les "sous-fonctions" doivent être placées dans le C pour restreinte la visiblité et rendre le code plus clair.
 
-
+/// Ce header définit les méthodes d'un Device, ainsi que l'API
+/// haut-niveau côté master pour communiquer en utilisant ce protocole.
+/// Pour faire des manipulations plus bas-niveau (nécessaires pour implémenter
+/// un esclave par exemple), inclure protocomm-details.h
 #include <stdint.h>
 #include <stddef.h>
 

@@ -2,40 +2,39 @@
 #include <string.h>
 #include <assert.h>
 
-static void pushFrame(proto_Data_EmulSlave_t* data, proto_Command_t command, uint8_t const* args) {
-	if (data->priv_nbDelayedBytes + proto_FRAME_MAXSIZE < sizeof(data->priv_delayedBytes)) {
-		data->priv_nbDelayedBytes += proto_makeFrame(
-		    (void*)(data->priv_delayedBytes + data->priv_nbDelayedBytes),
+static void pushFrame(proto_Data_EmulSlave_t* this, proto_Command_t command, uint8_t const* args) {
+	if (this->priv_nbDelayedBytes + proto_FRAME_MAXSIZE < sizeof(this->priv_delayedBytes)) {
+		this->priv_nbDelayedBytes += proto_makeFrame(
+		    (void*)(this->priv_delayedBytes + this->priv_nbDelayedBytes),
 		    command, args);
 	}
 }
 
-/// SLI data -> appelle ca plutôt this plutôt
 /// Cette fonction sert à stacker les réponses qui devront être dépilés comment.
-static void pushFrame1arg(proto_Data_EmulSlave_t* data, proto_Command_t command, uint8_t arg1) {
-	pushFrame(data, command, &arg1);
+static void pushFrame1arg(proto_Data_EmulSlave_t* this, proto_Command_t command, uint8_t arg1) {
+	pushFrame(this, command, &arg1);
 }
 
 static void emulslave_callback(void* userdata, proto_Command_t command, uint8_t const* args) {
-	proto_Data_EmulSlave_t* data = userdata;
+	proto_Data_EmulSlave_t* this = userdata;
 	switch (command) {
 	case proto_SET: // quand le MASTER demande de changer une valeur
 		if (args[0] < 20) {
-			data->registers[args[0]] = args[1];
-			pushFrame1arg(data, proto_STATUS, proto_NO_ERROR);
+			this->registers[args[0]] = args[1];
+			pushFrame1arg(this, proto_STATUS, proto_NO_ERROR);
 		} else
-			pushFrame1arg(data, proto_STATUS, proto_INVALID_REGISTER);
+			pushFrame1arg(this, proto_STATUS, proto_INVALID_REGISTER);
 		break;
 		
 	case proto_GET: // quand le MASTER demande d'accéder à une valeur
 		if (args[0] < 20)
-			pushFrame1arg(data, proto_REPLY, data->registers[args[0]]);
+			pushFrame1arg(this, proto_REPLY, this->registers[args[0]]);
 		else
-			pushFrame1arg(data, proto_STATUS, proto_INVALID_REGISTER);
+			pushFrame1arg(this, proto_STATUS, proto_INVALID_REGISTER);
 		break;
 		
 	case proto_NOTIF_BAD_CRC: // quand la bibliothèque a détecté un mauvais CRC
-		pushFrame1arg(data, proto_STATUS, proto_INVALID_CRC);
+		pushFrame1arg(this, proto_STATUS, proto_INVALID_CRC);
 		break;
 		
 	default:

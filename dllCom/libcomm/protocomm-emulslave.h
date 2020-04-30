@@ -1,9 +1,21 @@
 #ifndef CIO_TSE_PROTOCOMM_EMULSLAVE
 #define CIO_TSE_PROTOCOMM_EMULSLAVE
-/// SLI : il faudrait expliquer dans quelle genre d'émulation on est ?
-/// Si je comprends bien ça permet de tester le slave dans un contexte monothread, avec simplement la mise à disposition de la réponse.
-/// J'aurai bien aimé avoir une fonction qui permette de poper les trames de ce simulateur,
-/// et aussi une fonction d'interrogation des registres (c'est bête mais ça aide à comprendre ce qui est fait.
+
+/// L'émulation est basée sur du mono-threadé : quand on appelle write() du device,
+/// immédiatement cela appelle interpretBlob() sur une machine d'état interne
+/// à "l'émulateur" (cf. proto_Data_EmulSlave_t ). Les octets des trames renvoyées sont
+/// stockées dans une queue interne (priv_delayedBytes). Appeler read() du device
+/// fait "popper" les octets de cette queue. (PS : la queue est First In, First Out).
+/// On peut accéder directement aux registres internes de l'émulateur avec
+///     proto_Data_EmulSlave_t devicedata;
+///     proto_initData_EmulSlave(&devicedata);
+///     ...
+///     printf("%d\n", (int)devicedata.registers[3]); // affiche la valeur dans le registre 3
+/// Ici, l'émulateur est volontairement limité à 20 registres (de 0 à 19), ainsi
+/// l'émulateur émet des INVALID_REGISTER si on tente d'accéder au-delà.
+/// Cela permet de tester la détection et réception d'erreur même dans un
+/// contexte "parfait" (pas de bruit dans les câbles, pas de délai...).
+
 #include "protocomm.h"
 #include "protocomm-details.h" // besoin d'inclure les détails pour définir proto_Data_EmulSlave::priv_state
 
