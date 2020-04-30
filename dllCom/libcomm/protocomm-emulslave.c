@@ -2,7 +2,7 @@
 #include <string.h>
 #include <assert.h>
 
-static void pushFrame(proto_Data_EmulSlave* data, proto_Command command, uint8_t const* args) {
+static void pushFrame(proto_Data_EmulSlave_t* data, proto_Command_t command, uint8_t const* args) {
 	if (data->priv_nbDelayedBytes + proto_FRAME_MAXSIZE < sizeof(data->priv_delayedBytes)) {
 		data->priv_nbDelayedBytes += proto_makeFrame(
 		    (void*)(data->priv_delayedBytes + data->priv_nbDelayedBytes),
@@ -10,12 +10,14 @@ static void pushFrame(proto_Data_EmulSlave* data, proto_Command command, uint8_t
 	}
 }
 
-static void pushFrame1arg(proto_Data_EmulSlave* data, proto_Command command, uint8_t arg1) {
+/// SLI data -> appelle ca plutôt this plutôt
+/// Cette fonction sert à stacker les réponses qui devront être dépilés comment.
+static void pushFrame1arg(proto_Data_EmulSlave_t* data, proto_Command_t command, uint8_t arg1) {
 	pushFrame(data, command, &arg1);
 }
 
-static void emulslave_callback(void* userdata, proto_Command command, uint8_t const* args) {
-	proto_Data_EmulSlave* data = userdata;
+static void emulslave_callback(void* userdata, proto_Command_t command, uint8_t const* args) {
+	proto_Data_EmulSlave_t* data = userdata;
 	switch (command) {
 	case proto_SET: // quand le MASTER demande de changer une valeur
 		if (args[0] < 20) {
@@ -42,12 +44,10 @@ static void emulslave_callback(void* userdata, proto_Command command, uint8_t co
 	}
 }
 
-
-
 static void emulslave_write(void* iodata, uint8_t const* buffer, uint8_t size) {
 	assert(iodata != NULL);
 	assert(buffer != NULL);
-	proto_Data_EmulSlave* data = iodata;
+	proto_Data_EmulSlave_t* data = iodata;
 	proto_setReceiver(&data->priv_state, emulslave_callback, data); 
 	proto_interpretBlob(&data->priv_state, buffer, size);
 }
@@ -55,7 +55,7 @@ static void emulslave_write(void* iodata, uint8_t const* buffer, uint8_t size) {
 static uint8_t emulslave_read(void* iodata, uint8_t* buffer, uint8_t bufferSize) {
 	assert(iodata != NULL);
 	assert(buffer != NULL);
-	proto_Data_EmulSlave* data = iodata;
+	proto_Data_EmulSlave_t* data = iodata;
 	
 	uint8_t nbDelayedBytes = data->priv_nbDelayedBytes;
 	
@@ -70,14 +70,17 @@ static uint8_t emulslave_read(void* iodata, uint8_t* buffer, uint8_t bufferSize)
 	return nbRead;
 }
 
-void proto_initData_EmulSlave(proto_Data_EmulSlave* iodata) {
+static void emulslave_destroy(void* iodata) { /* ne fait rien */ }
+
+void proto_initData_EmulSlave(proto_Data_EmulSlave_t* iodata) {
 	assert(iodata != NULL);
 	memset(iodata, 0, sizeof(*iodata));
 }
 
-proto_Device proto_getDevice_EmulSlave() {
-	static proto_IfaceIODevice emulslave_device = {
-		.write = emulslave_write, .read = emulslave_read
-	};
-	return &emulslave_device;
+static proto_IfaceIODevice_t emulslaveDevice = {
+	.write = emulslave_write, .read = emulslave_read, .destroy = emulslave_destroy
+};
+
+proto_Device_t proto_getDevice_EmulSlave(void) {
+	return &emulslaveDevice;
 }

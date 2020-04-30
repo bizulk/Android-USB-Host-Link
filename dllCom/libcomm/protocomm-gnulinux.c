@@ -1,4 +1,5 @@
 #include "protocomm-gnulinux.h"
+#include "protocomm-details.h"
 
 // pour avoir accès aux fonctions exclusives à GNU/Linux
 #define _GNU_SOURCE
@@ -9,7 +10,7 @@
 #include <string.h>
 
 
-int proto_initData_GnuLinux(proto_Data_GnuLinux* iodata, char const* path, uint8_t timeout_ds) {
+int proto_initData_GnuLinux(proto_Data_GnuLinux_t* iodata, char const* path, uint8_t timeout_ds) {
 	assert(iodata != NULL);
 	
 	// Ouverture du terminal
@@ -52,24 +53,26 @@ int proto_initData_GnuLinux(proto_Data_GnuLinux* iodata, char const* path, uint8
     return 0;
 }
 
-void proto_finalizeData_GnuLinux(proto_Data_GnuLinux* iodata) {
-	assert(iodata != NULL);
-	close(iodata->fileDescriptor);
-}
-
 static void gnulinux_write(void* iodata, uint8_t const* buffer, uint8_t size) {
-	proto_Data_GnuLinux* data = iodata;
+	proto_Data_GnuLinux_t* data = iodata;
+	// SLI : attention write retourne le nombre d'octets effectivement écrit qui peut être < size. Faut faire une boucle.
 	write(data->fileDescriptor, buffer, size);
 }
 
 static uint8_t gnulinux_read(void* iodata, uint8_t* buffer, uint8_t bufferSize) {
-	proto_Data_GnuLinux* data = iodata;
+	proto_Data_GnuLinux_t* data = iodata;
 	return read(data->fileDescriptor, buffer, bufferSize);
 }
 
-proto_Device proto_getDevice_GnuLinux() {
-	static proto_IfaceIODevice gnulinux_device = {
-		.write = gnulinux_write, .read = gnulinux_read
-	};
-	return &gnulinux_device;
+static void gnulinux_destroy(void* iodata) {
+	proto_Data_GnuLinux_t* data = iodata;
+	close(data->fileDescriptor);
+}
+
+static proto_IfaceIODevice_t gnulinuxDevice = {
+	.write = gnulinux_write, .read = gnulinux_read, .destroy = gnulinux_destroy
+};
+
+proto_Device_t proto_getDevice_GnuLinux() {
+	return &gnulinuxDevice;
 }
