@@ -8,96 +8,102 @@
 #include <string.h>
 #include <stdio.h>
 
-typedef struct master_Data {
+// API bas-niveau pour tester les comportements bas-niveau (ici, le CRC)
+
+typedef struct master_Data_t {
 	uint8_t lastCommand;
 	uint8_t lastArgs[proto_MAX_ARGS];
 	uint8_t nbReceived;
-} master_Data;
+} master_Data_t;
 
-void master_callback(void* userdata, proto_Command command, uint8_t const* args) {
-	master_Data* data = userdata;
+void master_callback(void* userdata, proto_Command_t command, uint8_t const* args) {
+	master_Data_t* data = userdata;
 	++data->nbReceived;
 	data->lastCommand = command;
 	memcpy(data->lastArgs, args, proto_getArgsSize(command));
 }
+proto_State_t state = { 0 };
 
-int main() {
-	
-	// Initialisation du device (code à changer en fonction du device)
-	proto_Data_EmulSlave devicedata;
-	proto_initData_EmulSlave(&devicedata);
-	proto_Device device = proto_getDevice_EmulSlave();
-	// Maintenant qu'on a initialisé le device, le code suivant est
-	// indépendant du device sous-jacent
-	
-	// Initialisation du maître
-	master_Data masterdata = {0};
-	uint8_t args[proto_MAX_ARGS] = {0};
-	proto_State state = {0};
-	proto_setReceiver(&state, master_callback, &masterdata);
-	
+// définition des tests
+
+proto_Data_EmulSlave_t devicedata;
+proto_Device_t device;
+master_Data_t masterdata = { 0 };
+uint8_t args[proto_MAX_ARGS] = { 0 };
+
+
+void test_set_NO_ERROR() {
+	devicedata.registers[5] = 0; // Au début, on a le registre 5 avec la valeur 0
 	// On fait une demande d'écriture
-	args[0] = 5; // registre à écrire
-	args[1] = 175; // nombre à écrire
-	proto_writeFrame(proto_SET, args, device, &devicedata);
-	
-	/* SLI
-		Comment l'esclave a-t-il pu prendre en compte la demande sans que proto_readBlob soit exécuté ?
-	*/
-	// L'esclave a bien pris en compte la demande
-	assert(devicedata.registers[5] == 175);
-	
-	/* SLI deuxième test ICI ok
-	*/
-	devicedata.registers[13] = 218; // on écrit directement sur l'esclave
-	// On fait une demande de lecture
-	args[0] = 13; // registre à lire
-	proto_writeFrame(proto_GET, args, device, &devicedata);
-	/* SLI oui mais la ondevrait tester la valeur recu non ?? il manque un assert pour moi et aussi le readblob */
+	proto_Status_t status = proto_cio_master_set(5, 167, /*timeout_ms=*/0, device, &devicedata);
+	// PS : pas besoin de timeout car c'est instantané avec l'émulation
+	assert(status == proto_NO_ERROR);
+	assert(devicedata.registers[5] == 167);
+}
 
-	/* !! Je ne comprends pas ce test là ??
-	*/
-	int nbFrameCompleted = proto_readBlob(&state, device, &devicedata);
-	// Cette commande a lu 2 trames ! Une trame de STATUS (retourné
-	// par SET) et une trame REPLY (retourné par GET)
-	assert(nbFrameCompleted == 2); // on a du recevoir une frame
-	assert(masterdata.nbReceived == 2); // le master aussi a vu une trame passer
-	
-	assert(masterdata.lastCommand == proto_REPLY); // on a bien reçu une trame de réponse
-	assert(masterdata.lastArgs[0] == 218); // on a bien reçu la valeur attendue
-	
-	
-	// on réinitialise masterdata
-	masterdata.nbReceived = 0;
-	
-	// On fait une demande de lecture
-	args[0] = 25; // erreur ! l'esclave (tel qu'implémenté par l'émulation) n'a que 20 registres
-	proto_writeFrame(proto_GET, args, device, &devicedata);
-	
-	nbFrameCompleted = proto_readBlob(&state, device, &devicedata);
-	assert(nbFrameCompleted == 1); // on a du recevoir une frame
-	assert(masterdata.nbReceived == 1); // le master aussi a vu une trame passer
-	
-	assert(masterdata.lastCommand == proto_STATUS); // on a reçu une erreur de la part de l'esclave
-	assert(masterdata.lastArgs[0] == proto_INVALID_REGISTER);
-	
-	/* Que teste-t-on ici ??*/
-	proto_Frame frame = { 0 };
-	frame.header = proto_HEADER;
-	frame.crc = 0; // le CRC est pertinemment faux !
+void test_set_INVALID_REGISTER() {
+	// L'émulation ne dispose que de 20 registres
+	// Ecrire dans un registre au-delà est une erreur !
+	proto_Status_t status = proto_cio_master_set(25, 0, 0, device, &devicedata);
+	assert(status == proto_INVALID_REGISTER);
+}
+
+void test_get_NO_ERROR() {
+	uint8_t valeur = 0;
+	devicedata.registers[18] = 234;
+	proto_Status_t status = proto_cio_master_get(18, &valeur, 0, device, &devicedata);
+	assert(status == proto_NO_ERROR);
+	assert(valeur == 234); 
+}
+
+void test_get_INVALID_REGISTER() {
+	// L'émulation ne dispose que de 20 registres
+	// Lire un registre au-delà est une erreur !
+	uint8_t valeur = 23;
+	proto_Status_t status = proto_cio_master_get(45, &valeur, 0, device, &devicedata);
+	assert(status == proto_INVALID_REGISTER);
+	assert(valeur == 23); // en cas d'erreur, la sortie n'est pas modifiée
+}
+
+void test_crc() {
+	// On crée une frame nous-même, avec un CRC pertinemment faux
+	proto_Frame_t frame = { 0 };
+	frame.startOfFrame = proto_START_OF_FRAME;
+	frame.crc8 = 0; // le CRC est pertinemment faux !
 	frame.command = proto_STATUS;
 	frame.args[0] = proto_NO_ERROR;
 	
+	// On essaye de lire la frame
 	proto_interpretBlob(&state, (void*)&frame, 4);
 	// Une erreur de CRC est normalement arrivée !
 	assert(masterdata.lastCommand == proto_NOTIF_BAD_CRC);
+}
+
+
+int main() {
 	
+	// Initialisation du device d'émulation
+	proto_initData_EmulSlave(&devicedata);
+	device = proto_getDevice_EmulSlave();
+	
+	// Initialisation du maître
+	proto_setReceiver(&state, master_callback, &masterdata);
+	
+	
+	test_set_NO_ERROR();
+	
+	test_set_INVALID_REGISTER();
+	
+	test_get_NO_ERROR();
+	
+	test_get_INVALID_REGISTER();
+	
+	test_crc();
 	
 	puts("Tous les tests ont réussi !");
 	
-	// En fonction du device, il faudra peut-être le détruire.
-	// Ici, le device est complètement alloué sur la pile, il sera donc
-	// détruit à la fin de la fonction. Donc on ne fait rien.
+	
+	proto_closeDevice(device, &devicedata);
 	
 	return 0;
 }
