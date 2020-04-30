@@ -4,6 +4,7 @@
 #include <QMainWindow>
 #include <../libcomm/protocomm-emulslave.h>
 #include <../libcomm/protocomm.h>
+#include <../libcomm/protocomm-details.h>
 #include <stdio.h>
 
 QT_BEGIN_NAMESPACE
@@ -13,24 +14,20 @@ QT_END_NAMESPACE
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
-    // Mettre un minimum de commentaire svp !
-    proto_Data_EmulSlave devicedata;
-    proto_Device device = proto_getDevice_EmulSlave();
 
-    proto_State _etat;
-    // y'a vraiment besoin que ce soit un membre ?
-    uint8_t _args[proto_MAX_ARGS];
-    uint8_t _numeroRegistre;
-    uint8_t _valeurRegistre;
-    // Pas bien d'accord avec cette façon d'écrire le log, voir les commentaires dans l'implémentation;
-    QString _errorLog;
+    // Variables qui permettent d'émuler l'esclave
+    proto_Data_EmulSlave_t devicedata;
+    proto_Device_t device;
+
+    uint8_t _numeroRegistre = 0;
+    uint8_t _valeurRegistre = 0;
 
 public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
-    // callBack sera appelé quand on a reçu une trame
-    void onProtoFrameRcvd(proto_Command, uint8_t const*);
+    // Fonction permettant d'analyser le statut et de remplir le log en fonction
+    void analyseStatus(proto_Command_t, proto_Status_t);
 
 private:
     Ui::MainWindow *ui;
