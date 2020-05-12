@@ -129,7 +129,6 @@ proto_Status_t proto_master_set(proto_hdle_t * this, uint8_t register_, uint8_t 
 
     proto_frame_arg_t arg = { .reg = register_, .value = value};
     proto_Status_t ret = 0;
-    proto_Command_t cmd = 0;
 
     if( proto_writeFrame(this, proto_CMD_SET, (void*)&arg) != 0)
     {
