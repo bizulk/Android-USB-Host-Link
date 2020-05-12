@@ -8,23 +8,14 @@
  * TYPES & CONSTANT & VARIABLE
 ******************************************************************************/
 
-/// Statut en résultat de proto_interpretByte
-typedef enum proto_ResultStatus_t {
-    proto_WAITING,   /// La trame n'est pas finie
-    proto_COMPLETED, /// On a lu une trame correctement
-    proto_REFUSED    /// On a lu une trame mais il y a eu une erreur (exemple : CRC)
-} proto_ResultStatus_t;
-
 /******************************************************************************
  * LOCAL PROTOTYPES
 ******************************************************************************/
 
 static uint8_t getCRC(uint8_t const* data, uint8_t size);
-static uint8_t getFrameCRC(proto_Frame_t* pframe);
+static uint8_t getFrameCRC(const proto_Frame_t *pframe);
 
-/// Cette fonction est responsable de créer la trame de notification
-/// d'erreur car c'est elle qui a le plus d'informations sur le CRC.
-static proto_ResultStatus_t proto_decodeFrame(proto_hdle_t* this, proto_Command_t * cmd, proto_frame_arg_t *arg);
+
 
 /******************************************************************************
  * FUNCTIONS
@@ -53,6 +44,18 @@ void proto_destroy(proto_hdle_t * this)
     free(this);
 }
 
+int proto_open(proto_hdle_t * this, const char * szPath)
+{
+    assert( this && this->priv_iodevice);
+    return this->priv_iodevice->open(this->priv_iodevice, szPath);
+}
+
+int proto_close(proto_hdle_t * this)
+{
+    assert( this && this->priv_iodevice);
+    return this->priv_iodevice->close(this->priv_iodevice);
+}
+
 void proto_setReceiver(proto_hdle_t* this, proto_OnReception_t callback, void* userdata) {
     assert(this != NULL);
     this->priv_callback = callback;
@@ -78,18 +81,39 @@ uint8_t proto_makeFrame(proto_Frame_t* frame, proto_Command_t command, uint8_t c
     return proto_ARGS_OFFSET + argSize;
 }
 
-int proto_readFrame(proto_hdle_t* this) {
-    /* On se contente de lire une trame ou ce qu'il reste à en lire, pour éviter des tout
-     * Par contre on ne peut utiliser la trame privée : la réception peut être externalisé
+proto_Status_t proto_readFrame(proto_hdle_t* this, int16_t tout_ms) {
+    /* on ne peut utiliser la trame privée de this : la réception peut être externalisé
     */
     uint8_t buf[sizeof(proto_Frame_t)] = {0};
-    uint8_t len = (sizeof(this->priv_frame)) - this->priv_nbBytes;
-    uint8_t nbRead = this->priv_iodevice->read(this->priv_iodevice, buf, len);
-    if( proto_pushToFrame(this, (uint8_t*)&this->priv_frame, nbRead) < nbRead
+    uint8_t len =0;
+    int nbRead = 0;
+    int ret = 0;
+
+    len = (sizeof(this->priv_frame)) - this->priv_nbBytes;
+    nbRead = this->priv_iodevice->read(this->priv_iodevice, buf, len, tout_ms);
+    if (nbRead > 0)
+    {
+        if( proto_pushToFrame(this, buf, nbRead) >= 0 )
+        {
+            ret = proto_NO_ERROR;
+        }
+        else // On n'a pas réussi à tout lire dans le délai
+        {
+            ret = proto_TIMEOUT;
+        }
+    }
+    else if( nbRead < 0)
+    {
+        ret = proto_ERR_SYS;
+    }
+    else if( nbRead == 0)
+    {
+        ret = proto_TIMEOUT;
+    }
+
+    return ret;
 }
 
-// Découpage du buffer d'entrée en trame
-// Retourne : nombre d'octet lus :
 int proto_pushToFrame(proto_hdle_t* this, const uint8_t * buf, uint32_t len) {
     assert(this != NULL && buf != NULL && len>0);
     uint32_t cursor = 0;
@@ -105,7 +129,7 @@ int proto_pushToFrame(proto_hdle_t* this, const uint8_t * buf, uint32_t len) {
                 break;
         }
         if(cursor == len)
-            return len;
+            return -1;
     }
 
     // Copie des octets (au passage le SOF)
@@ -115,75 +139,48 @@ int proto_pushToFrame(proto_hdle_t* this, const uint8_t * buf, uint32_t len) {
     }
     if( cursor == len )
        return len;
+    // Calcul de la taille complete de la trame
     framelen = proto_ARGS_OFFSET + proto_getArgsSize(this->priv_frame.command);
     while( (this->priv_nbBytes < framelen) && (cursor<len) )
     {
         pcFrame[this->priv_nbBytes++] = buf[cursor++];
     }
-#if 0
-    if (status == proto_COMPLETED) {
-        this->priv_callback(
-            this->priv_userdata,
-            this->priv_frame.command,
-            (uint8_t*)&this->priv_frame.arg);
-        ++nbFrameEnd;
-    }
-#endif
-    // Si trame terminée : on retourne ce qui a été consommée, sinon ce qui nous reste (en valeur négative)
-    return (this->priv_nbBytes == framelen) ? cursor : (this->priv_nbBytes-framelen);
+
+    // Si trame terminée : on retourne ce qui a été consommée, sinon -1
+    return (this->priv_nbBytes == framelen) ? cursor : -1;
 }
 
 // Valisation du CRC, de la partie donnée
-proto_ResultStatus_t proto_decodeFrame(proto_hdle_t* this, proto_Command_t * cmd, proto_frame_arg_t *arg)
+proto_DecodeStatus_t proto_decodeFrame(proto_hdle_t* this, proto_Command_t * cmd, proto_frame_arg_t *arg)
 {
-    assert( cmd && arg);
-    // TODO remplacer par un flag interne
+    uint8_t crc8 = 0;
+    assert( this && cmd && arg);
     if (this->priv_nbBytes < proto_ARGS_OFFSET)
     {
         return proto_WAITING;
     }
-    else if (this->priv_nbBytes < proto_ARGS_OFFSET + proto_getArgsSize(this->priv_frame.command) )
+    else if (this->priv_nbBytes < (proto_ARGS_OFFSET + proto_getArgsSize(this->priv_frame.command)) )
     {
         return proto_WAITING;
     }
-    else if(getFrameCRC(&this->priv_frame) != this->priv_frame.crc8)
+    else
     {
-        return proto_REFUSED;
+        crc8 = getFrameCRC(&this->priv_frame);
+        if( crc8 != this->priv_frame.crc8 )
+        {
+            *cmd = proto_CMD_ERR_CRC;
+            arg->reg = this->priv_frame.crc8;
+            arg->value = crc8;
+            return proto_REFUSED;
+        }
     }
 
     *cmd = this->priv_frame.command;
     *arg = this->priv_frame.arg;
 
-    // réinitialisation du curseur compteur
+    // réinitialisation du curseur compteur pour permettre la réception de la prochaine trame
     this->priv_nbBytes = 0;
-
     return proto_COMPLETED;
-
-    // La trame n'est pas encore complète, on a juste accès à l'octet
-    // de commande, donc on peut connaître le nombre d'arguments attendus.
-    if (this->priv_nbBytes >= proto_ARGS_OFFSET) {
-        // si on a reçu l'octet de commande
-        uint8_t nbArgs = proto_getArgsSize(this->priv_frame.command);
-        if (this->priv_nbBytes == proto_ARGS_OFFSET + nbArgs) {
-
-            // si on a reçu tous les octets d'arguments, on passe les
-            // test de validation
-
-            // on calcule le CRC sans compter le CRC reçu ni le Header
-            uint8_t crcCalc = getFrameCRC(&this->priv_frame);
-            if (crcCalc != this->priv_frame.crc8) {
-#if 0
-                // si le CRC ne correspond pas, on remplace la trame
-                // actuelle par une notification de type BAD_CRC
-                uint8_t args[2] = { this->priv_frame.crc8, crcCalc };
-                this->priv_nbBytes = proto_makeFrame(&this->priv_frame, proto_NOTIF_BAD_CRC, args);
-#endif
-                return proto_REFUSED;
-            }
-            // une trame a été reçue en entier
-        }
-    }
-    return proto_WAITING; // la trame n'a pas été reçue en entier
 }
 
 static uint8_t getCRC(uint8_t const* data, uint8_t size) {
@@ -200,10 +197,9 @@ static uint8_t getCRC(uint8_t const* data, uint8_t size) {
     return crc & 0xff; // on ne garde que les 8 bits de poids faibles
 }
 
-static uint8_t getFrameCRC(proto_Frame_t* pFrame) {
-    uint8_t* data = (uint8_t*)pFrame;
-    return getCRC(data + proto_COMMAND_OFFSET,
-                  1 + proto_getArgsSize(data[proto_COMMAND_OFFSET]));
+static uint8_t getFrameCRC(const proto_Frame_t* pFrame) {
+    return getCRC(&pFrame->command,
+                  sizeof(pFrame->command) + proto_getArgsSize(pFrame->command));
 }
 
 uint8_t proto_getArgsSize(proto_Command_t cmd) {

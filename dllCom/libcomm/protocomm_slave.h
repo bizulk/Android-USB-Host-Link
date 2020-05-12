@@ -15,9 +15,33 @@ extern "C" {
 #include "protocomm_ll.h"
 #include "libcomm_global.h"
 
+///
+/// \brief proto_slave_create Creation d'une instance d'esclave
+/// \param iodevice
+/// \param callback
+/// \param userdata
+///
+///
+proto_hdle_t * LIBCOMM_EXPORT proto_slave_create(proto_Device_t iodevice, proto_OnReception_t callback, void* userdata);
 
-void LIBCOMM_EXPORT proto_slave_init();
-void LIBCOMM_EXPORT proto_slave_main(void);
+///
+/// \brief proto_open Appel l'ouverture du device
+/// \return 0 OK, sinon erreur
+///
+int LIBCOMM_EXPORT proto_slave_open(proto_hdle_t * this, const char * szPath);
+
+///
+/// \brief proto_close Appelle la fermeture du device (open possible après)
+/// \return 0 OK
+///
+int LIBCOMM_EXPORT proto_slave_close(proto_hdle_t * this);
+
+///
+/// \brief proto_slave_main Iteration de traitement d'un esclave.
+/// \return résultat du traitement : 0 pas de requete traitée, 1 une requete traitée, -1 erreur IO
+/// Fonction à appeler dans une boucle pour un traitement continu.
+///
+int LIBCOMM_EXPORT proto_slave_main(proto_hdle_t * this);
 
 #ifdef __cplusplus
 } // extern "C"

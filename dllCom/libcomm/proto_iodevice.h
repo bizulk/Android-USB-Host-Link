@@ -30,13 +30,13 @@ typedef struct proto_IfaceIODevice {
     /// cela fera un close() sur le fileDescriptor).
     void (*destroy)(struct proto_IfaceIODevice* this);
 
-    /// Lit N caractères (possiblement 0). La fonction peut être bloquante
+    /// Lit N caractères. La fonction peut être bloquante
     /// temporairement (timeout) pour certains Device (exemple : GNU/Linux).
-    /// @param[in] iodata pointeur vers le type encapsulant le IO Device
-    /// @param[out] buffer les octets lus seront écrits ici
-    /// @param[in] bufferSize le nombre d'octets maximal à écrire dans le buffer
-    /// @returns le nombre d'octets réellement lus
-    uint8_t (*read)(struct proto_IfaceIODevice* this, void* buffer, uint8_t bufferSize);
+    /// @param[in] this Instance de l'iodevice
+    /// @param[out] buf les octets lus seront écrits ici
+    /// @param[in] len taille à lire
+    /// @returns >=0 ci qui a put être lu dans le délai imparti, <0 erreur
+    int (*read)(struct proto_IfaceIODevice* this, void* buf, uint8_t len, int16_t tout_ms);
 
     /// Ecrit N caractères.
     /// @param[in] this pointeur vers l'instance IO Device

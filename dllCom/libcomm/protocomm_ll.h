@@ -24,10 +24,11 @@ extern "C" {
 /// Erreurs possibles dans les traitements
 typedef enum proto_Status {
     proto_NO_ERROR,
-    proto_INVALID_CRC,       ///< la trame reçue n'a pas un CRC cohérent
-    proto_INVALID_REGISTER,  ///< la cible ne possède pas le registre demandé
-    proto_INVALID_VALUE,     ///< la cible ne peut pas mettre cette valeur dans le registre
+    proto_ERR_SYS,           ///!< Erreur systeme
+    proto_ERR_CRC,       ///< la trame reçue n'a pas un CRC cohérent
+    proto_INVALID_ARG,  ///< la cible ne possède pas le registre demandé
     proto_TIMEOUT,           ///< on a pas reçu de trame complète pendant le temps indiqué
+    proto_ERR_PROTO ///< Erreur de protocole (réponse inattendue)
 } proto_Status_t;
 
 #define proto_MAX_ARGS 2
@@ -54,13 +55,12 @@ typedef struct proto_frame_arg
 /// ayant reçu une NOTIF_BAD_CRC renverra une trame [ STATUS, INVALID_CRC ].
 typedef enum proto_Command_t {
     // Commandes du MASTER
-        proto_SET,     ///< On veut envoyer une donnée à la cible   : args = [REGISTRE] [VALEUR]
-        proto_GET,     ///< On veut lire une donnée de la cible     : args = [REGISTRE] (VALEUR)
+        proto_CMD_SET,     ///< On veut envoyer une donnée à la cible   : args = [REGISTRE] [VALEUR]
+        proto_CMD_GET,     ///< On veut lire une donnée de la cible     : args = [REGISTRE] (PADDING)
     // Réponse du SLAVE
-        proto_REPLY,   ///< La cible répond à la demande de lecture : args = [VALEUR]
-        proto_STATUS,  ///< La cible répond OK ou une erreur        : args = [proto_Status_t]
-    // Notifications : recevables par le callback mais non transmis physiquement
-        proto_NOTIF_BAD_CRC, ///< la trame reçue a un CRC invalide  : args = [CRC_RECU] [CRC_CALCULE]
+        proto_CMD_REPLY,   ///< La cible répond à la demande de lecture : args = [VALEUR]
+        proto_CMD_ERR_CRC,  ///< la trame reçue a un CRC invalide        : args = [CRC_RECU] [CRC_CALCULE]:
+        proto_CMD_ERR_ARG, ///< le traitement utilisateur a refusé le traitement : args = [REGISTRE] (VALEUR) (qui ont été envoyé)
     // Nombre de commandes possibles
         proto_LAST,    ///< le nombre de commandes disponibles
 } proto_Command_t;
@@ -90,12 +90,12 @@ enum {
         sizeof(proto_Frame_t),
 };
 
-/// Esclave Callback appelé quand une trame est complètement reçue
+/// Esclave : Callback appelée quand une trame est complètement reçue
 /// @param[inout] userdata L'utilisateur de la bibliothèque choisit ce qu'il y met et comment l'interpréter
 /// @param[in] command La commande demandée
-/// @param[in] args Les arguments liés à la commande demandée (de taille proto_getArgsSize(command) )
+/// @param[inout] args Les arguments liés à la commande demandée (de taille proto_getArgsSize(command) ),
 /// @return résultat du traitement : 0 commande traitée, sinon erreur dans les arguments
-typedef int (*proto_OnReception_t)(void* userdata, proto_Command_t command, uint8_t const* args);
+typedef int (*proto_OnReception_t)(void* userdata, proto_Command_t command, uint8_t * args);
 
 /// Instance de protocole Master/Slave
 /// Cette définition n'est fournie que dans le but d'allouer proto_State
@@ -109,6 +109,12 @@ typedef struct proto_hdle {
     proto_Device_t priv_iodevice; ///< Device à utiliser
 } proto_hdle_t;
 
+/// Statut en résultat du décodage de trame
+typedef enum proto_DecodeStatus {
+    proto_WAITING,   /// La trame n'est pas finie
+    proto_COMPLETED, /// On a lu une trame correctement
+    proto_REFUSED    /// On a lu une trame mais il y a eu une erreur (exemple : CRC)
+} proto_DecodeStatus_t;
 
 /******************************************************************************
  * PROTO COMMUN SLAVE/MASTER
@@ -116,8 +122,8 @@ typedef struct proto_hdle {
 
 ///
 /// \brief proto_create Créer une instance de protocole
-/// \param iodevice device à utiliser (peut être NULL)
-/// \return
+/// \param iodevice device à utiliser (peut être NULL si on ne souhaite pas utiliser l'API)
+/// \return Instance de protocole, NULL si n'a pu être alloué
 ///
 proto_hdle_t * proto_create(proto_Device_t iodevice);
 
@@ -136,14 +142,31 @@ void proto_init(proto_hdle_t * this, proto_Device_t iodevice);
 ///
 void proto_destroy(proto_hdle_t * this);
 
+///
+/// \brief proto_open Appel l'ouverture du device
+/// \return 0 OK, sinon erreur
+///
+int proto_open(proto_hdle_t * this, const char * szPath);
+
+///
+/// \brief proto_close Appelle la fermeture du device (open possible après)
+/// \return 0 OK
+///
+int proto_close(proto_hdle_t * this);
+
+#define PROTO_WAIT_FOREVER -1
+
 /// Fonction de réception d'une trame (maitre ou esclave)
+/// **Utilise le device** pour une lecture,
+/// La fonction tente de lire une trame dans le délai imparti.
+/// Le délai est appliqué par le device utilisé.
 ///
-/// \arg **Utilise le device** pour une lecture,
-/// \arg quand une trame est reçue la callback est appelée.
-/// Cette fonction est a appeler en boucle pour finaliser la lecture
+/// Note : pour dépiler la trame reçue il faut appeler proto_decodeFrame (tout appel répété annulera la lecture)
 ///
-/// @returns le nombre de trames finies de lire (peut être 0)
-int proto_readFrame(proto_hdle_t* this);
+/// \arg this instance
+/// \arg tout en milliseconde, si <0 attente infinie, si 0 non bloquant, sinon on attend le délai
+/// @returns OK pour une trame reçue, TIMEOUT sinon, ERR_SYS si problème sur le read
+proto_Status_t proto_readFrame(proto_hdle_t* this, int16_t tout_ms);
 
 /// Ecriture d'une trame
 ///
@@ -168,22 +191,27 @@ uint8_t proto_getArgsSize(proto_Command_t cmd);
 void proto_setReceiver(proto_hdle_t* this, proto_OnReception_t callback, void* userdata);
 
 
-/// Empilement et analyse des octets recu
+/// Empilement et analyse des octets recus
 /// \note La fonction est publique pour permettre une simplification à l'intégration : bypasser l'utilisation d'un device,
 /// Exemple : sur la carte cible on pourra appeler directement cette fonction dans la callback USB de réception de caractères.
+/// note : pour dépiler la trame reçue il faut appeler proto_decodeFrame
 /// @param[inout] Instance du protocole.
-/// @param[in] buf données d'entrées
+/// @param[in] buf données d'entrées (peut être > trame)
 /// @param[in] len Le nombre d'octets d'entrée.
-/// @returns le nombre d'octets lus [0-len[ : trame pleine, len : trame pleine ou tout est consommé (il faut appeler une fois de plus)
+/// @returns le nombre d'octets consommés [0-len] => trame pleine, -1 : pas de trame validé
 int proto_pushToFrame(proto_hdle_t* this, const uint8_t * buf, uint32_t len);
 
-// \arg
-// \arg len : tout est consommé (lire un coup supplémentaire pour confirmer trame pleine)
+///
+/// \brief proto_decodeFrame Décodage de la trame reçue et dépilement
+/// \param this Instance de protocole
+/// \param[out] cmd commande
+/// \param[out] arg données associées
+/// \return résultat de l'analyse : WAITING (en attente de trame), COMPLETED (une trame décodée), REFUSED : trame invalide
+///
+proto_DecodeStatus_t proto_decodeFrame(proto_hdle_t* this, proto_Command_t * cmd, proto_frame_arg_t *arg);
 
 /// Construit une trame d'échange
-///
-/// \note La fonction est publique pour permettre une simplification à l'intégration : le protocole ne sert qu'a fabriquer la trame
-/// On n'utilise pas IO device
+/// Fonction publique : si l'on utilise le protocole sans IOdevice, sinon utiliser proto_writeFrame
 /// Les octets d'arguments non utilisés sont mis à zéro.
 /// @param[out] frame  Là où sera écrite la trame
 /// @param[in] command La commande de la trame.

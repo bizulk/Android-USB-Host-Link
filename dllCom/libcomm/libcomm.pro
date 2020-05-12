@@ -18,15 +18,16 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 SOURCES += \
     devices/device_serial.c \
-    protocomm.c \
-    protocomm_ll.c
+    protocomm_ll.c \
+    protocomm_master.c \
+    protocomm_slave.c
 
 HEADERS += \
     devices/device_serial.h \
     libcomm_global.h \
     proto_iodevice.h \
-    protocomm.h \
     protocomm_ll.h \
+    protocomm_master.h \
     protocomm_slave.h
 
 # Default rules for deployment.

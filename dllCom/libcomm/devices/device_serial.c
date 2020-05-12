@@ -25,11 +25,6 @@ typedef struct
 ******************************************************************************/
 
 
-// Implémentation de l'ouverture de la liaison
-static int  devserial_open(struct proto_IfaceIODevice* this, const char * szPath);
-
-
-
 /******************************************************************************
  * FUNCTION
 ******************************************************************************/
@@ -48,22 +43,22 @@ void devserial_destroy(proto_Device_t this)
 }
 
 
-int  devserial_open(struct proto_IfaceIODevice* this, const char * szPath)
+static int  devserial_open(struct proto_IfaceIODevice* this, const char * szPath)
 {
     return -1;
 }
 
-int devserial_close(struct proto_IfaceIODevice* this)
+static int devserial_close(struct proto_IfaceIODevice* this)
 {
     return -1;
 }
 
-uint8_t devserial_read(struct proto_IfaceIODevice* this, void* buffer, uint8_t bufferSize)
+static int devserial_read(struct proto_IfaceIODevice* this, void* buffer, uint8_t bufferSize, int16_t tout_ms)
 {
     return 0;
 }
 
-int devserial_write(struct proto_IfaceIODevice* this, const void * buffer, uint8_t size)
+static int devserial_write(struct proto_IfaceIODevice* this, const void * buffer, uint8_t size)
 {
     return 0;
 }
