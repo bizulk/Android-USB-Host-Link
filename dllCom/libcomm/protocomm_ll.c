@@ -63,9 +63,8 @@ void proto_setReceiver(proto_hdle_t* this, proto_OnReception_t callback, void* u
 }
 
 int proto_writeFrame(proto_hdle_t* this, proto_Command_t command, uint8_t const* args) {
-    proto_Frame_t frame = {0};
-    uint8_t nbBytes = proto_makeFrame(&frame, command, args);
-    return this->priv_iodevice->write(this->priv_iodevice, &frame, nbBytes);
+    uint8_t nbBytes = proto_makeFrame(&this->priv_frame, command, args);
+    return this->priv_iodevice->write(this->priv_iodevice, &this->priv_frame, nbBytes);
 }
 
 uint8_t proto_makeFrame(proto_Frame_t* frame, proto_Command_t command, uint8_t const* args) {
