@@ -24,19 +24,24 @@ typedef struct
  * LOCAL PROTO
 ******************************************************************************/
 
+///
+/// \brief devserial_init : même chose que create, mais avec une instance alloué sur la pile
+/// \warning Ne pas appeler "destroy" pour ce cas
+/// \param this Instance pre-alloué
+///
+static void devserial_init(proto_Device_t this);
 
 /******************************************************************************
  * FUNCTION
 ******************************************************************************/
 
-///
-/// \brief devserial_destroy Détruit notre instance
-///
 void devserial_destroy(proto_Device_t this)
 {
     assert(this && this->user);
 
-    /// Fermeture des ports . Liberation des structures
+    /// Fermeture des ports (todo).
+    ///
+    /// Liberation des structures
     this->close(this);
     free(this->user);
     free(this);
@@ -63,16 +68,14 @@ static int devserial_write(struct proto_IfaceIODevice* this, const void * buffer
     return 0;
 }
 
-///
-/// \brief Retourne une instance d'interface pour notre interface
-/// \param szPath
-/// \return
-///
+
 proto_Device_t devserial_create(void)
 {
     /// allocation des structures et initialisation du pointeur
     proto_Device_t this  = (proto_Device_t)malloc( sizeof(proto_IfaceIODevice_t) );
+    this->user = (proto_dev_serial_t*)malloc(sizeof(proto_dev_serial_t));
     devserial_init(this);
+
     return this;
 }
 
@@ -84,7 +87,5 @@ void devserial_init(proto_Device_t this)
     this->destroy = devserial_destroy;
     this->read = devserial_read;
     this->write = devserial_write;
-    this->user = (proto_dev_serial_t*)malloc(sizeof(proto_dev_serial_t));
-
     memset(this->user, 0, sizeof(proto_dev_serial_t));
 }
