@@ -17,12 +17,14 @@ DEFINES += QT_DEPRECATED_WARNINGS
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
+    devices/device_fakeslave.c \
     devices/device_serial.c \
     protocomm_ll.c \
     protocomm_master.c \
     protocomm_slave.c
 
 HEADERS += \
+    devices/device_fakeslave.h \
     devices/device_serial.h \
     libcomm_global.h \
     proto_iodevice.h \
