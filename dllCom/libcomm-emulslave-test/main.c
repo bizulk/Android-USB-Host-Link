@@ -11,21 +11,10 @@
 typedef struct master_Data_t {
     proto_hdle_t * proto; ///< Instance du protocole
 	uint8_t lastCommand;
-	uint8_t lastArgs[proto_MAX_ARGS];
-	uint8_t nbReceived;
     uint8_t * slaveRegs; /// Acces au registre du slave (pour contrôle et initialisation)
 } master_Data_t;
 
-void master_callback(void* userdata, proto_Command_t command, uint8_t const* args) {
-	master_Data_t* data = userdata;
-	++data->nbReceived;
-	data->lastCommand = command;
-	memcpy(data->lastArgs, args, proto_getArgsSize(command));
-}
-
-proto_Device_t device;
 master_Data_t _masterdata = { 0 };
-uint8_t args[proto_MAX_ARGS] = { 0 };
 
 ///
 /// \brief test_set_NO_ERROR test nominal des écritures sur le slave
@@ -109,8 +98,8 @@ int main() {
 	puts("Tous les tests ont réussi !");
 	
 	
-    proto_close(_masterdata.proto);
-    proto_destroy(_masterdata.proto);
+    proto_master_close(_masterdata.proto);
+    proto_master_destroy(_masterdata.proto);
 	
 	return 0;
 }
