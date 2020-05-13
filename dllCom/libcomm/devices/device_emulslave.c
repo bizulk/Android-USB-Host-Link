@@ -29,14 +29,14 @@ typedef struct proto_dev_emulslave {
      proto_Frame_t frame; /// Acces par frame (lorsque le slave push)
      uint8_t buf[ sizeof(proto_Frame_t) ]; ///< Acces par octets (quane le master read)
     } priv_masterStk;
-     uint16_t priv_masterStkSize; ///< Taille occupée dans la stack
+     uint16_t priv_usMasterStkSize; ///< Taille occupée dans la stack
 
     proto_hdle_t * slaveThis; ///!< Instance du slave
     union{
      proto_Frame_t frame; /// Acces par frame (lorsque le slave push)
      uint8_t buf[ sizeof(proto_Frame_t) ]; ///< Acces par octets (quane le master read)
     } priv_slaveStk;
-     uint16_t priv_slaveStkSize; ///< Taille occupée dans la stack
+     uint16_t priv_usSlaveStkSize; ///< Taille occupée dans la stack
 } proto_dev_emulslave_t;
 
 ///
@@ -140,7 +140,7 @@ static int devemulslave_read(proto_Device_t this, void* buf, uint8_t len, int16_
     UNUSED(tout_ms);
 
     proto_dev_emulslave_t* slave = this->user;
-    uint8_t nbDelayedBytes = slave->priv_slaveStkSize;
+    uint8_t nbDelayedBytes = slave->priv_usSlaveStkSize;
 
     // On prend le minimum entre bufferSize et nbDelayedBytes
     int nbRead = len < nbDelayedBytes ? len : nbDelayedBytes;
@@ -148,7 +148,7 @@ static int devemulslave_read(proto_Device_t this, void* buf, uint8_t len, int16_
     memcpy(buf, slave->priv_slaveStk.buf, nbRead);
     // On dépile les octets du buffer
     memmove(slave->priv_slaveStk.buf, slave->priv_slaveStk.buf + nbRead, nbDelayedBytes - nbRead);
-    slave->priv_slaveStkSize -= nbRead;
+    slave->priv_usSlaveStkSize -= nbRead;
 
     return nbRead;
 }
@@ -161,7 +161,7 @@ static int devemulslave_write(proto_Device_t this, const void * buf, uint8_t len
 
     // On push sur le buffer autant que possible
     proto_dev_emulslave_t* slave = this->user;
-    uint8_t sizeLeft = sizeof(slave->priv_masterStk) - slave->priv_masterStkSize;
+    uint16_t sizeLeft = sizeof(slave->priv_masterStk) - slave->priv_usMasterStkSize;
 
     // D'après la spec d'interface on peut tout écrire ou pas.
     int nbWrite = (len < sizeLeft) ? len : sizeLeft;
@@ -169,8 +169,8 @@ static int devemulslave_write(proto_Device_t this, const void * buf, uint8_t len
         return -1;
 
     // On copie les octets dans le buffer interne
-    memcpy(slave->priv_masterStk.buf + slave->priv_masterStkSize,buf, nbWrite);
-    slave->priv_masterStkSize += nbWrite;
+    memcpy(slave->priv_masterStk.buf + slave->priv_usMasterStkSize,buf, nbWrite);
+    slave->priv_usMasterStkSize += nbWrite;
 
     // On traite immédiatement la requête
     proto_slave_main(slave->slaveThis);
@@ -184,14 +184,14 @@ static int devemulslave_callback(void* userdata, proto_Command_t command, uint8_
     proto_dev_emulslave_t* this = userdata;
 	switch (command) {
     case proto_CMD_SET: // quand le MASTER demande de changer une valeur
-		if (args[0] < 20) {
+        if (args[0] < EMULSLAVE_NB_REGS) {
 			this->registers[args[0]] = args[1];
 		} else
             ret = -1;
 		break;
 		
     case proto_CMD_GET: // quand le MASTER demande d'accéder à une valeur
-		if (args[0] < 20)
+        if (args[0] < EMULSLAVE_NB_REGS)
             args[0] = this->registers[args[0]];
 		else
             ret = -1;
@@ -219,16 +219,17 @@ static int devemulslave_fake_read(proto_Device_t this, void* buf, uint8_t len, i
     assert(this && buf);
     UNUSED(tout_ms);
 
-    proto_dev_emulslave_t* slave = this->user;
-    uint8_t nbDelayedBytes = slave->priv_masterStkSize;
+    proto_Device_t masterdev_base = (proto_Device_t)this->user;
+    proto_dev_emulslave_t * masterdev = (proto_dev_emulslave_t *)masterdev_base->user;
+    uint16_t usStkSize = masterdev->priv_usMasterStkSize;
 
     // On prend le minimum entre bufferSize et nbDelayedBytes
-    int nbRead = len < nbDelayedBytes ? len : nbDelayedBytes;
+    int nbRead = len < usStkSize ? len : usStkSize;
     // On copie les octets dans le buffer donné
-    memcpy(buf, slave->priv_slaveStk.buf, nbRead);
+    memcpy(buf, masterdev->priv_masterStk.buf, nbRead);
     // On dépile les octets du buffer
-    memmove(slave->priv_slaveStk.buf, slave->priv_slaveStk.buf + nbRead, nbDelayedBytes - nbRead);
-    slave->priv_slaveStkSize -= nbRead;
+    memmove(masterdev->priv_slaveStk.buf, masterdev->priv_masterStk.buf + nbRead, usStkSize - nbRead);
+    masterdev->priv_usMasterStkSize -= nbRead;
 
     return nbRead;
 }
@@ -239,8 +240,10 @@ static int devemulslave_fake_write(proto_Device_t this, const void * buf, uint8_
     assert(buf);
 
     // On push sur le buffer autant que possible
-    proto_dev_emulslave_t* slave = this->user;
-    uint8_t sizeLeft = sizeof(slave->priv_slaveStk) - slave->priv_slaveStkSize;
+    proto_Device_t masterdev_base = (proto_Device_t)this->user;
+    proto_dev_emulslave_t * masterdev = (proto_dev_emulslave_t *)masterdev_base->user;
+
+    uint16_t sizeLeft = sizeof(masterdev->priv_slaveStk) - masterdev->priv_usSlaveStkSize;
 
     // D'après la spec d'interface on peut tout écrire ou pas.
     int nbWrite = (len < sizeLeft) ? len : sizeLeft;
@@ -248,8 +251,8 @@ static int devemulslave_fake_write(proto_Device_t this, const void * buf, uint8_
         return -1;
 
     // On copie les octets dans le buffer interne
-    memcpy(slave->priv_slaveStk.buf + slave->priv_slaveStkSize,buf, nbWrite);
-    slave->priv_slaveStkSize += nbWrite;
+    memcpy(masterdev->priv_slaveStk.buf + masterdev->priv_usSlaveStkSize,buf, nbWrite);
+    masterdev->priv_usSlaveStkSize += nbWrite;
 
     return 0;
 }
