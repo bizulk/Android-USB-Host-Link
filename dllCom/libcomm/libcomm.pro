@@ -1,6 +1,7 @@
-QT       += core gui
+CONFIG -= qt
 
-greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
+TEMPLATE = lib
+DEFINES += LIBCOMM_LIBRARY
 
 CONFIG += c++11
 
@@ -16,37 +17,23 @@ DEFINES += QT_DEPRECATED_WARNINGS
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
-    main.cpp \
-    mainwindow.cpp
+    devices/device_emulslave.c \
+    devices/device_serial.c \
+    protocomm_ll.c \
+    protocomm_master.c \
+    protocomm_slave.c
 
 HEADERS += \
-    mainwindow.h
-
-FORMS += \
-    mainwindow.ui
+    devices/device_emulslave.h \
+    devices/device_serial.h \
+    libcomm_global.h \
+    proto_iodevice.h \
+    protocomm_ll.h \
+    protocomm_master.h \
+    protocomm_slave.h
 
 # Default rules for deployment.
-qnx: target.path = /tmp/$${TARGET}/bin
-else: unix:!android: target.path = /opt/$${TARGET}/bin
+unix {
+    target.path = /usr/lib
+}
 !isEmpty(target.path): INSTALLS += target
-
-
-# Path to libcomm projet
-LIB_SRC_PATH = ../libComm
-
-INCLUDEPATH += $$LIB_SRC_PATH/
-INCLUDEPATH += $$LIB_SRC_PATH/devices
-
-CONFIG(debug, debug|release) {
-    QMAKE_CFLAGS += -O0
-    LIBS+=-L$$LIB_SRC_PATH/../build-win/debug/
-    message(Debug configuration.)
-}
-
-CONFIG(release, debug|release) {
-    LIBS+=-L$$LIB_SRC_PATH/../build-win/release
-    message(Release configuration.)
-}
-
-LIBS+=-llibcomm
-
