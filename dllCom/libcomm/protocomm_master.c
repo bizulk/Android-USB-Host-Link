@@ -80,14 +80,15 @@ static proto_Status_t proto_master_readFrame(proto_hdle_t * this, proto_frame_ar
         switch( proto_decodeFrame(this, &cmd, arg))
         {
         case proto_COMPLETED:
-            // On fait juste de la validation de contenu
+            // On fait juste de la validation de contenu a ce stage
             switch (cmd) {
             case proto_CMD_REPLY:
                 // rien a faire
                 break;
+            // Rappel : la trame est bonne pour nous, c'est le slave qui nous retourne une erreur de traitement
             case proto_CMD_ERR_ARG:
             case proto_CMD_ERR_CRC:
-                // Les arguments sont positionnés
+                // Les arguments  de retour sont déjà positionnés
                 ret = proto_INVALID_ARG;
                 break;
             default:
@@ -95,6 +96,7 @@ static proto_Status_t proto_master_readFrame(proto_hdle_t * this, proto_frame_ar
                 break;
             }
             break;
+         // Il y a eu un problème de transmission slave -> master
         case proto_REFUSED:
             ret = proto_ERR_CRC;
             break;
