@@ -146,7 +146,7 @@ int proto_pushToFrame(proto_hdle_t* this, const uint8_t * buf, uint32_t len) {
     }
 
     // Si trame terminée : on retourne ce qui a été consommée, sinon -1
-    return (this->priv_nbBytes == framelen) ? cursor : -1;
+    return (this->priv_nbBytes == framelen) ? (int)cursor : -1;
 }
 
 // Valisation du CRC, de la partie donnée

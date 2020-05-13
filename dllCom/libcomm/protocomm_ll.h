@@ -1,6 +1,10 @@
 #ifndef CIO_TSE_PROTOCOMM_DETAILS
 #define CIO_TSE_PROTOCOMM_DETAILS
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * API LowLevel du protocole : manipulation bas niveau des trames
  *
@@ -13,9 +17,7 @@
 
 #include "proto_iodevice.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+
 
 /******************************************************************************
  * API - Format d'échanche
@@ -137,25 +139,25 @@ proto_hdle_t * proto_create(proto_Device_t iodevice);
 ///
 /// \warning ne pass appeler destroy dans ce cas de figure
 ///
-void proto_init(proto_hdle_t * this, proto_Device_t iodevice);
+void proto_init(proto_hdle_t * _this, proto_Device_t iodevice);
 
 ///
 /// \brief proto_destroy detruit toutes les ressources alloué
 /// \param this après destruction ce handle est invalide
 ///
-void proto_destroy(proto_hdle_t * this);
+void proto_destroy(proto_hdle_t * _this);
 
 ///
 /// \brief proto_open Appel l'ouverture du device
 /// \return 0 OK, sinon erreur
 ///
-int proto_open(proto_hdle_t * this, const char * szPath);
+int proto_open(proto_hdle_t * _this, const char * szPath);
 
 ///
 /// \brief proto_close Appelle la fermeture du device (open possible après)
 /// \return 0 OK
 ///
-int proto_close(proto_hdle_t * this);
+int proto_close(proto_hdle_t * _this);
 
 #define PROTO_WAIT_FOREVER -1
 
@@ -169,7 +171,7 @@ int proto_close(proto_hdle_t * this);
 /// \arg this instance
 /// \arg tout en milliseconde, si <0 attente infinie, si 0 non bloquant, sinon on attend le délai
 /// @returns OK pour une trame reçue, TIMEOUT sinon, ERR_SYS si problème sur le read
-proto_Status_t proto_readFrame(proto_hdle_t* this, int16_t tout_ms);
+proto_Status_t proto_readFrame(proto_hdle_t* _this, int16_t tout_ms);
 
 /// Ecriture d'une trame
 ///
@@ -178,7 +180,7 @@ proto_Status_t proto_readFrame(proto_hdle_t* this, int16_t tout_ms);
 /// @param[in] command La commande de la trame.
 /// @param[in] args Les arguments de la trame, cf le format de la frame pour l'ordre
 /// @return résultat de l'opération (0 réussi, sinon erreur)
-int proto_writeFrame(proto_hdle_t* this, proto_Command_t command, const uint8_t * args);
+int proto_writeFrame(proto_hdle_t* _this, proto_Command_t command, const uint8_t * args);
 
 /******************************************************************************
  * PROTO RESERVE SLAVE
@@ -191,7 +193,7 @@ uint8_t proto_getArgsSize(proto_Command_t cmd);
 /// @param[inout] state L'état à modifier
 /// @param[in] callback Le callback à appeler, NULL si rien à appeler
 /// @param[in] userdata Sera passé tel quel à onReception
-void proto_setReceiver(proto_hdle_t* this, proto_OnReception_t callback, void* userdata);
+void proto_setReceiver(proto_hdle_t* _this, proto_OnReception_t callback, void* userdata);
 
 
 /// Empilement et analyse des octets recus
@@ -202,7 +204,7 @@ void proto_setReceiver(proto_hdle_t* this, proto_OnReception_t callback, void* u
 /// @param[in] buf données d'entrées (peut être > trame)
 /// @param[in] len Le nombre d'octets d'entrée.
 /// @returns le nombre d'octets consommés [0-len] => trame pleine, -1 : pas de trame validé
-int proto_pushToFrame(proto_hdle_t* this, const uint8_t * buf, uint32_t len);
+int proto_pushToFrame(proto_hdle_t* _this, const uint8_t * buf, uint32_t len);
 
 ///
 /// \brief proto_decodeFrame Décodage de la trame reçue et dépilement
@@ -211,7 +213,7 @@ int proto_pushToFrame(proto_hdle_t* this, const uint8_t * buf, uint32_t len);
 /// \param[out] arg données associées
 /// \return résultat de l'analyse : WAITING (en attente de trame), COMPLETED (une trame décodée), REFUSED : trame invalide
 ///
-proto_DecodeStatus_t proto_decodeFrame(proto_hdle_t* this, proto_Command_t * cmd, proto_frame_data_t *arg);
+proto_DecodeStatus_t proto_decodeFrame(proto_hdle_t* _this, proto_Command_t * cmd, proto_frame_data_t *arg);
 
 /// Construit une trame d'échange
 /// Fonction publique : si l'on utilise le protocole sans IOdevice, sinon utiliser proto_writeFrame

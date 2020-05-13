@@ -1,6 +1,10 @@
 #ifndef IODEVICE_H
 #define IODEVICE_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /// Implementation d'un IO Device pour découpler la couche protocole de la liaison
 #include <stdint.h>
 #include <stddef.h>
@@ -20,16 +24,16 @@ typedef struct proto_IfaceIODevice {
     ///
     /// @param[in] path d'accès au device (path système)
     /// @return retour de fonction 0=OK, sinon erreur
-    int  (*open)(proto_Device_t this, const char * szPath);
+    int  (*open)(proto_Device_t _this, const char * szPath);
 
     /// @brief clos la liaison
     /// Un open est toujours possible
     ///
-    int (*close)(proto_Device_t this);
+    int (*close)(proto_Device_t _this);
 
     /// Détruit les données de l'interface (par exemple, sous GNU/Linux
     /// cela fera un close() sur le fileDescriptor).
-    void (*destroy)(proto_Device_t this);
+    void (*destroy)(proto_Device_t _this);
 
     /// Lit N caractères. La fonction peut être bloquante
     /// temporairement (timeout) pour certains Device (exemple : GNU/Linux).
@@ -37,14 +41,14 @@ typedef struct proto_IfaceIODevice {
     /// @param[out] buf les octets lus seront écrits ici
     /// @param[in] len taille à lire
     /// @returns >=0 ci qui a put être lu dans le délai imparti, <0 erreur
-    int (*read)(proto_Device_t this, void* buf, uint8_t len, int16_t tout_ms);
+    int (*read)(proto_Device_t _this, void* buf, uint8_t len, int16_t tout_ms);
 
     /// Ecrit N caractères.
     /// @param[in] this pointeur vers l'instance IO Device
     /// @param[in] buffer octets à envoyer
     /// @param[in] size nombre d'octets à envoyer
     /// @returns 0 OK, sinon erreur
-    int (*write)(proto_Device_t this, const void * buffer, uint8_t size);
+    int (*write)(proto_Device_t _this, const void * buffer, uint8_t size);
 
     /// Définit les données complémentaires de l'interface
     void * user;
@@ -63,6 +67,10 @@ typedef struct proto_IfaceIODevice {
 
 #ifndef UNUSED
 #define UNUSED(x) (void)x
+#endif
+
+#ifdef __cplusplus
+} // extern "C"
 #endif
 
 #endif // IODEVICE_H

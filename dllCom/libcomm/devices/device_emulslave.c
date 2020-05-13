@@ -91,7 +91,7 @@ static int devemulslave_isFrame(proto_Frame_t *pFrame, uint8_t len);
  * FUNCTION
 ******************************************************************************/
 
-uint8_t * LIBCOMM_EXPORT devemulslave_getRegisters(proto_Device_t this)
+uint8_t * devemulslave_getRegisters(proto_Device_t this)
 {
     assert(this && this->user);
     proto_dev_emulslave_t* slave = this->user;
@@ -134,11 +134,14 @@ void devemulslave_init(proto_Device_t this)
 
 static int  devemulslave_open(proto_Device_t this, const char * szPath)
 {
+    UNUSED(this);
+    UNUSED(szPath);
     return 0;
 }
 
 static int devemulslave_close(proto_Device_t this)
 {
+    UNUSED(this);
     return 0;
 }
 
@@ -181,7 +184,6 @@ static int devemulslave_write(proto_Device_t this, const void * buf, uint8_t len
 {
     assert(this && this->user);
     assert(buf);
-    int ret = 0;
 
     // On push sur le buffer autant que possible
     proto_dev_emulslave_t* slave = this->user;
@@ -238,10 +240,13 @@ static int devemulslave_callback(void* userdata, proto_Command_t command, uint8_
 
 static int devemulslave_fake_open(proto_Device_t this, const char * szPath)
 {
+    UNUSED(this);
+    UNUSED(szPath);
     return 0;
 }
 static int devemulslave_fake_close(proto_Device_t this)
 {
+    UNUSED(this);
     return 0;
 }
 
@@ -308,13 +313,13 @@ proto_Device_t devemulslave_fakeSlaveCreate(proto_Device_t masterthis)
 }
 
 
-void LIBCOMM_EXPORT devemulslave_setFlags(proto_Device_t this, uint8_t FLAGS)
+void devemulslave_setFlags(proto_Device_t this, uint8_t FLAGS)
 {
     proto_dev_emulslave_t* slave = this->user;
     slave->flags = FLAGS;
 }
 
-void LIBCOMM_EXPORT devemulslave_getFlags(proto_Device_t this, uint8_t *FLAGS)
+void devemulslave_getFlags(proto_Device_t this, uint8_t *FLAGS)
 {
     proto_dev_emulslave_t* slave = this->user;
     *FLAGS = slave->flags;

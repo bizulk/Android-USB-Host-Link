@@ -22,7 +22,7 @@ extern "C" {
 ///
 /// \brief proto_cio_open Encapsulation du protocole pour avoir une API confirme
 /// \param szDev chemin à ouvrir (/dev/ttyS0 ou \\.\COMn)
-/// \return Instance de notre protocole (this), ou NULL s'il y a eu un soucis d'implémentation.
+/// \return Instance de notre protocole (_this), ou NULL s'il y a eu un soucis d'implémentation.
 ///
 /// Encapsule la creation du device
 ///
@@ -38,21 +38,21 @@ proto_hdle_t * LIBCOMM_EXPORT proto_master_create(proto_Device_t iodevice);
 
 ///
 /// \brief proto_destroy Destruction de notre instance
-/// \param this Instance
+/// \param _this Instance
 ///
-void LIBCOMM_EXPORT proto_master_destroy(proto_hdle_t * this);
+void LIBCOMM_EXPORT proto_master_destroy(proto_hdle_t * _this);
 
 ///
 /// \brief proto_open Appel l'ouverture du device
 /// \return 0 OK, sinon erreur
 ///
-int LIBCOMM_EXPORT proto_master_open(proto_hdle_t * this, const char * szPath);
+int LIBCOMM_EXPORT proto_master_open(proto_hdle_t * _this, const char * szPath);
 
 ///
 /// \brief proto_close Appelle la fermeture du device (open possible après)
 /// \return 0 OK
 ///
-int LIBCOMM_EXPORT proto_master_close(proto_hdle_t * this);
+int LIBCOMM_EXPORT proto_master_close(proto_hdle_t * _this);
 
 
 /// Demande à l'esclave une valeur. PS : Le timeout est approximatif
@@ -64,7 +64,7 @@ int LIBCOMM_EXPORT proto_master_close(proto_hdle_t * this);
 /// @param[in] iodevice  pointeur vers l'interface du IO Device
 /// @param[inout] iodata pointeur vers les données nécessaires pour le IO Device
 /// @returns La réponse de l'esclave
-proto_Status_t LIBCOMM_EXPORT proto_master_get(proto_hdle_t * this, uint8_t register_, uint8_t* value);
+proto_Status_t LIBCOMM_EXPORT proto_master_get(proto_hdle_t * _this, uint8_t register_, uint8_t* value);
 
 /// Demande à l'esclave d'enregistrer une valeur.
 /// @param[in] register_ le registre de l'esclave qu'on veut écrire
@@ -73,7 +73,7 @@ proto_Status_t LIBCOMM_EXPORT proto_master_get(proto_hdle_t * this, uint8_t regi
 /// @param[in] iodevice  pointeur vers l'interface du IO Device
 /// @param[inout] iodata pointeur vers les données nécessaires pour le IO Device
 /// @returns La réponse de l'esclave (la valeur a été écrite ssi proto_NO_ERROR)
-proto_Status_t LIBCOMM_EXPORT proto_master_set(proto_hdle_t * this, uint8_t register_, uint8_t value);
+proto_Status_t LIBCOMM_EXPORT proto_master_set(proto_hdle_t * _this, uint8_t register_, uint8_t value);
 
 
 #ifdef __cplusplus
