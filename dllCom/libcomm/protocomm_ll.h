@@ -8,9 +8,6 @@ extern "C" {
 /**
  * API LowLevel du protocole : manipulation bas niveau des trames
  *
- * Cette API est notamment utilisé pour implémenter un esclave.
- * (on peut aussi implémenter un MASTER avec, mais il y a une API plus
- * haut niveau dans protocomm.h)
  */
 #include <stdint.h>
 #include <stddef.h>
