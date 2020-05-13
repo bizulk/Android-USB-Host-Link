@@ -2,9 +2,7 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
-#include <../libcomm/protocomm-emulslave.h>
-#include <../libcomm/protocomm.h>
-#include <../libcomm/protocomm-details.h>
+#include <protocomm_master.h>
 #include <stdio.h>
 
 QT_BEGIN_NAMESPACE
@@ -15,9 +13,9 @@ class MainWindow : public QMainWindow
 {
     Q_OBJECT
 
-    // Variables qui permettent d'émuler l'esclave
-    proto_Data_EmulSlave_t devicedata;
-    proto_Device_t device;
+    /// Le device pour notre protocole
+    proto_Device_t _protodev;
+    proto_hdle_t * _proto_this;
 
     uint8_t _numeroRegistre = 0;
     uint8_t _valeurRegistre = 0;

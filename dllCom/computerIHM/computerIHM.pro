@@ -16,16 +16,10 @@ DEFINES += QT_DEPRECATED_WARNINGS
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
-    ../libcomm/protocomm-details.c \
-    ../libcomm/protocomm-emulslave.c \
-    ../libcomm/protocomm.c \
     main.cpp \
     mainwindow.cpp
 
 HEADERS += \
-    ../libcomm/protocomm-details.h \
-    ../libcomm/protocomm-emulslave.h \
-    ../libcomm/protocomm.h \
     mainwindow.h
 
 FORMS += \
@@ -35,3 +29,24 @@ FORMS += \
 qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
+
+
+# Path to libcomm projet
+LIB_SRC_PATH = ../libComm
+
+INCLUDEPATH += $$LIB_SRC_PATH/
+INCLUDEPATH += $$LIB_SRC_PATH/devices
+
+CONFIG(debug, debug|release) {
+    QMAKE_CFLAGS += -O0
+    LIBS+=-L$$LIB_SRC_PATH/../build-win/debug/
+    message(Debug configuration.)
+}
+
+CONFIG(release, debug|release) {
+    LIBS+=-L$$LIB_SRC_PATH/../build-win/release
+    message(Release configuration.)
+}
+
+LIBS+=-llibcomm
+
