@@ -32,15 +32,19 @@ proto_hdle_t * LIBCOMM_EXPORT proto_master_create(proto_Device_t iodevice)
     return proto_create(iodevice);
 }
 
+void LIBCOMM_EXPORT proto_master_destroy(proto_hdle_t * this)
+{
+    return proto_destroy(this);
+}
 
 int LIBCOMM_EXPORT proto_master_open(proto_hdle_t * this, const char * szPath)
 {
-    return this->priv_iodevice->open(this->priv_iodevice, szPath);
+    return proto_open(this, szPath);
 }
 
 int LIBCOMM_EXPORT proto_master_close(proto_hdle_t * this)
 {
-    return this->priv_iodevice->close(this->priv_iodevice);
+    return proto_close(this);
 }
 
 proto_hdle_t * LIBCOMM_EXPORT proto_cio_open(const char * szDev)

@@ -37,6 +37,12 @@ proto_hdle_t *  LIBCOMM_EXPORT proto_cio_open(const char * szDev);
 proto_hdle_t * LIBCOMM_EXPORT proto_master_create(proto_Device_t iodevice);
 
 ///
+/// \brief proto_destroy Destruction de notre instance
+/// \param this Instance
+///
+void LIBCOMM_EXPORT proto_master_destroy(proto_hdle_t * this);
+
+///
 /// \brief proto_open Appel l'ouverture du device
 /// \return 0 OK, sinon erreur
 ///
