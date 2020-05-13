@@ -1,4 +1,5 @@
 #include "protocomm_master.h"
+#include "device_emulslave.h"
 
 // Test du protocole master/slave avec le device emulslave
 
@@ -8,9 +9,11 @@
 
 // Structure de test pour ce qui se passe côté master
 typedef struct master_Data_t {
+    proto_hdle_t * proto; ///< Instance du protocole
 	uint8_t lastCommand;
 	uint8_t lastArgs[proto_MAX_ARGS];
 	uint8_t nbReceived;
+    uint8_t * slaveRegs; /// Acces au registre du slave (pour contrôle et initialisation)
 } master_Data_t;
 
 void master_callback(void* userdata, proto_Command_t command, uint8_t const* args) {
@@ -19,74 +22,80 @@ void master_callback(void* userdata, proto_Command_t command, uint8_t const* arg
 	data->lastCommand = command;
 	memcpy(data->lastArgs, args, proto_getArgsSize(command));
 }
-proto_State_t state = { 0 };
 
-// définition des tests
-
-proto_Data_EmulSlave_t devicedata;
 proto_Device_t device;
-master_Data_t masterdata = { 0 };
+master_Data_t _masterdata = { 0 };
 uint8_t args[proto_MAX_ARGS] = { 0 };
 
-
+///
+/// \brief test_set_NO_ERROR test nominal des écritures sur le slave
+///
 void test_set_NO_ERROR() {
-	devicedata.registers[5] = 0; // Au début, on a le registre 5 avec la valeur 0
+    int regno = 5;
+    uint8_t regvalue = 167;
+
+    /* TODO On va iterer sur tous les registres que l'on a, a chaque fois :
+     * on verifier la mise à jour du registre
+     * on vérifie que les autres registres ne sont pas impactés
+    */
+
+    memset(_masterdata.slaveRegs, 0, EMULSLAVE_NB_REGS * sizeof(*_masterdata.slaveRegs) );
 	// On fait une demande d'écriture
-	proto_Status_t status = proto_cio_master_set(5, 167, /*timeout_ms=*/0, device, &devicedata);
+    proto_Status_t status = proto_master_set(_masterdata.proto, regno, regvalue);
 	// PS : pas besoin de timeout car c'est instantané avec l'émulation
 	assert(status == proto_NO_ERROR);
-	assert(devicedata.registers[5] == 167);
+    assert(_masterdata.slaveRegs[regno] == regvalue);
 }
 
 void test_set_INVALID_REGISTER() {
-	// L'émulation ne dispose que de 20 registres
-	// Ecrire dans un registre au-delà est une erreur !
-	proto_Status_t status = proto_cio_master_set(25, 0, 0, device, &devicedata);
-	assert(status == proto_INVALID_REGISTER);
+
+    int regno = EMULSLAVE_NB_REGS;
+    uint8_t regvalue = 167;
+
+    // On va écrire sur un registre inexistant
+    proto_Status_t status = proto_master_set(_masterdata.proto, regno, regvalue);
+    assert(status == proto_INVALID_ARG);
 }
 
 void test_get_NO_ERROR() {
-	uint8_t valeur = 0;
-	devicedata.registers[18] = 234;
-	proto_Status_t status = proto_cio_master_get(18, &valeur, 0, device, &devicedata);
+
+    int regno = 18;
+    uint8_t regvalue = 0;
+
+    // Positionner le registre à une valeur non nulle
+    _masterdata.slaveRegs[regno] = 234;
+    proto_Status_t status = proto_master_get(_masterdata.proto, regno, &regvalue);
 	assert(status == proto_NO_ERROR);
-	assert(valeur == 234); 
+    assert(regvalue == _masterdata.slaveRegs[regno]);
 }
 
 void test_get_INVALID_REGISTER() {
-	// L'émulation ne dispose que de 20 registres
-	// Lire un registre au-delà est une erreur !
-	uint8_t valeur = 23;
-	proto_Status_t status = proto_cio_master_get(45, &valeur, 0, device, &devicedata);
-	assert(status == proto_INVALID_REGISTER);
-	assert(valeur == 23); // en cas d'erreur, la sortie n'est pas modifiée
+
+    int regno = EMULSLAVE_NB_REGS;
+    uint8_t regvalue = 0;
+
+    proto_Status_t status = proto_master_get(_masterdata.proto, regno, &regvalue);
+    assert(status == proto_INVALID_ARG);
+    assert(regvalue == 0); // en cas d'erreur, la sortie n'est pas modifiée
 }
 
 void test_crc() {
-	// On crée une frame nous-même, avec un CRC pertinemment faux
-	proto_Frame_t frame = { 0 };
-	frame.startOfFrame = proto_START_OF_FRAME;
-	frame.crc8 = 0; // le CRC est pertinemment faux !
-	frame.command = proto_STATUS;
-	frame.args[0] = proto_NO_ERROR;
-	
-	// On essaye de lire la frame
-	proto_interpretBlob(&state, (void*)&frame, 4);
-	// Une erreur de CRC est normalement arrivée !
-	assert(masterdata.lastCommand == proto_NOTIF_BAD_CRC);
+    int regno = 18;
+    uint8_t regvalue = 0;
+    devemulslave_setFlags(_masterdata.proto->priv_iodevice, EMULSLAVE_FLAG_MASTER_BADCRC);
+    proto_Status_t status = proto_master_set(_masterdata.proto, regno, regvalue);
+    assert(status == proto_ERR_CRC);
 }
 
 
 int main() {
 	
-	// Initialisation du device d'émulation
-	proto_initData_EmulSlave(&devicedata);
-	device = proto_getDevice_EmulSlave();
-	
-	// Initialisation du maître
-	proto_setReceiver(&state, master_callback, &masterdata);
-	
-	
+    // Initialisation du protocole avec le device emulslave
+    proto_Device_t devslave = devemulslave_create();
+    _masterdata.proto = proto_master_create(devslave);
+    assert(_masterdata.proto);
+    _masterdata.slaveRegs = devemulslave_getRegisters(devslave);
+
 	test_set_NO_ERROR();
 	
 	test_set_INVALID_REGISTER();
@@ -100,7 +109,8 @@ int main() {
 	puts("Tous les tests ont réussi !");
 	
 	
-	proto_closeDevice(device, &devicedata);
+    proto_close(_masterdata.proto);
+    proto_destroy(_masterdata.proto);
 	
 	return 0;
 }
