@@ -15,7 +15,7 @@
  * LOCAL PROTO
 ******************************************************************************/
 
-static proto_Status_t proto_master_readFrame(proto_hdle_t * this, proto_frame_arg_t * arg);
+static proto_Status_t proto_master_readFrame(proto_hdle_t * this, proto_frame_data_t * arg);
 
 /******************************************************************************
  * FUNCTIONS
@@ -63,7 +63,7 @@ proto_hdle_t * LIBCOMM_EXPORT proto_cio_open(const char * szDev)
     return this;
 }
 
-static proto_Status_t proto_master_readFrame(proto_hdle_t * this, proto_frame_arg_t * arg)
+static proto_Status_t proto_master_readFrame(proto_hdle_t * this, proto_frame_data_t * arg)
 {
     proto_Status_t ret = 0;
     proto_Command_t cmd = 0;
@@ -115,31 +115,31 @@ static proto_Status_t proto_master_readFrame(proto_hdle_t * this, proto_frame_ar
 
 proto_Status_t proto_master_get(proto_hdle_t * this, uint8_t register_, uint8_t* value) {
 
-    proto_frame_arg_t arg = { .reg = register_, .value = 0};
+    proto_frame_data_t data = { .req.reg = register_, .req.value = 0};
     proto_Status_t ret = 0;
 
 
-    if( proto_writeFrame(this, proto_CMD_GET, (void*)&arg) != 0)
+    if( proto_writeFrame(this, proto_CMD_GET, (void*)&data) != 0)
     {
         return proto_ERR_SYS;
     }
-    ret = proto_master_readFrame(this, &arg);
+    ret = proto_master_readFrame(this, &data);
     if( ret == proto_NO_ERROR)
     {
-        *value = arg.value;
+        *value = data.reg_value;
     }
     return ret;
 }
 
 proto_Status_t proto_master_set(proto_hdle_t * this, uint8_t register_, uint8_t value) {
 
-    proto_frame_arg_t arg = { .reg = register_, .value = value};
+    proto_frame_data_t data = { .req.reg = register_, .req.value = value};
     proto_Status_t ret = 0;
 
-    if( proto_writeFrame(this, proto_CMD_SET, (void*)&arg) != 0)
+    if( proto_writeFrame(this, proto_CMD_SET, (void*)&data) != 0)
     {
         return proto_ERR_SYS;
     }
-    ret = proto_master_readFrame(this, &arg);
+    ret = proto_master_readFrame(this, &data);
     return ret;
 }

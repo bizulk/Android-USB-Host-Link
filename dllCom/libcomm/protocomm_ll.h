@@ -35,11 +35,16 @@ typedef enum proto_Status {
 
 
 /// Définit les arguments d'une trame
-typedef struct proto_frame_arg
+typedef union proto_frame_data
 {
-   uint8_t reg; ///< numéro de registre à lire ou écrire
-   uint8_t value; ///< Valeur du registre
-} proto_frame_arg_t;
+   uint8_t raw[2]; ///< exemple dans le cas d'une erreur (on copie deux octets)
+   struct  {
+       uint8_t reg; ///< numéro de registre à lire ou écrire
+       uint8_t value; ///< Valeur du registre
+   } req;///< requete master
+   uint8_t reg_value; ///< response slave
+   uint8_t crcerr[2]; ///< CRC recu, CRC calculé
+} proto_frame_data_t;
 
 /// Les commandes qui sont recevables dans le callback.
 /// Il y a deux types d'erreurs :
@@ -73,10 +78,7 @@ typedef struct proto_Frame {
     uint8_t startOfFrame; ///< synchronisation de la réception
     uint8_t crc8; ///< CRC8
     uint8_t command; ///< ce sont les valeurs de l'enum proto_Command_t (command pour le master, status pour le slave)
-    union {
-        proto_frame_arg_t arg; ///< registre
-        uint8_t err; ///< Code d'erreur
-    };
+    proto_frame_data_t data;
 } proto_Frame_t; 
 
 /// Constantes pour la manipulation de la trame
@@ -85,7 +87,7 @@ enum {
     proto_COMMAND_OFFSET =       ///< La position de l'octet de commande
         offsetof(proto_Frame_t, command), 
     proto_ARGS_OFFSET =          ///< La position du premier argument dans la trame
-        offsetof(proto_Frame_t, arg),
+        offsetof(proto_Frame_t, data),
     proto_FRAME_MAXSIZE =        ///< Utilisé pour allouer un buffer dans lequel recevoir une trame
         sizeof(proto_Frame_t),
 };
@@ -208,7 +210,7 @@ int proto_pushToFrame(proto_hdle_t* this, const uint8_t * buf, uint32_t len);
 /// \param[out] arg données associées
 /// \return résultat de l'analyse : WAITING (en attente de trame), COMPLETED (une trame décodée), REFUSED : trame invalide
 ///
-proto_DecodeStatus_t proto_decodeFrame(proto_hdle_t* this, proto_Command_t * cmd, proto_frame_arg_t *arg);
+proto_DecodeStatus_t proto_decodeFrame(proto_hdle_t* this, proto_Command_t * cmd, proto_frame_data_t *arg);
 
 /// Construit une trame d'échange
 /// Fonction publique : si l'on utilise le protocole sans IOdevice, sinon utiliser proto_writeFrame

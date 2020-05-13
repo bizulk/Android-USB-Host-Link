@@ -74,8 +74,8 @@ uint8_t proto_makeFrame(proto_Frame_t* frame, proto_Command_t command, uint8_t c
 
     frame->startOfFrame = proto_START_OF_FRAME;
     frame->command = command;
-    memset(&frame->arg, 0, sizeof(frame->arg));
-    memcpy(&frame->arg, args, argSize); // on copie les arguments
+    memset(&frame->data, 0, sizeof(frame->data));
+    memcpy(&frame->data, args, argSize); // on copie les arguments
     frame->crc8 = getFrameCRC(frame);
     return proto_ARGS_OFFSET + argSize;
 }
@@ -150,7 +150,7 @@ int proto_pushToFrame(proto_hdle_t* this, const uint8_t * buf, uint32_t len) {
 }
 
 // Valisation du CRC, de la partie donnée
-proto_DecodeStatus_t proto_decodeFrame(proto_hdle_t* this, proto_Command_t * cmd, proto_frame_arg_t *arg)
+proto_DecodeStatus_t proto_decodeFrame(proto_hdle_t* this, proto_Command_t * cmd, proto_frame_data_t *arg)
 {
     uint8_t crc8 = 0;
     assert( this && cmd && arg);
@@ -168,14 +168,14 @@ proto_DecodeStatus_t proto_decodeFrame(proto_hdle_t* this, proto_Command_t * cmd
         if( crc8 != this->priv_frame.crc8 )
         {
             *cmd = proto_CMD_ERR_CRC;
-            arg->reg = this->priv_frame.crc8;
-            arg->value = crc8;
+            arg->crcerr[0] = this->priv_frame.crc8;
+            arg->crcerr[1] = crc8;
             return proto_REFUSED;
         }
     }
 
     *cmd = this->priv_frame.command;
-    *arg = this->priv_frame.arg;
+    *arg = this->priv_frame.data;
 
     // réinitialisation du curseur compteur pour permettre la réception de la prochaine trame
     this->priv_nbBytes = 0;
