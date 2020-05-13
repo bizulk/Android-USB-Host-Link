@@ -23,6 +23,7 @@
 /// Les attributs préfixés priv_ ne doivent pas être accédés (violation de l'encapsulation).
 typedef struct proto_dev_emulslave {
     uint8_t registers[EMULSLAVE_NB_REGS]; ///< Les registres en accès du slave
+    uint8_t flags; ///< Flags qui contrôle le comportement du device \sa emulslave_flags
 
     union{
      proto_Frame_t frame; /// Acces par frame (lorsque le slave push)
@@ -80,6 +81,14 @@ static int devemulslave_callback(void* userdata, proto_Command_t command, uint8_
 /******************************************************************************
  * FUNCTION
 ******************************************************************************/
+
+uint8_t * LIBCOMM_EXPORT devemulslave_getRegisters(proto_Device_t this)
+{
+    assert(this && this->user);
+    proto_dev_emulslave_t* slave = this->user;
+
+    return slave->registers;
+}
 
 proto_Device_t devemulslave_create(void)
 {
@@ -261,4 +270,17 @@ proto_Device_t devemulslave_t_fakeSlaveCreate(proto_Device_t masterthis)
     DEVIO_INIT(devemulslave_fake, this);
     this->user = masterthis;
     return this;
+}
+
+
+void LIBCOMM_EXPORT devemulslave_setFlags(proto_Device_t this, uint8_t FLAGS)
+{
+    proto_dev_emulslave_t* slave = this->user;
+    slave->flags = FLAGS;
+}
+
+void LIBCOMM_EXPORT devemulslave_getFlags(proto_Device_t this, uint8_t *FLAGS)
+{
+    proto_dev_emulslave_t* slave = this->user;
+    *FLAGS = slave->flags;
 }
