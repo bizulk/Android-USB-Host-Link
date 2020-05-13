@@ -68,7 +68,6 @@ static int devemulslave_fake_read(proto_Device_t this, void* buf, uint8_t len, i
 static int devemulslave_fake_write(proto_Device_t this, const void * buf, uint8_t len);
 static void devemulslave_fake_destroy(proto_Device_t this);
 
-
 ///
 /// \brief emulslave_callback Callback de réception d'une requete master
 /// \param userdata : les registres de données
@@ -77,6 +76,16 @@ static void devemulslave_fake_destroy(proto_Device_t this);
 /// \return
 ///
 static int devemulslave_callback(void* userdata, proto_Command_t command, uint8_t * args);
+
+///
+/// \brief devemulslave_isFrame fonction utilitaire qui vérifie que l'on a une trame dans notre bloc
+/// \param pFrame la trame supposée
+/// \param pFrame la taille de la trame que l'on a
+/// \return 0 on a bien une trame, sinon pas de trame identifiée
+///
+/// On considère que l'on a une trame si l'on a SOF, une commande valide et une taille suffisante
+///
+static int devemulslave_isFrame(proto_Frame_t *pFrame, uint8_t len);
 
 /******************************************************************************
  * FUNCTION
@@ -119,7 +128,7 @@ void devemulslave_init(proto_Device_t this)
     proto_dev_emulslave_t* slave = (proto_dev_emulslave_t*)this->user;
     memset(slave, 0, sizeof(proto_dev_emulslave_t));
     // Creation de l'instance de protocole slave
-    proto_Device_t slavedev = devemulslave_t_fakeSlaveCreate(this);
+    proto_Device_t slavedev = devemulslave_fakeSlaveCreate(this);
     slave->slaveThis = proto_slave_create(slavedev, devemulslave_callback, slave);
 }
 
@@ -153,6 +162,21 @@ static int devemulslave_read(proto_Device_t this, void* buf, uint8_t len, int16_
     return nbRead;
 }
 
+static int devemulslave_isFrame(proto_Frame_t *pFrame, uint8_t len)
+{
+    if( pFrame->startOfFrame != proto_START_OF_FRAME)
+        return -1;
+    if( len < proto_COMMAND_OFFSET )
+        return -1;
+    if( !(pFrame->command < proto_LAST))
+        return -1;
+
+    uint8_t framelen = proto_ARGS_OFFSET + proto_getArgsSize(pFrame->command);
+    if( len != framelen)
+        return -1;
+    return 0;
+}
+
 static int devemulslave_write(proto_Device_t this, const void * buf, uint8_t len)
 {
     assert(this && this->user);
@@ -171,6 +195,14 @@ static int devemulslave_write(proto_Device_t this, const void * buf, uint8_t len
     // On copie les octets dans le buffer interne
     memcpy(slave->priv_masterStk.buf + slave->priv_usMasterStkSize,buf, nbWrite);
     slave->priv_usMasterStkSize += nbWrite;
+
+    // Test : on manipule la trame selon le flag positionne
+    if( (slave->flags & EMULSLAVE_FLAG_MASTER_BADCRC) &&
+        (devemulslave_isFrame(&slave->priv_masterStk.frame, slave->priv_usMasterStkSize)==0) )
+    {
+        // on se contente d'incrémenter le CRC
+        slave->priv_masterStk.frame.crc8++;
+    }
 
     // On traite immédiatement la requête
     proto_slave_main(slave->slaveThis);

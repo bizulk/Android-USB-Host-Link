@@ -72,7 +72,7 @@ void test_crc() {
     uint8_t regvalue = 0;
     devemulslave_setFlags(_masterdata.proto->priv_iodevice, EMULSLAVE_FLAG_MASTER_BADCRC);
     proto_Status_t status = proto_master_set(_masterdata.proto, regno, regvalue);
-    assert(status == proto_ERR_CRC);
+    assert(status == proto_PEER_ERR_CRC);
 }
 
 

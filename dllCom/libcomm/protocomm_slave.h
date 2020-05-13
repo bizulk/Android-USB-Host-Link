@@ -43,6 +43,17 @@ int LIBCOMM_EXPORT proto_slave_close(proto_hdle_t * this);
 ///
 int LIBCOMM_EXPORT proto_slave_main(proto_hdle_t * this);
 
+enum proto_slave_flags
+{
+    PROTOSLAVE_FLAG_MASTER_BADCRC=(1), /// si positionné, considère que la trame envoyée par le master a un mauvais CRC
+    PROTOSLAVE_FLAG_SLAVE_BADCRC=(1<<1), /// si positionné, le slave repondra avec un CRC mauvais
+};
+
+/// Pour générer des cas de test
+void LIBCOMM_EXPORT devemulslave_setFlags(proto_Device_t this, uint8_t FLAGS);
+/// Pour générer des cas de test
+void LIBCOMM_EXPORT devemulslave_getFlags(proto_Device_t this, uint8_t * FLAGS);
+
 #ifdef __cplusplus
 } // extern "C"
 #endif

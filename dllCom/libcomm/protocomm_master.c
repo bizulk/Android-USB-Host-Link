@@ -90,8 +90,10 @@ static proto_Status_t proto_master_readFrame(proto_hdle_t * this, proto_frame_da
                 // rien a faire
                 break;
             // Rappel : la trame est bonne pour nous, c'est le slave qui nous retourne une erreur de traitement
-            case proto_CMD_ERR_ARG:
             case proto_CMD_ERR_CRC:
+                ret = proto_PEER_ERR_CRC;
+                break;
+            case proto_CMD_ERR_ARG:
                 // Les arguments  de retour sont déjà positionnés
                 ret = proto_INVALID_ARG;
                 break;

@@ -26,7 +26,8 @@ typedef enum proto_Status {
     proto_NO_ERROR,
     proto_ERR_SYS,           ///!< Erreur systeme
     proto_ERR_CRC,       ///< la trame reçue n'a pas un CRC cohérent
-    proto_INVALID_ARG,  ///< la cible ne possède pas le registre demandé
+    proto_PEER_ERR_CRC, ///< la cible a reçu une requete avec un mauvais CRC
+    proto_INVALID_ARG,  ///< la cible ne possède pas le registre demandé ou refuse la valeur à écrire
     proto_TIMEOUT,           ///< on a pas reçu de trame complète pendant le temps indiqué
     proto_ERR_PROTO ///< Erreur de protocole (réponse inattendue)
 } proto_Status_t;
