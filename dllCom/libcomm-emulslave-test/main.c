@@ -10,7 +10,6 @@
 // Structure de test pour ce qui se passe côté master
 typedef struct master_Data_t {
     proto_hdle_t * proto; ///< Instance du protocole
-	uint8_t lastCommand;
     uint8_t * slaveRegs; /// Acces au registre du slave (pour contrôle et initialisation)
 } master_Data_t;
 
