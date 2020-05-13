@@ -59,7 +59,7 @@ static int devemulslave_write(proto_Device_t this, const void * buf, uint8_t len
 static void devemulslave_destroy(proto_Device_t this);
 
 /// Fonctions internes pour l'émulation du slave du slave
-static proto_Device_t devemulslave_t_fakeSlaveCreate(proto_Device_t masterthis);
+static proto_Device_t devemulslave_fakeSlaveCreate(proto_Device_t masterthis);
 static int devemulslave_fake_open(proto_Device_t this, const char * szPath);
 static int devemulslave_fake_close(proto_Device_t this);
 /// La fonction va dépiler les trames dans la stack master
@@ -267,7 +267,7 @@ static void devemulslave_fake_destroy(proto_Device_t this)
     //free(this->user);
     free(this);
 }
-proto_Device_t devemulslave_t_fakeSlaveCreate(proto_Device_t masterthis)
+proto_Device_t devemulslave_fakeSlaveCreate(proto_Device_t masterthis)
 {
     proto_Device_t this = (proto_Device_t)malloc(sizeof(proto_IfaceIODevice_t));
     DEVIO_INIT(devemulslave_fake, this);
