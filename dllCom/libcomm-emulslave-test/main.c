@@ -1,15 +1,12 @@
-#include <protocomm-emulslave.h>
-// SLI 
-// Expliquer ce que fait ce test : 
-// une fonction par test cela serait plus clair
-// comment dans un contexte monothread valide -t-on le fonctionnement du slave ? (je le sais mais je fais une critique sur le manque de commentaire
+#include "protocomm_master.h"
+
+// Test du protocole master/slave avec le device emulslave
 
 #include <assert.h>
 #include <string.h>
 #include <stdio.h>
 
-// API bas-niveau pour tester les comportements bas-niveau (ici, le CRC)
-
+// Structure de test pour ce qui se passe côté master
 typedef struct master_Data_t {
 	uint8_t lastCommand;
 	uint8_t lastArgs[proto_MAX_ARGS];
