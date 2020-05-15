@@ -130,6 +130,28 @@ public class protocomm {
     return ret;
   }
 
+  public static SWIGTYPE_p_proto_Device_t devemulslave_create() {
+    SWIGTYPE_p_proto_Device_t ret = new SWIGTYPE_p_proto_Device_t(protocommPINVOKE.devemulslave_create(), true);
+    return ret;
+  }
+
+  public static SWIGTYPE_p_unsigned_char devemulslave_getRegisters(SWIGTYPE_p_proto_Device_t _this) {
+    global::System.IntPtr cPtr = protocommPINVOKE.devemulslave_getRegisters(SWIGTYPE_p_proto_Device_t.getCPtr(_this));
+    SWIGTYPE_p_unsigned_char ret = (cPtr == global::System.IntPtr.Zero) ? null : new SWIGTYPE_p_unsigned_char(cPtr, false);
+    if (protocommPINVOKE.SWIGPendingException.Pending) throw protocommPINVOKE.SWIGPendingException.Retrieve();
+    return ret;
+  }
+
+  public static void devemulslave_setFlags(SWIGTYPE_p_proto_Device_t _this, byte FLAGS) {
+    protocommPINVOKE.devemulslave_setFlags(SWIGTYPE_p_proto_Device_t.getCPtr(_this), FLAGS);
+    if (protocommPINVOKE.SWIGPendingException.Pending) throw protocommPINVOKE.SWIGPendingException.Retrieve();
+  }
+
+  public static void devemulslave_getFlags(SWIGTYPE_p_proto_Device_t _this, SWIGTYPE_p_unsigned_char FLAGS) {
+    protocommPINVOKE.devemulslave_getFlags(SWIGTYPE_p_proto_Device_t.getCPtr(_this), SWIGTYPE_p_unsigned_char.getCPtr(FLAGS));
+    if (protocommPINVOKE.SWIGPendingException.Pending) throw protocommPINVOKE.SWIGPendingException.Retrieve();
+  }
+
   public static readonly int PROTO_FRAME_RECV_TOUT_MS = protocommPINVOKE.PROTO_FRAME_RECV_TOUT_MS_get();
   public static readonly int proto_MAX_ARGS = protocommPINVOKE.proto_MAX_ARGS_get();
   public static readonly int proto_START_OF_FRAME = protocommPINVOKE.proto_START_OF_FRAME_get();
@@ -138,4 +160,5 @@ public class protocomm {
   public static readonly int proto_FRAME_MAXSIZE = protocommPINVOKE.proto_FRAME_MAXSIZE_get();
 
   public static readonly int PROTO_WAIT_FOREVER = protocommPINVOKE.PROTO_WAIT_FOREVER_get();
+  public static readonly int EMULSLAVE_NB_REGS = protocommPINVOKE.EMULSLAVE_NB_REGS_get();
 }

@@ -19,3 +19,4 @@ https://stackoverflow.com/questions/10476483/how-to-generate-a-cross-platform-in
 */
 %include "protocomm_master.h"
 %include "protocomm_ll.h"
+%include "device_emulslave.h"

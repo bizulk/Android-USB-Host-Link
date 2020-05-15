@@ -8,12 +8,18 @@ namespace IHM
 {
     public partial class MainPage : ContentPage
     {
+        //Handle du dll_if
+        dll_if m_dll_if;
+
         bool isConnected = false;
         bool isSending = false;
         bool isReceiving = false;
         public MainPage()
         {
             InitializeComponent();
+
+            //On récupère l'instance de dll_if pour appelé les fonctions de la DLL
+            m_dll_if = dll_if.GetInstance;
         }
 
         void OnButtonSendClicked(object sender, EventArgs e)
@@ -29,6 +35,9 @@ namespace IHM
                 log.Text += "\n" + DateTime.Now.ToString(" HH:mm") + " Not Sending";
             }
 
+            // TODO Test
+            // Ecriture de la valeur du registre
+            //m_dll_if.WriteRegister();
         }
         void OnButtonReceiveClicked(object sender, EventArgs e)
         {
@@ -42,6 +51,10 @@ namespace IHM
             {
                 log.Text += "\n" + DateTime.Now.ToString(" HH:mm") + " Not Receiving";
             }
+
+            // TODO Test
+            // Lecture de la valeur du registre
+            //m_dll_if.ReadRegister();
         }
         void OnButtonConnectClicked(object sender, EventArgs e)
         {
@@ -54,6 +67,10 @@ namespace IHM
                 receiveButton.IsEnabled = true;
                 sendButton.IsEnabled = true;
                 disconnectButton.IsEnabled = true;
+
+                // Test
+                // Ouverture de la connexion
+                m_dll_if.Open(m_dll_if.CreateEmulslave());
             }
             if (isConnected == true)
             {
@@ -71,6 +88,10 @@ namespace IHM
                     receiveButton.IsEnabled = false;
                     sendButton.IsEnabled = false;
                     disconnectButton.IsEnabled = false;
+
+                    // Test
+                    // Fermeture de la connexion
+                    m_dll_if.Close();
                 }
                 if (isConnected == true)
                 {

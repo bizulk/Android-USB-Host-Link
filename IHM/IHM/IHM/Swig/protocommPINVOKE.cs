@@ -388,4 +388,19 @@ class protocommPINVOKE {
 
   [global::System.Runtime.InteropServices.DllImport("protocomm", EntryPoint="CSharp_proto_makeFrame")]
   public static extern byte proto_makeFrame(global::System.Runtime.InteropServices.HandleRef jarg1, int jarg2, global::System.Runtime.InteropServices.HandleRef jarg3);
+
+  [global::System.Runtime.InteropServices.DllImport("protocomm", EntryPoint="CSharp_EMULSLAVE_NB_REGS_get")]
+  public static extern int EMULSLAVE_NB_REGS_get();
+
+  [global::System.Runtime.InteropServices.DllImport("protocomm", EntryPoint="CSharp_devemulslave_create")]
+  public static extern global::System.IntPtr devemulslave_create();
+
+  [global::System.Runtime.InteropServices.DllImport("protocomm", EntryPoint="CSharp_devemulslave_getRegisters")]
+  public static extern global::System.IntPtr devemulslave_getRegisters(global::System.Runtime.InteropServices.HandleRef jarg1);
+
+  [global::System.Runtime.InteropServices.DllImport("protocomm", EntryPoint="CSharp_devemulslave_setFlags")]
+  public static extern void devemulslave_setFlags(global::System.Runtime.InteropServices.HandleRef jarg1, byte jarg2);
+
+  [global::System.Runtime.InteropServices.DllImport("protocomm", EntryPoint="CSharp_devemulslave_getFlags")]
+  public static extern void devemulslave_getFlags(global::System.Runtime.InteropServices.HandleRef jarg1, global::System.Runtime.InteropServices.HandleRef jarg2);
 }

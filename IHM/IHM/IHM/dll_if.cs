@@ -103,5 +103,14 @@ namespace IHM
 
             return ret;
         }
+
+        /// <summary>
+        /// Retourne une instance d'interface pour notre interface
+        /// </summary>
+        /// <returns> Instance de notre device </returns>
+        public SWIGTYPE_p_proto_Device_t CreateEmulslave()
+        {
+            return protocomm.devemulslave_create();
+        }
     }
 }
