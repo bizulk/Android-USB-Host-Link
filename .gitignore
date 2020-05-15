@@ -18,3 +18,5 @@ dllCom/xamarin/protocomm/buildall_user.bat
 dllCom/xamarin/swig/out/
 
 dllCom/xamarin/swig/protocomm_wrap.c
+
+IHM/IHM/IHM.Android/libs/update_libs_env_user.bat

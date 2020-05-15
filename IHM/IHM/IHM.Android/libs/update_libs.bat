@@ -1,4 +1,4 @@
-echo off
+@echo off
 rem Mise à jour des DLL pandavcom
 rem Une simple copie depuis le répertoire projet dans dll/Xamarin.
 
@@ -6,7 +6,7 @@ rem ***************************************************************************
 rem variables
 rem ***************************************************************************
 
-rem Chemin vers le worspace (todo : utiliser la ligne de commande ou verifier la présence dans l'environnement)
+rem Chemin vers le dépôt 'AndroidFilaire' (todo : utiliser la ligne de commande ou verifier la présence dans l'environnement)
 call update_libs_env_user.bat
 rem Veut-on copier Debug ou Release
 set BUILD=Release

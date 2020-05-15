@@ -70,7 +70,7 @@ namespace IHM
 
                 // Test
                 // Ouverture de la connexion
-                m_dll_if.Open(m_dll_if.CreateEmulslave());
+                m_dll_if.Open(m_dll_if.CreateEmulslave(),"unused ;)");
             }
             if (isConnected == true)
             {
