@@ -2,6 +2,7 @@
  %module protocomm
  %{
 	#include "protocomm_master.h"
+	#include "devices/device_emulslave.h"
  %}
 
  /* utiliser les fichiers d'interface pour les standard sinon on a des types opaques
