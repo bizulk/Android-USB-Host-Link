@@ -185,6 +185,45 @@ class protocommPINVOKE {
   }
 
 
+  [global::System.Runtime.InteropServices.DllImport("protocomm", EntryPoint="CSharp_new_uint8_t_p")]
+  public static extern global::System.IntPtr new_uint8_t_p();
+
+  [global::System.Runtime.InteropServices.DllImport("protocomm", EntryPoint="CSharp_copy_uint8_t_p")]
+  public static extern global::System.IntPtr copy_uint8_t_p(byte jarg1);
+
+  [global::System.Runtime.InteropServices.DllImport("protocomm", EntryPoint="CSharp_delete_uint8_t_p")]
+  public static extern void delete_uint8_t_p(global::System.Runtime.InteropServices.HandleRef jarg1);
+
+  [global::System.Runtime.InteropServices.DllImport("protocomm", EntryPoint="CSharp_uint8_t_p_assign")]
+  public static extern void uint8_t_p_assign(global::System.Runtime.InteropServices.HandleRef jarg1, byte jarg2);
+
+  [global::System.Runtime.InteropServices.DllImport("protocomm", EntryPoint="CSharp_uint8_t_p_value")]
+  public static extern byte uint8_t_p_value(global::System.Runtime.InteropServices.HandleRef jarg1);
+
+  [global::System.Runtime.InteropServices.DllImport("protocomm", EntryPoint="CSharp_PROTO_FRAME_RECV_TOUT_MS_get")]
+  public static extern int PROTO_FRAME_RECV_TOUT_MS_get();
+
+  [global::System.Runtime.InteropServices.DllImport("protocomm", EntryPoint="CSharp_proto_cio_open")]
+  public static extern global::System.IntPtr proto_cio_open(string jarg1);
+
+  [global::System.Runtime.InteropServices.DllImport("protocomm", EntryPoint="CSharp_proto_master_create")]
+  public static extern global::System.IntPtr proto_master_create(global::System.Runtime.InteropServices.HandleRef jarg1);
+
+  [global::System.Runtime.InteropServices.DllImport("protocomm", EntryPoint="CSharp_proto_master_destroy")]
+  public static extern void proto_master_destroy(global::System.Runtime.InteropServices.HandleRef jarg1);
+
+  [global::System.Runtime.InteropServices.DllImport("protocomm", EntryPoint="CSharp_proto_master_open")]
+  public static extern int proto_master_open(global::System.Runtime.InteropServices.HandleRef jarg1, string jarg2);
+
+  [global::System.Runtime.InteropServices.DllImport("protocomm", EntryPoint="CSharp_proto_master_close")]
+  public static extern int proto_master_close(global::System.Runtime.InteropServices.HandleRef jarg1);
+
+  [global::System.Runtime.InteropServices.DllImport("protocomm", EntryPoint="CSharp_proto_master_get")]
+  public static extern int proto_master_get(global::System.Runtime.InteropServices.HandleRef jarg1, byte jarg2, global::System.Runtime.InteropServices.HandleRef jarg3);
+
+  [global::System.Runtime.InteropServices.DllImport("protocomm", EntryPoint="CSharp_proto_master_set")]
+  public static extern int proto_master_set(global::System.Runtime.InteropServices.HandleRef jarg1, byte jarg2, byte jarg3);
+
   [global::System.Runtime.InteropServices.DllImport("protocomm", EntryPoint="CSharp_proto_MAX_ARGS_get")]
   public static extern int proto_MAX_ARGS_get();
 

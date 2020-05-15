@@ -8,6 +8,68 @@
 
 
 public class protocomm {
+  public static SWIGTYPE_p_unsigned_char new_uint8_t_p() {
+    global::System.IntPtr cPtr = protocommPINVOKE.new_uint8_t_p();
+    SWIGTYPE_p_unsigned_char ret = (cPtr == global::System.IntPtr.Zero) ? null : new SWIGTYPE_p_unsigned_char(cPtr, false);
+    return ret;
+  }
+
+  public static SWIGTYPE_p_unsigned_char copy_uint8_t_p(byte value) {
+    global::System.IntPtr cPtr = protocommPINVOKE.copy_uint8_t_p(value);
+    SWIGTYPE_p_unsigned_char ret = (cPtr == global::System.IntPtr.Zero) ? null : new SWIGTYPE_p_unsigned_char(cPtr, false);
+    return ret;
+  }
+
+  public static void delete_uint8_t_p(SWIGTYPE_p_unsigned_char obj) {
+    protocommPINVOKE.delete_uint8_t_p(SWIGTYPE_p_unsigned_char.getCPtr(obj));
+  }
+
+  public static void uint8_t_p_assign(SWIGTYPE_p_unsigned_char obj, byte value) {
+    protocommPINVOKE.uint8_t_p_assign(SWIGTYPE_p_unsigned_char.getCPtr(obj), value);
+  }
+
+  public static byte uint8_t_p_value(SWIGTYPE_p_unsigned_char obj) {
+    byte ret = protocommPINVOKE.uint8_t_p_value(SWIGTYPE_p_unsigned_char.getCPtr(obj));
+    return ret;
+  }
+
+  public static proto_hdle_t proto_cio_open(string szDev) {
+    global::System.IntPtr cPtr = protocommPINVOKE.proto_cio_open(szDev);
+    proto_hdle_t ret = (cPtr == global::System.IntPtr.Zero) ? null : new proto_hdle_t(cPtr, false);
+    return ret;
+  }
+
+  public static proto_hdle_t proto_master_create(SWIGTYPE_p_proto_Device_t iodevice) {
+    global::System.IntPtr cPtr = protocommPINVOKE.proto_master_create(SWIGTYPE_p_proto_Device_t.getCPtr(iodevice));
+    proto_hdle_t ret = (cPtr == global::System.IntPtr.Zero) ? null : new proto_hdle_t(cPtr, false);
+    if (protocommPINVOKE.SWIGPendingException.Pending) throw protocommPINVOKE.SWIGPendingException.Retrieve();
+    return ret;
+  }
+
+  public static void proto_master_destroy(proto_hdle_t _this) {
+    protocommPINVOKE.proto_master_destroy(proto_hdle_t.getCPtr(_this));
+  }
+
+  public static int proto_master_open(proto_hdle_t _this, string szPath) {
+    int ret = protocommPINVOKE.proto_master_open(proto_hdle_t.getCPtr(_this), szPath);
+    return ret;
+  }
+
+  public static int proto_master_close(proto_hdle_t _this) {
+    int ret = protocommPINVOKE.proto_master_close(proto_hdle_t.getCPtr(_this));
+    return ret;
+  }
+
+  public static proto_Status_t proto_master_get(proto_hdle_t _this, byte register_, SWIGTYPE_p_unsigned_char value) {
+    proto_Status_t ret = (proto_Status_t)protocommPINVOKE.proto_master_get(proto_hdle_t.getCPtr(_this), register_, SWIGTYPE_p_unsigned_char.getCPtr(value));
+    return ret;
+  }
+
+  public static proto_Status_t proto_master_set(proto_hdle_t _this, byte register_, byte value) {
+    proto_Status_t ret = (proto_Status_t)protocommPINVOKE.proto_master_set(proto_hdle_t.getCPtr(_this), register_, value);
+    return ret;
+  }
+
   public static proto_hdle_t proto_create(SWIGTYPE_p_proto_Device_t iodevice) {
     global::System.IntPtr cPtr = protocommPINVOKE.proto_create(SWIGTYPE_p_proto_Device_t.getCPtr(iodevice));
     proto_hdle_t ret = (cPtr == global::System.IntPtr.Zero) ? null : new proto_hdle_t(cPtr, false);
@@ -68,6 +130,7 @@ public class protocomm {
     return ret;
   }
 
+  public static readonly int PROTO_FRAME_RECV_TOUT_MS = protocommPINVOKE.PROTO_FRAME_RECV_TOUT_MS_get();
   public static readonly int proto_MAX_ARGS = protocommPINVOKE.proto_MAX_ARGS_get();
   public static readonly int proto_START_OF_FRAME = protocommPINVOKE.proto_START_OF_FRAME_get();
   public static readonly int proto_COMMAND_OFFSET = protocommPINVOKE.proto_COMMAND_OFFSET_get();
