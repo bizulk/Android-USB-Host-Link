@@ -22,26 +22,26 @@ extern "C" {
 /// \param userdata
 ///
 ///
-proto_hdle_t * LIBCOMM_EXPORT proto_slave_create(proto_Device_t iodevice, proto_OnReception_t callback, void* userdata);
+LIBCOMM_EXPORT proto_hdle_t *  proto_slave_create(proto_Device_t iodevice, proto_OnReception_t callback, void* userdata);
 
 ///
 /// \brief proto_open Appel l'ouverture du device
 /// \return 0 OK, sinon erreur
 ///
-int LIBCOMM_EXPORT proto_slave_open(proto_hdle_t * this, const char * szPath);
+LIBCOMM_EXPORT int proto_slave_open(proto_hdle_t * this, const char * szPath);
 
 ///
 /// \brief proto_close Appelle la fermeture du device (open possible après)
 /// \return 0 OK
 ///
-int LIBCOMM_EXPORT proto_slave_close(proto_hdle_t * this);
+LIBCOMM_EXPORT int proto_slave_close(proto_hdle_t * this);
 
 ///
 /// \brief proto_slave_main Iteration de traitement d'un esclave.
 /// \return résultat du traitement : 0 pas de requete traitée, 1 une requete traitée, -1 erreur IO
 /// Fonction à appeler dans une boucle pour un traitement continu.
 ///
-int LIBCOMM_EXPORT proto_slave_main(proto_hdle_t * this);
+LIBCOMM_EXPORT int proto_slave_main(proto_hdle_t * this);
 
 enum proto_slave_flags
 {
@@ -50,9 +50,9 @@ enum proto_slave_flags
 };
 
 /// Pour générer des cas de test
-void LIBCOMM_EXPORT devemulslave_setFlags(proto_Device_t this, uint8_t FLAGS);
+LIBCOMM_EXPORT void devemulslave_setFlags(proto_Device_t this, uint8_t FLAGS);
 /// Pour générer des cas de test
-void LIBCOMM_EXPORT devemulslave_getFlags(proto_Device_t this, uint8_t * FLAGS);
+LIBCOMM_EXPORT void devemulslave_getFlags(proto_Device_t this, uint8_t * FLAGS);
 
 #ifdef __cplusplus
 } // extern "C"
