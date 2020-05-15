@@ -8,15 +8,15 @@ namespace IHM
      Et elle contient son instance de protocomm.
      Sinon pour le singleton, pas obligatoire peut-être pour cette appli, et le "lazy" ça peut marcher (moins lourd a lire mais tu as peut-être un avis là dessus ?)
          */
-    public sealed class dll_if : protocomm
+    public sealed class dll_if 
     {
         private static dll_if instance = null;
         private static readonly object Instancelock = new object();
         // Handle vers le panda
-        private proto_hdle_t m_handle = null;
+        private proto_hdle_t m_handle;
 
-        //Device
-        SWIGTYPE_p_proto_Device_t m_device = null;
+        //Device (exception si on initialise à NULL)
+        SWIGTYPE_p_proto_Device_t m_device;
 
         public static dll_if GetInstance
         {
@@ -97,12 +97,12 @@ namespace IHM
         {
             proto_Status_t ret;
             // SLI Je pige pas que SWIG ait crée un type opaque por l'uint8_t ??
-            var uiValue = new_uint8_t_p();
+            var uiValue = protocomm.new_uint8_t_p();
 
             ret = protocomm.proto_master_get(m_handle, uiRegister, uiValue);
 
             //On récupère la valeur
-            value = uint8_t_p_value(uiValue);
+            value = protocomm.uint8_t_p_value(uiValue);
 
             return ret;
         }
