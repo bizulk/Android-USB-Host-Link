@@ -1,0 +1,56 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="SWIG">
+      <UniqueIdentifier>{47d87cc8-c9ca-4581-9c09-42c469654168}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="dll">
+      <UniqueIdentifier>{fb7a6098-f941-4a56-9530-1c85532fcddb}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="$(MSBuildThisFileDirectory)protocomm.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\swig\protocomm_wrap.c">
+      <Filter>SWIG</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\..\libcomm\devices\device_serial.c">
+      <Filter>dll</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\..\libcomm\devices\device_emulslave.c">
+      <Filter>dll</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\..\libcomm\protocomm_ll.c">
+      <Filter>dll</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\..\libcomm\protocomm_master.c">
+      <Filter>dll</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\..\libcomm\protocomm_slave.c">
+      <Filter>dll</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="$(MSBuildThisFileDirectory)protocomm.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\..\libcomm\devices\device_serial.h">
+      <Filter>dll</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\..\libcomm\devices\device_emulslave.h">
+      <Filter>dll</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\..\libcomm\libcomm_global.h">
+      <Filter>dll</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\..\libcomm\proto_iodevice.h">
+      <Filter>dll</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\..\libcomm\protocomm_ll.h">
+      <Filter>dll</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\..\libcomm\protocomm_master.h">
+      <Filter>dll</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\..\libcomm\protocomm_slave.h">
+      <Filter>dll</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

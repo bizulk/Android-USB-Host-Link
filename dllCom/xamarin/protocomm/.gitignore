@@ -1,0 +1,7 @@
+build-win
+Debug/
+Release/
+*.user
+Makefile
+/.vs
+
