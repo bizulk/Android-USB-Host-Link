@@ -12,3 +12,9 @@ IHM/IHM/IHM//obj/Debug/
 IHM/IHM/IHM/IHM.Android/bin/Debug/
 
 IHM/IHM/IHM/IHM.Android/obj/Debug/
+
+dllCom/xamarin/protocomm/buildall_user.bat
+
+dllCom/xamarin/swig/out/
+
+dllCom/xamarin/swig/protocomm_wrap.c
