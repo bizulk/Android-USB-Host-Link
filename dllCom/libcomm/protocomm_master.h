@@ -19,6 +19,12 @@ extern "C" {
 /// Définition de l'attente d'une trame
 #define PROTO_FRAME_RECV_TOUT_MS 1000
 
+// Pour le parse par CFFI (python) ou SWIG il faut désactiver le symbole qui ne peut être traité
+#ifdef SWIG_FFI_BINDING
+#undef LIBCOMM_EXPORT
+#define LIBCOMM_EXPORT
+#endif
+
 ///
 /// \brief proto_cio_open Encapsulation du protocole pour avoir une API confirme
 /// \param szDev chemin à ouvrir (/dev/ttyS0 ou \\.\COMn)
