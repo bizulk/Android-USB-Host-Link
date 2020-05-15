@@ -4,6 +4,10 @@ using System.Text;
 
 namespace IHM
 {
+    /* vu comme c'est crée : je pense qu'il faut déifnir une IProtoIFace, et dll_if l'instancie
+     Et elle contient son instance de protocomm.
+     Sinon pour le singleton, pas obligatoire peut-être pour cette appli, et le "lazy" ça peut marcher (moins lourd a lire mais tu as peut-être un avis là dessus ?)
+         */
     public sealed class dll_if : protocomm
     {
         private static dll_if instance = null;
@@ -38,7 +42,7 @@ namespace IHM
         /// </summary>
         /// <param name="device"> device pour la connexion </param>
         /// <returns></returns>
-        public int Open(SWIGTYPE_p_proto_Device_t device)
+        public int Open(SWIGTYPE_p_proto_Device_t device, string szPath)
         {
             int ret = -1;
 
@@ -46,13 +50,12 @@ namespace IHM
 
             //On ouvre la connexion
             m_handle = protocomm.proto_master_create(m_device); //5s de timeout TODO a moditifer plus tard pour le rendre paramètrable
-            
             //On vérifie qu'il n'y a pas eu de problème lors de la connexion
             if(m_handle != null)
             {
                 ret = 0;
             }
-
+            protocomm.proto_master_open(m_handle, szPath);
             return ret;
         }
 
@@ -64,7 +67,7 @@ namespace IHM
         {
             //On ferme la connexion
             protocomm.proto_master_close(m_handle);
-
+            protocomm.proto_master_destroy(m_handle);
             //On met l'handle à null pour signifier qu'on s'est déconnecté
             m_handle = null;
         }
@@ -93,7 +96,7 @@ namespace IHM
         public proto_Status_t ReadRegister(byte uiRegister, ref byte value)
         {
             proto_Status_t ret;
-
+            // SLI Je pige pas que SWIG ait crée un type opaque por l'uint8_t ??
             var uiValue = new_uint8_t_p();
 
             ret = protocomm.proto_master_get(m_handle, uiRegister, uiValue);
