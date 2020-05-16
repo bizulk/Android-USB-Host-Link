@@ -3,7 +3,7 @@
 #define PLATFORM_ANDROID 0
 #define PLATFORM_IOS 1
 
-char* protocomm::getTemplateInfo()
+char * protocomm::getTemplateInfo()
 {
 #if PLATFORM == PLATFORM_IOS
 	static char info[] = "Platform for iOS";

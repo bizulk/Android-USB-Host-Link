@@ -1,0 +1,35 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup Label="Globals">
+    <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <HasSharedItems>true</HasSharedItems>
+    <ItemsProjectGuid>{a8a9e494-25e2-4652-bf09-a6919ef2abf8}</ItemsProjectGuid>
+  </PropertyGroup>
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);$(MSBuildThisFileDirectory)</AdditionalIncludeDirectories>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ProjectCapability Include="SourceItemsFromImports" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\..\..\libcomm\devices\device_emulslave.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\..\..\libcomm\devices\device_serial.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\..\..\libcomm\protocomm_ll.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\..\..\libcomm\protocomm_master.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\..\..\libcomm\protocomm_slave.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\..\swig\protocomm_wrap.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)protocomm.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\..\..\libcomm\devices\device_emulslave.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\..\..\libcomm\devices\device_serial.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\..\..\libcomm\libcomm_global.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\..\..\libcomm\protocomm_ll.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\..\..\libcomm\protocomm_master.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\..\..\libcomm\protocomm_slave.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\..\..\libcomm\proto_iodevice.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)protocomm.h" />
+  </ItemGroup>
+</Project>

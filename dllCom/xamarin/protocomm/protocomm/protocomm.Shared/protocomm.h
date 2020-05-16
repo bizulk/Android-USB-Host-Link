@@ -2,7 +2,7 @@
 
 class protocomm {
 public:
-    static char* getTemplateInfo();
+    static char * getTemplateInfo();
     protocomm();
     ~protocomm();
 };
