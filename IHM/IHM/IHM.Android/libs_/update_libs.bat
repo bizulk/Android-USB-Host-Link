@@ -10,14 +10,14 @@ rem Chemin vers le dépôt 'AndroidFilaire' (todo : utiliser la ligne de command
 call update_libs_env_user.bat
 rem Veut-on copier Debug ou Release
 set BUILD=Release
-set DLL_NAME=libprotocomm.so
+set DLL_NAME=libdllcom_Android.so
 
 rem ***************************************************************************
 rem constantes
 rem ***************************************************************************
 
 rem chemin vers le répertoire racine des DLL
-set DLLCOM_BIN_PATH=%ATO_WORKSPACE_PATH%\AndroidFilaire\dllcom\xamarin\protocomm\protocomm\protocomm.Android\
+set DLLCOM_BIN_PATH=%ATO_WORKSPACE_PATH%\AndroidFilaire\dllcom\xamarin\protocomm\dllcom.Android\
  
 set SRC_DLL_ARM64_PATH=%DLLCOM_BIN_PATH%\ARM64\%BUILD%\%DLL_NAME%
 set SRC_DLL_ARM_PATH=%DLLCOM_BIN_PATH%\ARM\%BUILD%\%DLL_NAME%

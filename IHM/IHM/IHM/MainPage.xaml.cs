@@ -8,7 +8,7 @@ namespace IHM
 {
     public partial class MainPage : ContentPage
     {
-        //Handle du dll_if
+        /// Handle du dll_if
         dll_if m_dll_if;
 
         bool isConnected = false;
@@ -17,23 +17,14 @@ namespace IHM
         public MainPage()
         {
             InitializeComponent();
-
-            //On récupère l'instance de dll_if pour appelé les fonctions de la DLL
+            //On récupère l'instance de dll_if pour appeler les fonctions de la DLL
             m_dll_if = dll_if.GetInstance;
         }
 
         void OnButtonSendClicked(object sender, EventArgs e)
         {
-            //To do : call method to send
-            if (isSending == true)
-            {
-                log.Text += "\n"+ DateTime.Now.ToString(" HH:mm") + " Sending";
-            }
 
-            if (isSending == false)
-            {
-                log.Text += "\n" + DateTime.Now.ToString(" HH:mm") + " Not Sending";
-            }
+           log.Text += "\n"+ DateTime.Now.ToString(" HH:mm") + " Sending";
 
             // TODO Test
             // Ecriture de la valeur du registre
