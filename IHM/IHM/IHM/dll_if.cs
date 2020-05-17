@@ -117,5 +117,24 @@ namespace IHM
             ret = protocomm.devemulslave_create();
             return ret;
         }
+
+        /// <summary>
+        /// Fournit une string de description du status
+        /// </summary>
+        /// <param name="status"> Status à interpreter</param>
+        public static string ProtoStatusGetString(proto_Status_t status)
+        {
+            List<string> lszStatus = new List<string>
+            {
+                  "Success",
+                  "Erreur Système",
+                  "CRC de la trame reçue invalide",
+                  "Le peer signale une erreur de CRC",
+                  "Argument invalide",
+                  "timeout",
+                  "Erreur de protocole"
+            };
+            return lszStatus[(int)status];
+        }
     }
 }
