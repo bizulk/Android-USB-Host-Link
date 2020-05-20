@@ -21,7 +21,7 @@ extern "C" {
 /// \param szPath
 /// \return Instance de notre device
 ///
-proto_Device_t LIBCOMM_EXPORT devemulslave_create(void);
+LIBCOMM_EXPORT proto_Device_t devemulslave_create(void);
 
 ///
 /// \brief devemulslave_getRegisters Cette fonction permet d'avoir accès aux registres du slave émulé
@@ -29,7 +29,7 @@ proto_Device_t LIBCOMM_EXPORT devemulslave_create(void);
 ///
 /// Cette fonction existe pour la mise en place des tests
 ///
-uint8_t * LIBCOMM_EXPORT devemulslave_getRegisters(proto_Device_t _this);
+LIBCOMM_EXPORT uint8_t * devemulslave_getRegisters(proto_Device_t _this);
 
 enum emulslave_flags
 {
@@ -38,9 +38,9 @@ enum emulslave_flags
 };
 
 /// Pour générer des cas de test
-void LIBCOMM_EXPORT devemulslave_setFlags(proto_Device_t _this, uint8_t FLAGS);
+LIBCOMM_EXPORT void devemulslave_setFlags(proto_Device_t _this, uint8_t FLAGS);
 /// Pour générer des cas de test
-void LIBCOMM_EXPORT devemulslave_getFlags(proto_Device_t _this, uint8_t * FLAGS);
+LIBCOMM_EXPORT void devemulslave_getFlags(proto_Device_t _this, uint8_t * FLAGS);
 
 #ifdef __cplusplus
 } // extern "C"

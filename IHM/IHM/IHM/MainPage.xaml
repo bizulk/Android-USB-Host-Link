@@ -28,7 +28,7 @@
                    Grid.ColumnSpan="4"
                    />
             <Label Grid.Row="2"
-                   Text="Value 1"
+                   Text="Register 1"
                    HeightRequest="20"
                    TextColor="White"
                    BackgroundColor="Black"/>
@@ -36,23 +36,27 @@
                    Grid.Row="2"
                    Text="Value" 
                    TextColor="White"
-                   BackgroundColor="Black"/>
-            <Editor Grid.Column="2"
+                   BackgroundColor="Black"
+                   x:Name="peerReg1"/>
+            <Entry Grid.Column="2"
                     Grid.Row="2"
                      Grid.ColumnSpan="2"
+                   x:Name="userReg1"
                     />
             <Label Grid.Row="3"
-                   Text="Value 2"
+                   Text="Register 2"
                    TextColor="White"
                    BackgroundColor="Black"/>
             <Label Grid.Column="1"
                    Grid.Row="3"
                    Text="Value"
                    TextColor="White"
-                   BackgroundColor="Black"/>
-            <Editor Grid.Row="3"
+                   BackgroundColor="Black"
+                   x:Name="peerReg2"/>
+            <Entry Grid.Row="3"
                     Grid.Column="2"
-                    Grid.ColumnSpan="2"/>
+                    Grid.ColumnSpan="2"
+                   x:Name="userReg2"/>
             <Editor Grid.Row="4"
                     Grid.RowSpan="2"
                     Grid.ColumnSpan="4"

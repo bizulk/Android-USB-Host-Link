@@ -152,7 +152,7 @@ static int devemulslave_read(proto_Device_t this, void* buf, uint8_t len, int16_
     UNUSED(tout_ms);
 
     proto_dev_emulslave_t* slave = this->user;
-    uint8_t nbDelayedBytes = slave->priv_usSlaveStkSize;
+    uint16_t nbDelayedBytes = slave->priv_usSlaveStkSize;
 
     // On prend le minimum entre bufferSize et nbDelayedBytes
     int nbRead = len < nbDelayedBytes ? len : nbDelayedBytes;
@@ -200,7 +200,7 @@ static int devemulslave_write(proto_Device_t this, const void * buf, uint8_t len
 
     // Test : on manipule la trame selon le flag positionne
     if( (slave->flags & EMULSLAVE_FLAG_MASTER_BADCRC) &&
-        (devemulslave_isFrame(&slave->priv_masterStk.frame, slave->priv_usMasterStkSize)==0) )
+        (devemulslave_isFrame(&slave->priv_masterStk.frame, (uint8_t)slave->priv_usMasterStkSize)==0) )
     {
         // on se contente d'incrémenter le CRC
         slave->priv_masterStk.frame.crc8++;

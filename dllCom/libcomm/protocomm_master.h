@@ -19,6 +19,12 @@ extern "C" {
 /// Définition de l'attente d'une trame
 #define PROTO_FRAME_RECV_TOUT_MS 1000
 
+// Pour le parse par CFFI (python) ou SWIG il faut désactiver le symbole qui ne peut être traité
+#ifdef SWIG_FFI_BINDING
+#undef LIBCOMM_EXPORT
+#define LIBCOMM_EXPORT
+#endif
+
 ///
 /// \brief proto_cio_open Encapsulation du protocole pour avoir une API confirme
 /// \param szDev chemin à ouvrir (/dev/ttyS0 ou \\.\COMn)
@@ -26,7 +32,7 @@ extern "C" {
 ///
 /// Encapsule la creation du device
 ///
-proto_hdle_t *  LIBCOMM_EXPORT proto_cio_open(const char * szDev);
+LIBCOMM_EXPORT proto_hdle_t *   proto_cio_open(const char * szDev);
 
 ///
 /// \brief proto_master_create Creation d'une instance pour le master
@@ -34,25 +40,25 @@ proto_hdle_t *  LIBCOMM_EXPORT proto_cio_open(const char * szDev);
 /// \param callback
 /// \param userdata
 ///
-proto_hdle_t * LIBCOMM_EXPORT proto_master_create(proto_Device_t iodevice);
+LIBCOMM_EXPORT proto_hdle_t * proto_master_create(proto_Device_t iodevice);
 
 ///
 /// \brief proto_destroy Destruction de notre instance
 /// \param _this Instance
 ///
-void LIBCOMM_EXPORT proto_master_destroy(proto_hdle_t * _this);
+LIBCOMM_EXPORT void proto_master_destroy(proto_hdle_t * _this);
 
 ///
 /// \brief proto_open Appel l'ouverture du device
 /// \return 0 OK, sinon erreur
 ///
-int LIBCOMM_EXPORT proto_master_open(proto_hdle_t * _this, const char * szPath);
+LIBCOMM_EXPORT int proto_master_open(proto_hdle_t * _this, const char * szPath);
 
 ///
 /// \brief proto_close Appelle la fermeture du device (open possible après)
 /// \return 0 OK
 ///
-int LIBCOMM_EXPORT proto_master_close(proto_hdle_t * _this);
+LIBCOMM_EXPORT int proto_master_close(proto_hdle_t * _this);
 
 
 /// Demande à l'esclave une valeur. PS : Le timeout est approximatif
@@ -64,7 +70,7 @@ int LIBCOMM_EXPORT proto_master_close(proto_hdle_t * _this);
 /// @param[in] iodevice  pointeur vers l'interface du IO Device
 /// @param[inout] iodata pointeur vers les données nécessaires pour le IO Device
 /// @returns La réponse de l'esclave
-proto_Status_t LIBCOMM_EXPORT proto_master_get(proto_hdle_t * _this, uint8_t register_, uint8_t* value);
+LIBCOMM_EXPORT proto_Status_t proto_master_get(proto_hdle_t * _this, uint8_t register_, uint8_t* value);
 
 /// Demande à l'esclave d'enregistrer une valeur.
 /// @param[in] register_ le registre de l'esclave qu'on veut écrire
@@ -73,7 +79,7 @@ proto_Status_t LIBCOMM_EXPORT proto_master_get(proto_hdle_t * _this, uint8_t reg
 /// @param[in] iodevice  pointeur vers l'interface du IO Device
 /// @param[inout] iodata pointeur vers les données nécessaires pour le IO Device
 /// @returns La réponse de l'esclave (la valeur a été écrite ssi proto_NO_ERROR)
-proto_Status_t LIBCOMM_EXPORT proto_master_set(proto_hdle_t * _this, uint8_t register_, uint8_t value);
+LIBCOMM_EXPORT proto_Status_t proto_master_set(proto_hdle_t * _this, uint8_t register_, uint8_t value);
 
 
 #ifdef __cplusplus

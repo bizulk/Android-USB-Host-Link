@@ -1,0 +1,56 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="$(MSBuildThisFileDirectory)protocomm.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\..\swig\protocomm_wrap.c">
+      <Filter>SWIG</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\..\..\libcomm\protocomm_ll.c">
+      <Filter>dll</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\..\..\libcomm\protocomm_master.c">
+      <Filter>dll</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\..\..\libcomm\protocomm_slave.c">
+      <Filter>dll</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\..\..\libcomm\devices\device_emulslave.c">
+      <Filter>dll</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\..\..\libcomm\devices\device_serial.c">
+      <Filter>dll</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="$(MSBuildThisFileDirectory)protocomm.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\..\..\libcomm\libcomm_global.h">
+      <Filter>dll</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\..\..\libcomm\proto_iodevice.h">
+      <Filter>dll</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\..\..\libcomm\protocomm_ll.h">
+      <Filter>dll</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\..\..\libcomm\protocomm_master.h">
+      <Filter>dll</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\..\..\libcomm\protocomm_slave.h">
+      <Filter>dll</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\..\..\libcomm\devices\device_emulslave.h">
+      <Filter>dll</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\..\..\libcomm\devices\device_serial.h">
+      <Filter>dll</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="SWIG">
+      <UniqueIdentifier>{f79515ad-d7b8-45f3-b6e8-96ca0874ec09}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="dll">
+      <UniqueIdentifier>{b94c14da-0213-4d74-99a4-ae390a20963d}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

@@ -27,27 +27,27 @@ static proto_Status_t proto_master_readFrame(proto_hdle_t * this, proto_frame_da
 /// \param callback
 /// \param userdata
 ///
-proto_hdle_t * LIBCOMM_EXPORT proto_master_create(proto_Device_t iodevice)
+proto_hdle_t * proto_master_create(proto_Device_t iodevice)
 {
     return proto_create(iodevice);
 }
 
-void LIBCOMM_EXPORT proto_master_destroy(proto_hdle_t * this)
+void proto_master_destroy(proto_hdle_t * this)
 {
     return proto_destroy(this);
 }
 
-int LIBCOMM_EXPORT proto_master_open(proto_hdle_t * this, const char * szPath)
+int proto_master_open(proto_hdle_t * this, const char * szPath)
 {
     return proto_open(this, szPath);
 }
 
-int LIBCOMM_EXPORT proto_master_close(proto_hdle_t * this)
+int proto_master_close(proto_hdle_t * this)
 {
     return proto_close(this);
 }
 
-proto_hdle_t * LIBCOMM_EXPORT proto_cio_open(const char * szDev)
+proto_hdle_t * proto_cio_open(const char * szDev)
 {
     assert(szDev);
     int ret = 0;
@@ -115,7 +115,7 @@ static proto_Status_t proto_master_readFrame(proto_hdle_t * this, proto_frame_da
     return ret;
 }
 
-proto_Status_t LIBCOMM_EXPORT proto_master_get(proto_hdle_t * this, uint8_t register_, uint8_t* value) {
+proto_Status_t proto_master_get(proto_hdle_t * this, uint8_t register_, uint8_t* value) {
 
     proto_frame_data_t data = { .req.reg = register_, .req.value = 0};
     proto_Status_t ret = 0;
@@ -133,7 +133,7 @@ proto_Status_t LIBCOMM_EXPORT proto_master_get(proto_hdle_t * this, uint8_t regi
     return ret;
 }
 
-proto_Status_t LIBCOMM_EXPORT proto_master_set(proto_hdle_t * this, uint8_t register_, uint8_t value) {
+proto_Status_t proto_master_set(proto_hdle_t * this, uint8_t register_, uint8_t value) {
 
     proto_frame_data_t data = { .req.reg = register_, .req.value = value};
     proto_Status_t ret = 0;

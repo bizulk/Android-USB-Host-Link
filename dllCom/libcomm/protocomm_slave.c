@@ -9,7 +9,7 @@
 #include <assert.h>
 #include "protocomm_slave.h"
 
-proto_hdle_t * LIBCOMM_EXPORT proto_slave_create(proto_Device_t iodevice, proto_OnReception_t callback, void* userdata)
+proto_hdle_t * proto_slave_create(proto_Device_t iodevice, proto_OnReception_t callback, void* userdata)
 {
     // Creation du protocole avec notre device
     proto_hdle_t * this = proto_create(iodevice);
@@ -19,18 +19,18 @@ proto_hdle_t * LIBCOMM_EXPORT proto_slave_create(proto_Device_t iodevice, proto_
     return this;
 }
 
-int LIBCOMM_EXPORT proto_slave_open(proto_hdle_t * this, const char * szPath)
+int proto_slave_open(proto_hdle_t * this, const char * szPath)
 {
     return proto_open(this, szPath);
 }
 
 
-int LIBCOMM_EXPORT proto_slave_close(proto_hdle_t * this)
+int proto_slave_close(proto_hdle_t * this)
 {
     return proto_close(this);
 }
 
-int LIBCOMM_EXPORT proto_slave_main(proto_hdle_t * this)
+int proto_slave_main(proto_hdle_t * this)
 {
     proto_Command_t cmd = 0;
     proto_Command_t cmdret = 0;
