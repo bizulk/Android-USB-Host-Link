@@ -53,6 +53,7 @@
 /* USER CODE BEGIN INCLUDE */
 #include <string.h>
 #include <stdio.h>
+#include "tst_iface.h"
 /* USER CODE END INCLUDE */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -297,11 +298,7 @@ static int8_t CDC_Receive_FS(uint8_t* Buf, uint32_t *Len)
   USBD_CDC_SetRxBuffer(&hUsbDeviceFS, &Buf[0]);
   USBD_CDC_ReceivePacket(&hUsbDeviceFS);
   // CIO - Add code here
-  // Echo the received chars
-  CDC_Transmit_FS(Buf, *Len);
-  // Try de stlink debug interface
-  printf("received %lu char\n", *Len);
-  return (USBD_OK);
+  return _CDC_Receive_FS_user(Buf, Len);
   /* USER CODE END 6 */
 }
 
