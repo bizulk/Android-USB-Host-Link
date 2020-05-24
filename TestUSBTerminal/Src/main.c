@@ -55,6 +55,8 @@
 
 /* USER CODE BEGIN Includes */
 
+#include "tst_iface.h"
+
 /* USER CODE END Includes */
 
 /* Private variables ---------------------------------------------------------*/
@@ -84,7 +86,9 @@ void SystemClock_Config(void);
 int main(void)
 {
   /* USER CODE BEGIN 1 */
-
+	// Cette variable sert à cadencer des traitements
+  uint32_t ulStamp_ms = 0;
+  uint32_t ulDly_ms = 0;
   /* USER CODE END 1 */
 
   /* MCU Configuration----------------------------------------------------------*/
@@ -113,13 +117,21 @@ int main(void)
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
+  // Initialisation pour récupérer un délai juste la première fois
+  ulStamp_ms = HAL_GetTick();
+
   while (1)
   {
 
   /* USER CODE END WHILE */
 
   /* USER CODE BEGIN 3 */
-
+	  ulDly_ms = HAL_GetTick();
+	  if( (ulDly_ms - ulStamp_ms)>1000)
+	  {
+		  ulStamp_ms = ulDly_ms;
+		  tst_loop_1hz();
+	  }
   }
   /* USER CODE END 3 */
 
