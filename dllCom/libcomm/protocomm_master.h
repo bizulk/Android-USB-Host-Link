@@ -25,6 +25,7 @@ extern "C" {
 #define LIBCOMM_EXPORT
 #endif
 
+
 ///
 /// \brief proto_cio_open Encapsulation du protocole pour avoir une API confirme
 /// \param szDev chemin à ouvrir (/dev/ttyS0 ou \\.\COMn)
@@ -61,24 +62,16 @@ LIBCOMM_EXPORT int proto_master_open(proto_hdle_t * _this, const char * szPath);
 LIBCOMM_EXPORT int proto_master_close(proto_hdle_t * _this);
 
 
-/// Demande à l'esclave une valeur. PS : Le timeout est approximatif
-/// car basé sur la fonction clock() de <time.h>. Or cette fonction n'est
-/// pas précise (cf. https://en.cppreference.com/w/c/chrono/clock ).
-/// @param[in] register_ le registre de l'esclave qu'on veut lire
-/// @param[out] value    là où sera écrit la valeur en cas de succès.
-/// @pram[in] timeout_ms nombre de millisecondes à attendre au minimum
-/// @param[in] iodevice  pointeur vers l'interface du IO Device
-/// @param[inout] iodata pointeur vers les données nécessaires pour le IO Device
-/// @returns La réponse de l'esclave
+/// Demande à l'esclave de lire une valeur.
+/// \param[in] register_ le registre de l'esclave qu'on veut lire
+/// \param[out] value    là où sera écrit la valeur en cas de succès.
+/// \return proto_NO_ERROR si pas d'erreur
 LIBCOMM_EXPORT proto_Status_t proto_master_get(proto_hdle_t * _this, uint8_t register_, uint8_t* value);
 
 /// Demande à l'esclave d'enregistrer une valeur.
-/// @param[in] register_ le registre de l'esclave qu'on veut écrire
-/// @param[out] value    la valeur à écrire
-/// @pram[in] timeout_ms nombre de millisecondes à attendre au minimum
-/// @param[in] iodevice  pointeur vers l'interface du IO Device
-/// @param[inout] iodata pointeur vers les données nécessaires pour le IO Device
-/// @returns La réponse de l'esclave (la valeur a été écrite ssi proto_NO_ERROR)
+/// \param[in] register_ le registre de l'esclave qu'on veut écrire
+/// \param[out] value    la valeur à écrire
+/// \return proto_NO_ERROR si pas d'erreur
 LIBCOMM_EXPORT proto_Status_t proto_master_set(proto_hdle_t * _this, uint8_t register_, uint8_t value);
 
 

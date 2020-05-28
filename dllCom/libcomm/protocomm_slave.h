@@ -24,6 +24,13 @@ extern "C" {
 ///
 LIBCOMM_EXPORT proto_hdle_t *  proto_slave_create(proto_Device_t iodevice, proto_OnReception_t callback, void* userdata);
 
+
+///
+/// \brief proto_destroy Destruction de notre instance
+/// \param _this Instance
+///
+LIBCOMM_EXPORT void proto_slave_destroy(proto_hdle_t * _this);
+
 ///
 /// \brief proto_open Appel l'ouverture du device
 /// \return 0 OK, sinon erreur

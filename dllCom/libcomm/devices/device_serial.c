@@ -9,6 +9,9 @@
 #include "proto_iodevice.h"
 #include "device_serial.h"
 #include <string.h>
+#include <ctype.h>
+#include <errno.h>
+
 
 /******************************************************************************
  * TYPES & VARIABLES
@@ -17,7 +20,8 @@
 /* Complément de données nécessaire à la structure */
 typedef struct
 {
-    int toto;
+    int fileDescriptor;
+    int mustBeClosed;
 } proto_dev_serial_t ;
 
 /******************************************************************************
@@ -47,8 +51,128 @@ void devserial_destroy(proto_Device_t this)
     free(this);
 }
 
+#ifdef __linux__
 
-static int  devserial_open(struct proto_IfaceIODevice* this, const char * szPath)
+// headers propres à Linux
+#include <unistd.h>
+#include <fcntl.h>
+#include <termios.h>
+
+/// Configure le FileDescriptor
+/// Notamment vtime et vmin, qui définissent
+/// le comportement bloquant (ou non) de la fonction read
+/// retourne 0 si OK, -1 si erreur
+static int setFdMode(int fd, int vtime, int vmin) {
+    struct termios tty;
+    memset(&tty, 0, sizeof tty);
+    if (tcgetattr(fd, &tty) != 0) {
+        return -1;
+    }
+    tty.c_cflag = ( tty.c_cflag
+                        & ~PARENB // Pas de bit de parité
+                        & ~CSTOPB ) // Un seul bit de stop
+        | CS8     // 8 bits par byte
+        | CREAD   // on active READ
+        | CLOCAL; // on ignore les ctrl lines
+    tty.c_lflag = tty.c_lflag
+        & ~ICANON // Pas le mode canonique
+        & ~ECHO   // Pas d'echo
+        & ~ECHONL // Pas d'echo sur nouvelle ligne
+        & ~ISIG   // On n'interprète pas INTR QUIT SUSP
+        & ~IXON & ~IXOFF & ~ IXANY // Pas de s/w flow ctrl
+        & ~IGNBRK & ~BRKINT & ~PARMRK & ~ISTRIP
+        & ~INLCR & ~IGNCR & ~ ICRNL;
+    tty.c_oflag &= ~OPOST & ~ONLCR;
+
+    tty.c_cc[VTIME] = vtime;
+    tty.c_cc[VMIN] = vmin;
+
+    if (tcsetattr(fd, TCSANOW, &tty) != 0) {
+        return -1;
+    }
+    return 0;
+}
+
+static int devserial_close(struct proto_IfaceIODevice* this)
+{
+    assert(this);
+
+    proto_dev_serial_t* infos = this->user;
+
+    if (infos->mustBeClosed)
+        return close(infos->fileDescriptor);
+    else
+        return 0;
+}
+
+static int devserial_open(struct proto_IfaceIODevice* this, const char * szPath)
+{
+    assert(this && szPath);
+
+    proto_dev_serial_t* infos = this->user;
+
+    devserial_close(this);
+
+    int fd = open(szPath, O_RDWR);
+    if (fd < 0)
+        return fd;
+
+    infos->fileDescriptor = fd;
+    infos->mustBeClosed = 1;
+    // vtime = 0, vmin = 0 : les appels à "read" sont non-bloquants
+    return setFdMode(infos->fileDescriptor, 0, 0);
+}
+
+
+static int devserial_read(struct proto_IfaceIODevice* this, void* buffer, uint8_t bufferSize, int16_t tout_ms)
+{
+    assert(this && buffer);
+    UNUSED(tout_ms);
+
+    proto_dev_serial_t* infos = this->user;
+    return read(infos->fileDescriptor, buffer, bufferSize);
+}
+
+static int devserial_write(struct proto_IfaceIODevice* this, const void * buffer, uint8_t size)
+{
+    assert(this && buffer);
+
+    proto_dev_serial_t* infos = this->user;
+    while (size > 0) {
+        int ret = write(infos->fileDescriptor, buffer, size);
+        if (ret < 0)
+            return -1;
+        else {
+            buffer += ret; // octets qui restent à transmettre
+            size -= ret;
+        }
+    }
+    return 0;
+}
+
+int devserial_openFD(proto_Device_t this, int fileDescriptor) {
+    assert(this);
+
+    int ret = setFdMode(fileDescriptor, 0, 0);
+    if (ret < 0)
+        return -1;
+
+    devserial_close(this);
+    proto_dev_serial_t* infos = this->user;
+    infos->fileDescriptor = fileDescriptor;
+    infos->mustBeClosed = 0;
+    return 0;
+}
+
+int devserial_getFD(proto_Device_t this) {
+
+    return ((proto_dev_serial_t*) this->user)->fileDescriptor;
+
+}
+
+#else // if __linux__ not defined
+
+static int devserial_open(struct proto_IfaceIODevice* this, const char * szPath)
 {
     return -1;
 }
@@ -68,6 +192,12 @@ static int devserial_write(struct proto_IfaceIODevice* this, const void * buffer
     return 0;
 }
 
+int devserial_openFD(proto_Device_t _this, int fileDescriptor) {
+    return -1;
+}
+
+
+#endif
 
 proto_Device_t devserial_create(void)
 {
@@ -79,6 +209,7 @@ proto_Device_t devserial_create(void)
     return this;
 }
 
+
 void devserial_init(proto_Device_t this)
 {
     assert(this);
@@ -87,5 +218,8 @@ void devserial_init(proto_Device_t this)
     this->destroy = devserial_destroy;
     this->read = devserial_read;
     this->write = devserial_write;
-    memset(this->user, 0, sizeof(proto_dev_serial_t));
+
+    proto_dev_serial_t* infos = this->user;
+    infos->fileDescriptor = -1;
+    infos->mustBeClosed = 0;
 }

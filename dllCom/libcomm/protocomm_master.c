@@ -121,7 +121,7 @@ proto_Status_t proto_master_get(proto_hdle_t * this, uint8_t register_, uint8_t*
     proto_Status_t ret = 0;
 
 
-    if( proto_writeFrame(this, proto_CMD_GET, (void*)&data) != 0)
+    if( proto_writeFrame(this, proto_CMD_GET, &data) != 0)
     {
         return proto_ERR_SYS;
     }
@@ -138,7 +138,7 @@ proto_Status_t proto_master_set(proto_hdle_t * this, uint8_t register_, uint8_t 
     proto_frame_data_t data = { .req.reg = register_, .req.value = value};
     proto_Status_t ret = 0;
 
-    if( proto_writeFrame(this, proto_CMD_SET, (void*)&data) != 0)
+    if( proto_writeFrame(this, proto_CMD_SET, &data) != 0)
     {
         return proto_ERR_SYS;
     }
