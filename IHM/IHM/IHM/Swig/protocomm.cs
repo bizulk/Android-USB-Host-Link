@@ -103,8 +103,13 @@ public class protocomm {
     return ret;
   }
 
-  public static int proto_writeFrame(proto_hdle_t _this, proto_Command_t command, SWIGTYPE_p_unsigned_char args) {
-    int ret = protocommPINVOKE.proto_writeFrame(proto_hdle_t.getCPtr(_this), (int)command, SWIGTYPE_p_unsigned_char.getCPtr(args));
+  public static proto_DecodeStatus_t proto_decodeFrame(proto_hdle_t _this, SWIGTYPE_p_proto_Command cmd, proto_frame_data_t arg) {
+    proto_DecodeStatus_t ret = (proto_DecodeStatus_t)protocommPINVOKE.proto_decodeFrame(proto_hdle_t.getCPtr(_this), SWIGTYPE_p_proto_Command.getCPtr(cmd), proto_frame_data_t.getCPtr(arg));
+    return ret;
+  }
+
+  public static int proto_writeFrame(proto_hdle_t _this, proto_Command_t command, proto_frame_data_t args) {
+    int ret = protocommPINVOKE.proto_writeFrame(proto_hdle_t.getCPtr(_this), (int)command, proto_frame_data_t.getCPtr(args));
     return ret;
   }
 
@@ -113,8 +118,8 @@ public class protocomm {
     return ret;
   }
 
-  public static void proto_setReceiver(proto_hdle_t _this, SWIGTYPE_p_f_p_void_enum_proto_Command_t_p_unsigned_char__int callback, SWIGTYPE_p_void userdata) {
-    protocommPINVOKE.proto_setReceiver(proto_hdle_t.getCPtr(_this), SWIGTYPE_p_f_p_void_enum_proto_Command_t_p_unsigned_char__int.getCPtr(callback), SWIGTYPE_p_void.getCPtr(userdata));
+  public static void proto_setReceiver(proto_hdle_t _this, SWIGTYPE_p_f_p_void_enum_proto_Command_p_union_proto_frame_data__int callback, SWIGTYPE_p_void userdata) {
+    protocommPINVOKE.proto_setReceiver(proto_hdle_t.getCPtr(_this), SWIGTYPE_p_f_p_void_enum_proto_Command_p_union_proto_frame_data__int.getCPtr(callback), SWIGTYPE_p_void.getCPtr(userdata));
   }
 
   public static int proto_pushToFrame(proto_hdle_t _this, SWIGTYPE_p_unsigned_char buf, uint len) {
@@ -122,13 +127,8 @@ public class protocomm {
     return ret;
   }
 
-  public static proto_DecodeStatus_t proto_decodeFrame(proto_hdle_t _this, SWIGTYPE_p_proto_Command_t cmd, proto_frame_data_t arg) {
-    proto_DecodeStatus_t ret = (proto_DecodeStatus_t)protocommPINVOKE.proto_decodeFrame(proto_hdle_t.getCPtr(_this), SWIGTYPE_p_proto_Command_t.getCPtr(cmd), proto_frame_data_t.getCPtr(arg));
-    return ret;
-  }
-
-  public static byte proto_makeFrame(proto_Frame_t frame, proto_Command_t command, SWIGTYPE_p_unsigned_char args) {
-    byte ret = protocommPINVOKE.proto_makeFrame(proto_Frame_t.getCPtr(frame), (int)command, SWIGTYPE_p_unsigned_char.getCPtr(args));
+  public static byte proto_makeFrame(proto_Frame_t frame, proto_Command_t command, proto_frame_data_t args) {
+    byte ret = protocommPINVOKE.proto_makeFrame(proto_Frame_t.getCPtr(frame), (int)command, proto_frame_data_t.getCPtr(args));
     return ret;
   }
 
@@ -154,8 +154,24 @@ public class protocomm {
     if (protocommPINVOKE.SWIGPendingException.Pending) throw protocommPINVOKE.SWIGPendingException.Retrieve();
   }
 
+  public static SWIGTYPE_p_proto_Device_t devserial_create() {
+    SWIGTYPE_p_proto_Device_t ret = new SWIGTYPE_p_proto_Device_t(protocommPINVOKE.devserial_create(), true);
+    return ret;
+  }
+
+  public static int devserial_setFD(SWIGTYPE_p_proto_Device_t _this, int fileDescriptor) {
+    int ret = protocommPINVOKE.devserial_setFD(SWIGTYPE_p_proto_Device_t.getCPtr(_this), fileDescriptor);
+    if (protocommPINVOKE.SWIGPendingException.Pending) throw protocommPINVOKE.SWIGPendingException.Retrieve();
+    return ret;
+  }
+
+  public static int devserial_getFD(SWIGTYPE_p_proto_Device_t _this) {
+    int ret = protocommPINVOKE.devserial_getFD(SWIGTYPE_p_proto_Device_t.getCPtr(_this));
+    if (protocommPINVOKE.SWIGPendingException.Pending) throw protocommPINVOKE.SWIGPendingException.Retrieve();
+    return ret;
+  }
+
   public static readonly int PROTO_FRAME_RECV_TOUT_MS = protocommPINVOKE.PROTO_FRAME_RECV_TOUT_MS_get();
-  public static readonly int proto_MAX_ARGS = protocommPINVOKE.proto_MAX_ARGS_get();
   public static readonly int proto_START_OF_FRAME = protocommPINVOKE.proto_START_OF_FRAME_get();
   public static readonly int proto_COMMAND_OFFSET = protocommPINVOKE.proto_COMMAND_OFFSET_get();
   public static readonly int proto_ARGS_OFFSET = protocommPINVOKE.proto_ARGS_OFFSET_get();

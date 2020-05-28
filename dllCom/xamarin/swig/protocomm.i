@@ -3,6 +3,7 @@
  %{
 	#include "protocomm_master.h"
 	#include "devices/device_emulslave.h"
+	#include "devices/device_serial.h"
  %}
 
  /* utiliser les fichiers d'interface pour les standard sinon on a des types opaques
@@ -21,3 +22,4 @@ https://stackoverflow.com/questions/10476483/how-to-generate-a-cross-platform-in
 %include "protocomm_master.h"
 %include "protocomm_ll.h"
 %include "device_emulslave.h"
+%include "device_serial.h"

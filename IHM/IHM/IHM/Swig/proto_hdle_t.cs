@@ -39,13 +39,13 @@ public class proto_hdle_t : global::System.IDisposable {
     }
   }
 
-  public SWIGTYPE_p_f_p_void_enum_proto_Command_t_p_unsigned_char__int priv_callback {
+  public SWIGTYPE_p_f_p_void_enum_proto_Command_p_union_proto_frame_data__int priv_callback {
     set {
-      protocommPINVOKE.proto_hdle_t_priv_callback_set(swigCPtr, SWIGTYPE_p_f_p_void_enum_proto_Command_t_p_unsigned_char__int.getCPtr(value));
+      protocommPINVOKE.proto_hdle_t_priv_callback_set(swigCPtr, SWIGTYPE_p_f_p_void_enum_proto_Command_p_union_proto_frame_data__int.getCPtr(value));
     } 
     get {
       global::System.IntPtr cPtr = protocommPINVOKE.proto_hdle_t_priv_callback_get(swigCPtr);
-      SWIGTYPE_p_f_p_void_enum_proto_Command_t_p_unsigned_char__int ret = (cPtr == global::System.IntPtr.Zero) ? null : new SWIGTYPE_p_f_p_void_enum_proto_Command_t_p_unsigned_char__int(cPtr, false);
+      SWIGTYPE_p_f_p_void_enum_proto_Command_p_union_proto_frame_data__int ret = (cPtr == global::System.IntPtr.Zero) ? null : new SWIGTYPE_p_f_p_void_enum_proto_Command_p_union_proto_frame_data__int(cPtr, false);
       return ret;
     } 
   }
