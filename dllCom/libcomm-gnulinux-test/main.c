@@ -17,18 +17,16 @@
 
 // Le slave reçoit une demande GET [R] et retourne R*3.
 // Les demandes SET échouent toujours.
-// userdata doit être un pointeur vers le handle du slave
-int slave_receive(void* userdata, proto_Command_t command, proto_frame_data_t* args_in) {
-    proto_frame_data_t args_out;
+int slave_receive(void* userdata, proto_Command_t command, proto_frame_data_t* args_inout) {
+    UNUSED(userdata);
 
-    proto_hdle_t* hdle = userdata;
 	switch(command) {
     case proto_CMD_GET:
-        args_out.reg_value = args_in->req.reg * 3;
-        proto_writeFrame(hdle, proto_CMD_REPLY, &args_out);
-        return 0;
+        // les arguments de la trame de retour sont indiqués en écrivant dans args_inout
+        args_inout->reg_value = args_inout->req.reg * 3;
+        return 0; // 0 = OK, tout va bien
 	default:
-        return -1; // erreur, on n'attendait pas ça
+        return -1; // -1 = erreur, on n'attendait pas cette commande
 	}
 }
 
@@ -155,8 +153,7 @@ int initialize(Handles_t* handles) {
     proto_hdle_t* slaveHdle = NULL;
 
     if ((masterHdle = proto_master_create(devices.masterDev))) {
-        if ((slaveHdle = proto_slave_create(devices.slaveDev, NULL, NULL))) {
-            proto_setReceiver(slaveHdle, &slave_receive, slaveHdle);
+        if ((slaveHdle = proto_slave_create(devices.slaveDev, &slave_receive, NULL))) {
 
             handles->masterHdle = masterHdle;
             handles->slaveHdle = slaveHdle;
