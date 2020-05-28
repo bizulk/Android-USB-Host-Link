@@ -20,8 +20,7 @@
 /* Complément de données nécessaire à la structure */
 typedef struct
 {
-    int fileDescriptor;
-    int mustBeClosed;
+    int fileDescriptor; // Descripteur de fichier ouvert
 } proto_dev_serial_t ;
 
 /******************************************************************************
@@ -52,7 +51,7 @@ void devserial_destroy(proto_Device_t this)
 }
 
 #ifdef __linux__
-
+#warning "info - compiling for linux env"
 // headers propres à Linux
 #include <unistd.h>
 #include <fcntl.h>
@@ -96,17 +95,24 @@ static int setFdMode(int fd, int vtime, int vmin) {
 static int devserial_close(struct proto_IfaceIODevice* this)
 {
     assert(this);
+	int ret = 0;
 
     proto_dev_serial_t* infos = this->user;
 
-    if (infos->mustBeClosed)
-        return close(infos->fileDescriptor);
-    else
-        return 0;
+	if (infos->fileDescriptor >=0)
+	{
+		ret = close(infos->fileDescriptor);
+		// Invalider le descripteur de fichier pour éviter toute utilisation ultérieure
+		// Même si cela n'a pas marché on peut pas faire grand chose de plus ici
+		infos->fileDescriptor = -1;
+	}
+
+	return ret;
 }
 
 static int devserial_open(struct proto_IfaceIODevice* this, const char * szPath)
 {
+
     assert(this && szPath);
 
     proto_dev_serial_t* infos = this->user;
@@ -118,8 +124,8 @@ static int devserial_open(struct proto_IfaceIODevice* this, const char * szPath)
         return fd;
 
     infos->fileDescriptor = fd;
-    infos->mustBeClosed = 1;
     // vtime = 0, vmin = 0 : les appels à "read" sont non-bloquants
+	// TODO SLI : c'était possible de les rendre bloquants, la fonction de haut niveau contrôlant le temps écoulé
     return setFdMode(infos->fileDescriptor, 0, 0);
 }
 
@@ -128,16 +134,18 @@ static int devserial_read(struct proto_IfaceIODevice* this, void* buffer, uint8_
 {
     assert(this && buffer);
     UNUSED(tout_ms);
-
-    proto_dev_serial_t* infos = this->user;
+	proto_dev_serial_t* infos = this->user;
+	if (infos->fileDescriptor < 0)
+		return -1;
     return read(infos->fileDescriptor, buffer, bufferSize);
 }
 
 static int devserial_write(struct proto_IfaceIODevice* this, const void * buffer, uint8_t size)
 {
     assert(this && buffer);
-
-    proto_dev_serial_t* infos = this->user;
+	proto_dev_serial_t* infos = this->user;
+	if (infos->fileDescriptor < 0)
+		return -1;
     while (size > 0) {
         int ret = write(infos->fileDescriptor, buffer, size);
         if (ret < 0)
@@ -150,9 +158,11 @@ static int devserial_write(struct proto_IfaceIODevice* this, const void * buffer
     return 0;
 }
 
-int devserial_openFD(proto_Device_t this, int fileDescriptor) {
+int devserial_setFD(proto_Device_t this, int fileDescriptor) {
     assert(this);
 
+	if (fileDescriptor < 0)
+		return -1;
     int ret = setFdMode(fileDescriptor, 0, 0);
     if (ret < 0)
         return -1;
@@ -160,7 +170,6 @@ int devserial_openFD(proto_Device_t this, int fileDescriptor) {
     devserial_close(this);
     proto_dev_serial_t* infos = this->user;
     infos->fileDescriptor = fileDescriptor;
-    infos->mustBeClosed = 0;
     return 0;
 }
 
@@ -220,6 +229,5 @@ void devserial_init(proto_Device_t this)
     this->write = devserial_write;
 
     proto_dev_serial_t* infos = this->user;
-    infos->fileDescriptor = -1;
-    infos->mustBeClosed = 0;
+    infos->fileDescriptor = -1; // Initialisation à la valeur "invalide" retournée par l'open
 }
