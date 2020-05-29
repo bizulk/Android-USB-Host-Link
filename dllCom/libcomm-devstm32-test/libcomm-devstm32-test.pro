@@ -4,9 +4,13 @@ CONFIG -= app_bundle
 CONFIG -= qt
 
 SOURCES += \
-        main.c
+    device_stm32.c \
+    main.c
 
-TARGET = proto_test_emulslave
+HEADERS += \
+    device_stm32.h
+
+TARGET = proto_devstm32
 
 LIBS+=-llibcomm
 

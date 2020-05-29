@@ -62,12 +62,12 @@ void proto_setReceiver(proto_hdle_t* this, proto_OnReception_t callback, void* u
     this->priv_userdata = userdata;
 }
 
-int proto_writeFrame(proto_hdle_t* this, proto_Command_t command, uint8_t const* args) {
+int proto_writeFrame(proto_hdle_t* this, proto_Command_t command, proto_frame_data_t const* args) {
     uint8_t nbBytes = proto_makeFrame(&this->priv_frame, command, args);
     return this->priv_iodevice->write(this->priv_iodevice, &this->priv_frame, nbBytes);
 }
 
-uint8_t proto_makeFrame(proto_Frame_t* frame, proto_Command_t command, uint8_t const* args) {
+uint8_t proto_makeFrame(proto_Frame_t* frame, proto_Command_t command, proto_frame_data_t const* args) {
     assert(frame != NULL);
     assert(args != NULL);
     uint8_t argSize = proto_getArgsSize(command);
@@ -75,7 +75,7 @@ uint8_t proto_makeFrame(proto_Frame_t* frame, proto_Command_t command, uint8_t c
     frame->startOfFrame = proto_START_OF_FRAME;
     frame->command = command;
     memset(&frame->data, 0, sizeof(frame->data));
-    memcpy(&frame->data, args, argSize); // on copie les arguments
+    memcpy(&frame->data, args->raw, argSize); // on copie les arguments
     frame->crc8 = getFrameCRC(frame);
     return proto_ARGS_OFFSET + argSize;
 }
@@ -84,7 +84,7 @@ proto_Status_t proto_readFrame(proto_hdle_t* this, int16_t tout_ms) {
     /* on ne peut utiliser la trame privée de this : la réception peut être externalisé
     */
     uint8_t buf[sizeof(proto_Frame_t)] = {0};
-    uint8_t len =0;
+    uint8_t len = 0;
     int nbRead = 0;
     int ret = 0;
 
@@ -149,7 +149,7 @@ int proto_pushToFrame(proto_hdle_t* this, const uint8_t * buf, uint32_t len) {
     return (this->priv_nbBytes == framelen) ? (int)cursor : -1;
 }
 
-// Valisation du CRC, de la partie donnée
+// Validation du CRC, de la partie donnée
 proto_DecodeStatus_t proto_decodeFrame(proto_hdle_t* this, proto_Command_t * cmd, proto_frame_data_t *arg)
 {
     uint8_t crc8 = 0;

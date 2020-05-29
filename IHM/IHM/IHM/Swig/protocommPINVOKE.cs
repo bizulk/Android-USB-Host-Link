@@ -226,9 +226,6 @@ class protocommPINVOKE {
   [global::System.Runtime.InteropServices.DllImport("protocomm", EntryPoint="CSharp_proto_master_set")]
   public static extern int proto_master_set(global::System.Runtime.InteropServices.HandleRef jarg1, byte jarg2, byte jarg3);
 
-  [global::System.Runtime.InteropServices.DllImport("protocomm", EntryPoint="CSharp_proto_MAX_ARGS_get")]
-  public static extern int proto_MAX_ARGS_get();
-
   [global::System.Runtime.InteropServices.DllImport("protocomm", EntryPoint="CSharp_proto_frame_data_t_raw_set")]
   public static extern void proto_frame_data_t_raw_set(global::System.Runtime.InteropServices.HandleRef jarg1, global::System.Runtime.InteropServices.HandleRef jarg2);
 
@@ -373,6 +370,9 @@ class protocommPINVOKE {
   [global::System.Runtime.InteropServices.DllImport("protocomm", EntryPoint="CSharp_proto_readFrame")]
   public static extern int proto_readFrame(global::System.Runtime.InteropServices.HandleRef jarg1, short jarg2);
 
+  [global::System.Runtime.InteropServices.DllImport("protocomm", EntryPoint="CSharp_proto_decodeFrame")]
+  public static extern int proto_decodeFrame(global::System.Runtime.InteropServices.HandleRef jarg1, global::System.Runtime.InteropServices.HandleRef jarg2, global::System.Runtime.InteropServices.HandleRef jarg3);
+
   [global::System.Runtime.InteropServices.DllImport("protocomm", EntryPoint="CSharp_proto_writeFrame")]
   public static extern int proto_writeFrame(global::System.Runtime.InteropServices.HandleRef jarg1, int jarg2, global::System.Runtime.InteropServices.HandleRef jarg3);
 
@@ -384,9 +384,6 @@ class protocommPINVOKE {
 
   [global::System.Runtime.InteropServices.DllImport("protocomm", EntryPoint="CSharp_proto_pushToFrame")]
   public static extern int proto_pushToFrame(global::System.Runtime.InteropServices.HandleRef jarg1, global::System.Runtime.InteropServices.HandleRef jarg2, uint jarg3);
-
-  [global::System.Runtime.InteropServices.DllImport("protocomm", EntryPoint="CSharp_proto_decodeFrame")]
-  public static extern int proto_decodeFrame(global::System.Runtime.InteropServices.HandleRef jarg1, global::System.Runtime.InteropServices.HandleRef jarg2, global::System.Runtime.InteropServices.HandleRef jarg3);
 
   [global::System.Runtime.InteropServices.DllImport("protocomm", EntryPoint="CSharp_proto_makeFrame")]
   public static extern byte proto_makeFrame(global::System.Runtime.InteropServices.HandleRef jarg1, int jarg2, global::System.Runtime.InteropServices.HandleRef jarg3);
@@ -405,4 +402,13 @@ class protocommPINVOKE {
 
   [global::System.Runtime.InteropServices.DllImport("protocomm", EntryPoint="CSharp_devemulslave_getFlags")]
   public static extern void devemulslave_getFlags(global::System.Runtime.InteropServices.HandleRef jarg1, global::System.Runtime.InteropServices.HandleRef jarg2);
+
+  [global::System.Runtime.InteropServices.DllImport("protocomm", EntryPoint="CSharp_devserial_create")]
+  public static extern global::System.IntPtr devserial_create();
+
+  [global::System.Runtime.InteropServices.DllImport("protocomm", EntryPoint="CSharp_devserial_setFD")]
+  public static extern int devserial_setFD(global::System.Runtime.InteropServices.HandleRef jarg1, int jarg2);
+
+  [global::System.Runtime.InteropServices.DllImport("protocomm", EntryPoint="CSharp_devserial_getFD")]
+  public static extern int devserial_getFD(global::System.Runtime.InteropServices.HandleRef jarg1);
 }

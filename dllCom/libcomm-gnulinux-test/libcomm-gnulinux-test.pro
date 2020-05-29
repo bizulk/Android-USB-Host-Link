@@ -6,9 +6,10 @@ CONFIG -= qt
 SOURCES += \
         main.c
 
-TARGET = proto_test_emulslave
+TARGET = proto_test_gnulinux
 
-LIBS+=-llibcomm
+LIBS += -llibcomm -pthread
+QMAKE_CFLAGS += -pthread
 
 # Path to libcomm projet
 LIB_SRC_PATH = ../libcomm

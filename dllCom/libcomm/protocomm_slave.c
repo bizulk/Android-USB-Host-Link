@@ -19,6 +19,11 @@ proto_hdle_t * proto_slave_create(proto_Device_t iodevice, proto_OnReception_t c
     return this;
 }
 
+void proto_slave_destroy(proto_hdle_t * this)
+{
+    return proto_destroy(this);
+}
+
 int proto_slave_open(proto_hdle_t * this, const char * szPath)
 {
     return proto_open(this, szPath);
@@ -44,7 +49,7 @@ int proto_slave_main(proto_hdle_t * this)
         {
         case proto_COMPLETED:
             // Appeler la callaback
-            if( this->priv_callback(this->priv_userdata, cmd, (uint8_t*)&req) == 0 )
+            if( this->priv_callback(this->priv_userdata, cmd, &req) == 0 )
             {
                 cmdret = proto_CMD_REPLY;
                 ret = 1;
@@ -54,7 +59,7 @@ int proto_slave_main(proto_hdle_t * this)
                 cmdret = proto_CMD_ERR_ARG;
                 ret = 1;
             }
-            proto_writeFrame(this, cmdret, (uint8_t*)&req);
+            proto_writeFrame(this, cmdret, &req);
             break;
             case proto_WAITING:
             // Normalement on tombe pas dans ce cas, mais sait-on jamais
@@ -62,8 +67,8 @@ int proto_slave_main(proto_hdle_t * this)
             break;
         case proto_REFUSED:
             // Erreur dans le décodage de la trame : renvoyer la réponse
-            proto_writeFrame(this, cmd, (uint8_t*)&req);
-            ret =1;
+            proto_writeFrame(this, cmd, &req);
+            ret = 1;
             break;
         default:
             // Erreur dans les traitements

@@ -75,7 +75,7 @@ static void devemulslave_fake_destroy(proto_Device_t this);
 /// \param[inout] args argument d'entrée
 /// \return
 ///
-static int devemulslave_callback(void* userdata, proto_Command_t command, uint8_t * args);
+static int devemulslave_callback(void* userdata, proto_Command_t command, proto_frame_data_t* args);
 
 ///
 /// \brief devemulslave_isFrame fonction utilitaire qui vérifie que l'on a une trame dans notre bloc
@@ -212,29 +212,29 @@ static int devemulslave_write(proto_Device_t this, const void * buf, uint8_t len
     return 0;
 }
 
-static int devemulslave_callback(void* userdata, proto_Command_t command, uint8_t * args) {
+static int devemulslave_callback(void* userdata, proto_Command_t command, proto_frame_data_t* args) {
 
     int ret = 0;
     proto_dev_emulslave_t* this = userdata;
 	switch (command) {
     case proto_CMD_SET: // quand le MASTER demande de changer une valeur
-        if (args[0] < EMULSLAVE_NB_REGS) {
-			this->registers[args[0]] = args[1];
-		} else
+        if (args->req.reg < EMULSLAVE_NB_REGS) {
+            this->registers[args->req.reg] = args->req.value;
+        } else
             ret = -1;
-		break;
+        break;
 		
     case proto_CMD_GET: // quand le MASTER demande d'accéder à une valeur
-        if (args[0] < EMULSLAVE_NB_REGS)
-            args[0] = this->registers[args[0]];
-		else
+        if (args->req.reg < EMULSLAVE_NB_REGS)
+            args->reg_value = this->registers[args->req.reg];
+        else
             ret = -1;
-		break;	
+        break;
 		
-	default:
+    default:
         ret = -1;
-		break;
-	}
+        break;
+    }
     return ret;
 }
 
