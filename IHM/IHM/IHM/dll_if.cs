@@ -119,6 +119,22 @@ namespace IHM
         }
 
         /// <summary>
+        /// Creation du device serial
+        /// Pour démonstration de l'utilisation de l'interface Android
+        /// </summary>
+        /// <returns></returns>
+        public SWIGTYPE_p_proto_Device_t CreateDevSerial()
+        {
+            SWIGTYPE_p_proto_Device_t dev;
+
+            // Récupére notre FD avec l'USBManager
+            int fd = Xamarin.Forms.DependencyService.Get<IUsbManager>().Init();
+            dev = protocomm.devserial_create();
+            int ret = protocomm.devserial_setFD(dev, fd);
+            return dev;
+        }
+        
+        /// <summary>
         /// Fournit une string de description du status
         /// </summary>
         /// <param name="status"> Status à interpreter</param>
