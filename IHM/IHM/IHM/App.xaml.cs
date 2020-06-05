@@ -7,11 +7,11 @@ namespace IHM
 {
     public partial class App : Application
     {
-        public App()
+        public App(IUsbManager usbManager)
         {
             InitializeComponent();
 
-            MainPage = new MainPage();
+            MainPage = new MainPage(usbManager);
         }
 
         protected override void OnStart()

@@ -18,7 +18,9 @@ namespace IHM
         // Liste des valeurs lues
         List<Label> m_lRegsLbl;
 
-        public MainPage()
+        IUsbManager usbManager_;
+
+        public MainPage(IUsbManager usbManager)
         {
             InitializeComponent();
             //On récupère l'instance de dll_if pour appeler les fonctions de la DLL
@@ -36,6 +38,8 @@ namespace IHM
                 peerReg1,
                 peerReg2
             };
+
+            usbManager_ = usbManager;
         }
 
         void OnButtonSendClicked(object sender, EventArgs e)
@@ -43,13 +47,26 @@ namespace IHM
             byte regVal;
             proto_Status_t status;
 
+            ICollection<string> allNames = usbManager_.getListOfConnections();
+            foreach (string name in allNames)
+            {
+                log.Text += "\n" + name;
+            }
+
             for (int i = 0; i < m_lRegsEntry.Count; i++)
             {
-                if (m_lRegsEntry[i].Text.Length > 0)
+                if (m_lRegsEntry[i].Text != null && m_lRegsEntry[i].Text.Length > 0)
                 {
-                    regVal = byte.Parse(m_lRegsEntry[i].Text);
-                    status = m_dll_if.WriteRegister((byte)i, regVal);
-                    log.Text += "\n" + DateTime.Now.ToString(" HH:mm ") + "reg" + i.ToString() +  "val " + regVal.ToString() + ": " + dll_if.ProtoStatusGetString(status);
+                    try
+                    {
+                        regVal = byte.Parse(m_lRegsEntry[i].Text); // Lève une exception si la valeur n'est pas entre 0 et 255
+                        status = m_dll_if.WriteRegister((byte)i, regVal);
+                        log.Text += "\n" + DateTime.Now.ToString(" HH:mm ") + "reg" + i.ToString() + "val " + regVal.ToString() + ": " + dll_if.ProtoStatusGetString(status);
+                    }
+                    catch (Exception ex)
+                    {
+                        log.Text += "\n" + DateTime.Now.ToString(" HH:mm ") + "reg" + i.ToString() + " value must be between 0 and 255";
+                    }
                 }
                 else
                 {
