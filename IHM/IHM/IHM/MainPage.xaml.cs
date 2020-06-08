@@ -96,15 +96,6 @@ namespace IHM
             popupView.IsVisible = true;
             usbList.ItemsSource = usbNames;
             usbNames.Add("EmulSlave");
-            usbNames.Add("Usb 1");
-            usbNames.Add("Usb 2");
-            usbNames.Add("Usb 3");
-            usbNames.Add("Usb 4");
-            usbNames.Add("Usb 5");
-            usbNames.Add("Usb 6");
-            usbNames.Add("Usb 7");
-            usbNames.Add("Usb 8");
-            usbNames.Add("Usb 9");
             ICollection<string> allNames = usbManager_.getListOfConnections();
             foreach (string name in allNames)
             {
