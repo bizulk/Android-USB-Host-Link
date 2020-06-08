@@ -1,10 +1,12 @@
-﻿using System;
+﻿using Android.Content;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Xamarin.Forms;
+
 namespace IHM
 {
     public partial class MainPage : ContentPage
@@ -24,11 +26,6 @@ namespace IHM
         public MainPage()
         {
             InitializeComponent();
-        }
-
-        public MainPage(IUsbManager usbManager)
-        {
-            InitializeComponent();
             //On récupère l'instance de dll_if pour appeler les fonctions de la DLL
             m_dll_if = dll_if.GetInstance;
 
@@ -45,7 +42,7 @@ namespace IHM
                 peerReg2
             };
 
-            usbManager_ = usbManager;
+            usbManager_ = Xamarin.Forms.DependencyService.Get<IUsbManager>();
         }
 
         void OnButtonSendClicked(object sender, EventArgs e)
@@ -123,17 +120,18 @@ namespace IHM
                 log.Text += "\n" + DateTime.Now.ToString(" HH:mm") + " Fail to disconnect";
             }
         }
-        void OnButtonCancelClicked(object sender, EventArgs e)
+        void OnButtonCancelClicked(object sender, EventArgs e) // Annuler la selection de device
         {
             popupView.IsVisible = false;
         }
-        void OnButtonValidateClicked(object sender, EventArgs e)
+        void OnButtonValidateClicked(object sender, EventArgs e) // Valider la selection de device
         {
             popupView.IsVisible = false;
-            connect("EmulSlave");
+            connect((string)usbList.SelectedItem);
         }
         void connect(string name)
         {
+            Xamarin.Forms.DependencyService.Get<IUsbManager>().selectDevice(name);
             if (isConnected == false) // On a inversé les true et false pour les tests
             {
                 log.Text += "\n" + DateTime.Now.ToString(" HH:mm") + " Connected";

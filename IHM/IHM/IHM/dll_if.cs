@@ -128,7 +128,7 @@ namespace IHM
             SWIGTYPE_p_proto_Device_t dev;
 
             // Récupére notre FD avec l'USBManager
-            int fd = Xamarin.Forms.DependencyService.Get<IUsbManager>().Init();
+            int fd = Xamarin.Forms.DependencyService.Get<IUsbManager>().getDeviceConnection();
             dev = protocomm.devserial_create();
             int ret = protocomm.devserial_setFD(dev, fd);
             return dev;

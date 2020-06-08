@@ -14,13 +14,25 @@ namespace IHM
         /// Fonction initialisant la ressource au niveau système
         /// </summary>
         /// <returns> pourquoi pas le FD, pour l'instant je fais comme ça</returns>
-        int Init();
+        void Init(Object context);
 
         /// <summary>
-        /// Fonctions retournant une liste du nom de chaque connections 
+        /// Fonctions pour pouvoir afficher la liste des devices connecter
+        /// </summary>
+        /// <returns> une liste du nom de chaque connections </returns>
+        ICollection<string> getListOfConnections();
+
+        /// <summary>
+        /// Fonction pour choisir le nom du device avec lequel effectuer la connection 
         /// </summary>
         /// <returns></returns>
-        ICollection<string> getListOfConnections();
+        void selectDevice(string name);
+
+        /// <summary>
+        /// Fonctions retournant le FD 
+        /// </summary>
+        /// <returns>Le FD</returns>
+        int getDeviceConnection();
 
         /// <summary>
         /// Fonction de désallocation des ressources

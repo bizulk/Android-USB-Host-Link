@@ -26,7 +26,8 @@ namespace IHM.Droid
 
             base.OnCreate(savedInstanceState);
             global::Xamarin.Forms.Forms.Init(this, savedInstanceState);
-            LoadApplication(new App(new DroidUsbManager((UsbManager)GetSystemService(Context.UsbService))));
+            Xamarin.Forms.DependencyService.Get<IUsbManager>().Init(this);
+            LoadApplication(new App());
 
         }
     }

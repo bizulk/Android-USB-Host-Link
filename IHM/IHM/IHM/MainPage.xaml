@@ -108,7 +108,7 @@
 
             <ContentView x:Name="popupView" BackgroundColor="#C0808080" Padding="10, 0" IsVisible="False" AbsoluteLayout.LayoutBounds="0, 0, 1, 1" AbsoluteLayout.LayoutFlags="All">
                 <StackLayout VerticalOptions="Center" HorizontalOptions="Center">
-                    <StackLayout Orientation="Vertical" VerticalOptions="Center" HeightRequest="200" WidthRequest="350" BackgroundColor="White">
+                    <StackLayout Orientation="Vertical" HorizontalOptions="Center" VerticalOptions="Center" HeightRequest="200" WidthRequest="350" BackgroundColor="White">
                         <Frame BorderColor="Black"
                                HasShadow="True"
                                Padding="3"
