@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -19,6 +20,11 @@ namespace IHM
         List<Label> m_lRegsLbl;
 
         IUsbManager usbManager_;
+
+        public MainPage()
+        {
+            InitializeComponent();
+        }
 
         public MainPage(IUsbManager usbManager)
         {
@@ -46,12 +52,6 @@ namespace IHM
         {
             byte regVal;
             proto_Status_t status;
-
-            ICollection<string> allNames = usbManager_.getListOfConnections();
-            foreach (string name in allNames)
-            {
-                log.Text += "\n" + name;
-            }
 
             for (int i = 0; i < m_lRegsEntry.Count; i++)
             {
@@ -92,7 +92,57 @@ namespace IHM
         void OnButtonConnectClicked(object sender, EventArgs e)
         {
             //To do : call method to connect
+            ObservableCollection<string> usbNames = new ObservableCollection<string>();
+            popupView.IsVisible = true;
+            usbList.ItemsSource = usbNames;
+            usbNames.Add("EmulSlave");
+            usbNames.Add("Usb 1");
+            usbNames.Add("Usb 2");
+            usbNames.Add("Usb 3");
+            usbNames.Add("Usb 4");
+            usbNames.Add("Usb 5");
+            usbNames.Add("Usb 6");
+            usbNames.Add("Usb 7");
+            usbNames.Add("Usb 8");
+            usbNames.Add("Usb 9");
+            ICollection<string> allNames = usbManager_.getListOfConnections();
+            foreach (string name in allNames)
+            {
+                usbNames.Add(name);
+            }
+        }
+        void OnButtonDisconnectClicked(object sender, EventArgs e)
+        {
+            //To do : call method to disconnect
 
+            if (isConnected == false)
+            {
+                log.Text += "\n" + DateTime.Now.ToString(" HH:mm") + " Disconnected";
+                connectButton.IsEnabled = true;
+                receiveButton.IsEnabled = false;
+                sendButton.IsEnabled = false;
+                disconnectButton.IsEnabled = false;
+
+                // Test
+                // Fermeture de la connexion
+                m_dll_if.Close();
+            }
+            if (isConnected == true)
+            {
+                log.Text += "\n" + DateTime.Now.ToString(" HH:mm") + " Fail to disconnect";
+            }
+        }
+        void OnButtonCancelClicked(object sender, EventArgs e)
+        {
+            popupView.IsVisible = false;
+        }
+        void OnButtonValidateClicked(object sender, EventArgs e)
+        {
+            popupView.IsVisible = false;
+            connect("EmulSlave");
+        }
+        void connect(string name)
+        {
             if (isConnected == false) // On a inversé les true et false pour les tests
             {
                 log.Text += "\n" + DateTime.Now.ToString(" HH:mm") + " Connected";
@@ -103,33 +153,12 @@ namespace IHM
 
                 // Test
                 // Ouverture de la connexion
-                m_dll_if.Open(m_dll_if.CreateEmulslave(),"unused ;)");
+                m_dll_if.Open(m_dll_if.CreateEmulslave(), "unused ;)");
             }
             if (isConnected == true)
             {
                 log.Text += "\n" + DateTime.Now.ToString(" HH:mm") + " Fail to connect";
             }
         }
-        void OnButtonDisconnectClicked(object sender, EventArgs e)
-            {
-                //To do : call method to disconnect
-
-                if (isConnected == false)
-                {
-                    log.Text += "\n" + DateTime.Now.ToString(" HH:mm") + " Disconnected";
-                    connectButton.IsEnabled = true;
-                    receiveButton.IsEnabled = false;
-                    sendButton.IsEnabled = false;
-                    disconnectButton.IsEnabled = false;
-
-                    // Test
-                    // Fermeture de la connexion
-                    m_dll_if.Close();
-                }
-                if (isConnected == true)
-                {
-                    log.Text += "\n" + DateTime.Now.ToString(" HH:mm") + " Fail to disconnect";
-                }
-            }
     }
 }
