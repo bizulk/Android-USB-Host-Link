@@ -9,18 +9,18 @@
 //------------------------------------------------------------------------------
 
 
-public class SWIGTYPE_p_f_p_void_enum_proto_Command_t_p_unsigned_char__int {
+public class SWIGTYPE_p_proto_Command {
   private global::System.Runtime.InteropServices.HandleRef swigCPtr;
 
-  internal SWIGTYPE_p_f_p_void_enum_proto_Command_t_p_unsigned_char__int(global::System.IntPtr cPtr, bool futureUse) {
+  internal SWIGTYPE_p_proto_Command(global::System.IntPtr cPtr, bool futureUse) {
     swigCPtr = new global::System.Runtime.InteropServices.HandleRef(this, cPtr);
   }
 
-  protected SWIGTYPE_p_f_p_void_enum_proto_Command_t_p_unsigned_char__int() {
+  protected SWIGTYPE_p_proto_Command() {
     swigCPtr = new global::System.Runtime.InteropServices.HandleRef(null, global::System.IntPtr.Zero);
   }
 
-  internal static global::System.Runtime.InteropServices.HandleRef getCPtr(SWIGTYPE_p_f_p_void_enum_proto_Command_t_p_unsigned_char__int obj) {
+  internal static global::System.Runtime.InteropServices.HandleRef getCPtr(SWIGTYPE_p_proto_Command obj) {
     return (obj == null) ? new global::System.Runtime.InteropServices.HandleRef(null, global::System.IntPtr.Zero) : obj.swigCPtr;
   }
 }
