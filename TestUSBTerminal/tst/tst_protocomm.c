@@ -24,7 +24,7 @@
 
 int8_t _CDC_Receive_FS_user(uint8_t* Buf, uint32_t *Len)
 {
-	// TODO
+
 }
 #endif
 

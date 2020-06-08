@@ -52,10 +52,14 @@
 #include "usart.h"
 #include "usb_device.h"
 #include "gpio.h"
+#include "protocomm_ll.h"
+#include "proto_iodevice.h"
+#include "protocomm_slave.h"
+#include "device_stm32.h"
+#include "tst_iface.h"
 
 /* USER CODE BEGIN Includes */
 
-#include "tst_iface.h"
 
 /* USER CODE END Includes */
 
@@ -63,7 +67,8 @@
 
 /* USER CODE BEGIN PV */
 /* Private variables ---------------------------------------------------------*/
-
+proto_Device_t monDevice;
+proto_hdle_t * monSlave;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -75,7 +80,20 @@ void SystemClock_Config(void);
 /* USER CODE END PFP */
 
 /* USER CODE BEGIN 0 */
+// Le slave reçoit une demande GET [R] et retourne R*3.
+// Les demandes SET échouent toujours.
+int slave_receive(void* userdata, proto_Command_t command, proto_frame_data_t* args_inout) {
+    UNUSED(userdata);
 
+    switch(command) {
+    case proto_CMD_GET:
+        // les arguments de la trame de retour sont indiqués en écrivant dans args_inout
+        args_inout->reg_value = args_inout->req.reg * 3; // à définir en fonction de l'utilisation
+        return 0; // 0 = OK, tout va bien
+    default:
+        return -1; // -1 = erreur, on n'attendait pas cette commande
+    }
+}
 /* USER CODE END 0 */
 
 /**
@@ -98,6 +116,8 @@ int main(void)
 
   /* USER CODE BEGIN Init */
 
+
+  monSlave = proto_slave_create(monDevice, &slave_receive, NULL);
   /* USER CODE END Init */
 
   /* Configure the system clock */
@@ -126,11 +146,11 @@ int main(void)
   /* USER CODE END WHILE */
 
   /* USER CODE BEGIN 3 */
+	  proto_slave_main(monSlave);
 	  ulDly_ms = HAL_GetTick();
 	  if( (ulDly_ms - ulStamp_ms)>1000)
 	  {
 		  ulStamp_ms = ulDly_ms;
-		  tst_loop_1hz();
 	  }
   }
   /* USER CODE END 3 */

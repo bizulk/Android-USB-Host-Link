@@ -7,6 +7,8 @@
  *  Définit l'interface sur l'API de test
  */
 
+extern proto_Device_t monDevice;
+
 #ifndef TST_IFACE_H_
 #define TST_IFACE_H_
 
