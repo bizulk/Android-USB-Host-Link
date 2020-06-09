@@ -101,24 +101,14 @@ namespace IHM
         }
         void OnButtonDisconnectClicked(object sender, EventArgs e)
         {
-            //To do : call method to disconnect
-
-            if (isConnected == false)
-            {
-                log.Text += "\n" + DateTime.Now.ToString(" HH:mm") + " Disconnected";
-                connectButton.IsEnabled = true;
-                receiveButton.IsEnabled = false;
-                sendButton.IsEnabled = false;
-                disconnectButton.IsEnabled = false;
-
-                // Test
-                // Fermeture de la connexion
-                m_dll_if.Close();
-            }
-            if (isConnected == true)
-            {
-                log.Text += "\n" + DateTime.Now.ToString(" HH:mm") + " Fail to disconnect";
-            }
+            // Fermeture de la connexion
+            m_dll_if.Close();
+            isConnected = false;
+            log.Text += "\n" + DateTime.Now.ToString(" HH:mm") + " Disconnected";
+            connectButton.IsEnabled = true;
+            receiveButton.IsEnabled = false;
+            sendButton.IsEnabled = false;
+            disconnectButton.IsEnabled = false;
         }
         void OnButtonCancelClicked(object sender, EventArgs e) // Annuler la selection de device
         {
@@ -132,19 +122,26 @@ namespace IHM
         void connect(string name)
         {
             Xamarin.Forms.DependencyService.Get<IUsbManager>().selectDevice(name);
-            if (isConnected == false) // On a inversé les true et false pour les tests
+            if (name == "EmulSlave") // A enlever au final, mais permet de pouvoir tester l'application si l'on a pas de carte à connecter
+            {
+                // Test
+                // Ouverture de la connexion
+                isConnected = (0 == m_dll_if.Open(m_dll_if.CreateEmulslave(), "unused ;)")); // Si cette fonction retourne 0 alors on est connecté à la carte
+            }
+            else
+            {
+                isConnected = (0 == m_dll_if.Open(m_dll_if.CreateDevSerial(), "/dev/null")); // Si cette fonction retourne 0 alors on est connecté à la carte
+            }
+            if (isConnected == true) // On a inversé les true et false pour les tests
             {
                 log.Text += "\n" + DateTime.Now.ToString(" HH:mm") + " Connected";
                 connectButton.IsEnabled = false;
                 receiveButton.IsEnabled = true;
                 sendButton.IsEnabled = true;
                 disconnectButton.IsEnabled = true;
-
-                // Test
-                // Ouverture de la connexion
-                m_dll_if.Open(m_dll_if.CreateEmulslave(), "unused ;)");
+                
             }
-            if (isConnected == true)
+            if (isConnected == false)
             {
                 log.Text += "\n" + DateTime.Now.ToString(" HH:mm") + " Fail to connect";
             }

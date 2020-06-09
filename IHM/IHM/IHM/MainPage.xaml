@@ -108,11 +108,11 @@
 
             <ContentView x:Name="popupView" BackgroundColor="#C0808080" Padding="10, 0" IsVisible="False" AbsoluteLayout.LayoutBounds="0, 0, 1, 1" AbsoluteLayout.LayoutFlags="All">
                 <StackLayout VerticalOptions="Center" HorizontalOptions="Center">
-                    <StackLayout Orientation="Vertical" HorizontalOptions="Center" VerticalOptions="Center" HeightRequest="200" WidthRequest="350" BackgroundColor="White">
+                    <StackLayout Orientation="Vertical" HorizontalOptions="Center" VerticalOptions="Center" WidthRequest="350" BackgroundColor="White" Padding="5">
                         <Frame BorderColor="Black"
                                HasShadow="True"
                                Padding="3"
-                               Margin="10,2,10,2">
+                               Margin="2,2,2,2">
                             <Picker Title="Choose the device to connect with"
                                     x:Name="usbList"/>
                         </Frame>
@@ -120,12 +120,12 @@
                                 x:Name="cancelButton"
                                 BackgroundColor="Gray"
                                 Clicked="OnButtonCancelClicked" 
-                                Margin="10,2,10,2"/>
+                                Margin="2,2,2,2"/>
                         <Button Text="Validate" 
                                 x:Name="validateButton"
                                 BackgroundColor="Gray"
                                 Clicked="OnButtonValidateClicked"
-                                Margin="10,2,10,5"/>
+                                Margin="2,2,2,2"/>
                     </StackLayout>
                 </StackLayout>
             </ContentView>

@@ -38,19 +38,25 @@ namespace IHM.Droid.Interfaces
 
         public void selectDevice(string name)
         {
-            selectedDevice = name;
+            if (usbManager_.DeviceList.ContainsKey(name)) 
+            {
+                selectedDevice = name;
+            }
+            else // Normalement impossible sauf si l'appareil s'est deconnecté entre la sélection de son nom et le moment d'appuie sur Valider
+            {
+                selectedDevice = "null";
+            }
         }
 
         public int getDeviceConnection()
         {
-            if (selectedDevice.Equals("EmulSlave"))
+            if (selectedDevice.Equals("null"))
                 return -1;
             return usbManager_.OpenDevice(((Dictionary<string, UsbDevice>)usbManager_.DeviceList)[selectedDevice]).FileDescriptor;
         }
 
         public int Close()
         {
-            /* TODO : Do Droid Stuff */
             return 0;
         }
     }
