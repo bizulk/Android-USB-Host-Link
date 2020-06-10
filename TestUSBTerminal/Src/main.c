@@ -57,7 +57,6 @@
 /* USER CODE BEGIN Includes */
 
 #include "tst_iface.h"
-#include "/libcomm/Inc/proto_iodevice.h"
 
 /* USER CODE END Includes */
 
@@ -65,8 +64,7 @@
 
 /* USER CODE BEGIN PV */
 /* Private variables ---------------------------------------------------------*/
-proto_Device_t monDevice;
-proto_hdle_t monSlave;
+
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -93,8 +91,6 @@ int main(void)
   uint32_t ulStamp_ms = 0;
   uint32_t ulDly_ms = 0;
 
-  monDevice = devstm32_create();
-  monSlave = proto_slave_create(monDevice, &fonction_slave_receive, NULL);
   /* USER CODE END 1 */
 
   /* MCU Configuration----------------------------------------------------------*/
@@ -118,7 +114,7 @@ int main(void)
   MX_USART3_UART_Init();
   MX_USB_DEVICE_Init();
   /* USER CODE BEGIN 2 */
-
+  tst_init();
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -138,6 +134,7 @@ int main(void)
 		  ulStamp_ms = ulDly_ms;
 		  tst_loop_1hz();
 	  }
+	  tst_loop_main();
   }
   /* USER CODE END 3 */
 
