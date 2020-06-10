@@ -10,10 +10,20 @@
 #ifndef TST_IFACE_H_
 #define TST_IFACE_H_
 
+/** focntion d'appel de l'init
+ *
+ */
+extern __weak void tst_init(void);
+
 /** Boucle weak qui est appelée dans la boucle principale a la cadence d'1Hz
  *
  */
 extern __weak void tst_loop_1hz(void);
+
+/** Boucle weak qui est appelée dans la boucle principale a la cadence maximal
+ *
+ */
+extern __weak void tst_loop_main(void);
 
 /** Fonction callback sur la réception USB
  * Pour la description des arguments voir CDC_Receive_FS

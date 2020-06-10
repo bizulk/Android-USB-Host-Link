@@ -53,7 +53,7 @@
 /* USER CODE BEGIN INCLUDE */
 #include <string.h>
 #include <stdio.h>
-
+#include "tst_iface.h"
 
 /* USER CODE END INCLUDE */
 
