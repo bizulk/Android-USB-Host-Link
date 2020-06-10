@@ -27,67 +27,67 @@
 		<link>
 			<name>Inc/device_emulslave.h</name>
 			<type>1</type>
-			<location>C:/Users/elise/Documents/GitHub/AndroidFilaire/dllCom/libcomm/devices/device_emulslave.h</location>
+			<locationURI>PARENT-1-PROJECT_LOC/libcomm/devices/device_emulslave.h</locationURI>
 		</link>
 		<link>
 			<name>Inc/device_serial.h</name>
 			<type>1</type>
-			<location>C:/Users/elise/Documents/GitHub/AndroidFilaire/dllCom/libcomm/devices/device_serial.h</location>
+			<locationURI>PARENT-1-PROJECT_LOC/libcomm/devices/device_serial.h</locationURI>
 		</link>
 		<link>
 			<name>Inc/device_stm32.h</name>
 			<type>1</type>
-			<location>C:/Users/elise/Documents/GitHub/AndroidFilaire/dllCom/libcomm-devstm32-test/device_stm32.h</location>
+			<locationURI>PARENT-1-PROJECT_LOC/libcomm/devices/device_stm32.h</locationURI>
 		</link>
 		<link>
 			<name>Inc/libcomm_global.h</name>
 			<type>1</type>
-			<location>C:/Users/elise/Documents/GitHub/AndroidFilaire/dllCom/libcomm/libcomm_global.h</location>
+			<locationURI>PARENT-1-PROJECT_LOC/libcomm/libcomm_global.h</locationURI>
 		</link>
 		<link>
 			<name>Inc/proto_iodevice.h</name>
 			<type>1</type>
-			<location>C:/Users/elise/Documents/GitHub/AndroidFilaire/dllCom/libcomm/proto_iodevice.h</location>
+			<locationURI>PARENT-1-PROJECT_LOC/libcomm/proto_iodevice.h</locationURI>
 		</link>
 		<link>
 			<name>Inc/protocomm-gnulinux.h</name>
 			<type>1</type>
-			<location>C:/Users/elise/Documents/GitHub/AndroidFilaire/dllCom/libcomm/protocomm-gnulinux.h</location>
+			<locationURI>PARENT-1-PROJECT_LOC/libcomm/protocomm-gnulinux.h</locationURI>
 		</link>
 		<link>
 			<name>Inc/protocomm_ll.h</name>
 			<type>1</type>
-			<location>C:/Users/elise/Documents/GitHub/AndroidFilaire/dllCom/libcomm/protocomm_ll.h</location>
+			<locationURI>PARENT-1-PROJECT_LOC/libcomm/protocomm_ll.h</locationURI>
 		</link>
 		<link>
 			<name>Inc/protocomm_master.h</name>
 			<type>1</type>
-			<location>C:/Users/elise/Documents/GitHub/AndroidFilaire/dllCom/libcomm/protocomm_master.h</location>
+			<locationURI>PARENT-1-PROJECT_LOC/libcomm/protocomm_master.h</locationURI>
 		</link>
 		<link>
 			<name>Inc/protocomm_slave.h</name>
 			<type>1</type>
-			<location>C:/Users/elise/Documents/GitHub/AndroidFilaire/dllCom/libcomm/protocomm_slave.h</location>
+			<locationURI>PARENT-1-PROJECT_LOC/libcomm/protocomm_slave.h</locationURI>
 		</link>
 		<link>
 			<name>src/device_emulslave.c</name>
 			<type>1</type>
-			<location>C:/Users/elise/Documents/GitHub/AndroidFilaire/dllCom/libcomm/devices/device_emulslave.c</location>
+			<locationURI>PARENT-1-PROJECT_LOC/libcomm/devices/device_emulslave.c</locationURI>
 		</link>
 		<link>
 			<name>src/device_serial.c</name>
 			<type>1</type>
-			<location>C:/Users/elise/Documents/GitHub/AndroidFilaire/dllCom/libcomm/devices/device_serial.c</location>
+			<locationURI>PARENT-1-PROJECT_LOC/libcomm/devices/device_serial.c</locationURI>
 		</link>
 		<link>
 			<name>src/device_stm32.c</name>
 			<type>1</type>
-			<location>C:/Users/elise/Documents/GitHub/AndroidFilaire/dllCom/libcomm-devstm32-test/device_stm32.c</location>
+			<locationURI>PARENT-1-PROJECT_LOC/libcomm/devices/device_stm32.c</locationURI>
 		</link>
 		<link>
 			<name>src/protocomm-gnulinux.c</name>
 			<type>1</type>
-			<location>C:/Users/elise/Documents/GitHub/AndroidFilaire/dllCom/libcomm/protocomm-gnulinux.c</location>
+			<locationURI>PARENT-1-PROJECT_LOC/libcomm/protocomm-gnulinux.c</locationURI>
 		</link>
 		<link>
 			<name>src/protocomm_ll.c</name>
@@ -97,12 +97,12 @@
 		<link>
 			<name>src/protocomm_master.c</name>
 			<type>1</type>
-			<location>C:/Users/elise/Documents/GitHub/AndroidFilaire/dllCom/libcomm/protocomm_master.c</location>
+			<locationURI>PARENT-1-PROJECT_LOC/libcomm/protocomm_master.c</locationURI>
 		</link>
 		<link>
 			<name>src/protocomm_slave.c</name>
 			<type>1</type>
-			<location>C:/Users/elise/Documents/GitHub/AndroidFilaire/dllCom/libcomm/protocomm_slave.c</location>
+			<locationURI>PARENT-1-PROJECT_LOC/libcomm/protocomm_slave.c</locationURI>
 		</link>
 	</linkedResources>
 </projectDescription>

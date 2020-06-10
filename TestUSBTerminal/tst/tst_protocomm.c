@@ -22,6 +22,32 @@ extern proto_Device_t monDevice;
 #ifdef TST_PROTOCOMM
 
 #include "usbd_cdc_if.h"
+<<<<<<< Updated upstream
+=======
+#include "protocomm_slave.h"
+#include "device_stm32.h"
+#include "protocomm_slave.h"
+
+static proto_Device_t _stm32dev;
+static proto_hdle_t * _protoSlave;
+
+#define MY_TABLE_LEN 5
+
+/** Implémentation des registres côté slave : une table "mémoire" */
+static uint8_t _myTable[MY_TABLE_LEN] = {0};
+
+/*** Callback d'appel du protocole pour traiter les commandes
+ *
+ */
+static int slave_receive(void* userdata, proto_Command_t command, proto_frame_data_t* args_inout);
+
+
+void tst_init(void)
+{
+	_stm32dev = devstm32_create();
+	_protoSlave = proto_slave_create(_stm32dev, slave_receive, NULL);
+}
+>>>>>>> Stashed changes
 
 int8_t _CDC_Receive_FS_user(uint8_t* Buf, uint32_t *Len)
 {
