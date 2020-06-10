@@ -4,105 +4,132 @@
              x:Class="IHM.MainPage">
     <StackLayout Margin="0,0,0,0"
                  BackgroundColor="MidnightBlue">
-        <Grid Margin="0,0,0,0">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="0.25*" />
-                <ColumnDefinition Width="0.25*" />
-                <ColumnDefinition Width="0.25*" />
-                <ColumnDefinition Width="0.25*" />
-            </Grid.ColumnDefinitions>
-            <Grid.RowDefinitions>
-                <RowDefinition Height="38" />
-                <RowDefinition Height="38" />
-                <RowDefinition Height="38" />
-                <RowDefinition Height="38" />
-                <RowDefinition Height="38" />
-                <RowDefinition Height="38" />
-                <RowDefinition Height="38" />
-                <RowDefinition Height="38" />
-            </Grid.RowDefinitions>
-            <Label Text="Titre - Version"
-                   TextColor="White"
-                   HorizontalTextAlignment="Center"
-                   BackgroundColor="Black"
-                   Grid.ColumnSpan="4"
-                   />
-            <Label Grid.Row="2"
-                   Text="Register 1"
-                   HeightRequest="20"
-                   TextColor="White"
-                   BackgroundColor="Black"/>
-            <Label Grid.Column="1"
-                   Grid.Row="2"
-                   Text="Value" 
-                   TextColor="White"
-                   BackgroundColor="Black"
-                   x:Name="peerReg1"/>
-            <Entry Grid.Column="2"
-                    Grid.Row="2"
-                     Grid.ColumnSpan="2"
-                   x:Name="userReg1"
+
+        <AbsoluteLayout Padding="0" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand">
+            <Grid Margin="0,0,0,0"  AbsoluteLayout.LayoutBounds="0, 0, 1, 1" AbsoluteLayout.LayoutFlags="All">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="0.25*" />
+                    <ColumnDefinition Width="0.25*" />
+                    <ColumnDefinition Width="0.25*" />
+                    <ColumnDefinition Width="0.25*" />
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="38" />
+                    <RowDefinition Height="38" />
+                    <RowDefinition Height="38" />
+                    <RowDefinition Height="38" />
+                    <RowDefinition Height="38" />
+                    <RowDefinition Height="38" />
+                    <RowDefinition Height="38" />
+                    <RowDefinition Height="38" />
+                </Grid.RowDefinitions>
+                <Label Text="Titre - Version"
+                       TextColor="White"
+                       HorizontalTextAlignment="Center"
+                       BackgroundColor="Black"
+                       Grid.ColumnSpan="4"
+                       />
+                <Label Grid.Row="2"
+                       Text="Register 1"
+                       HeightRequest="20"
+                       TextColor="White"
+                       BackgroundColor="Black"/>
+                <Label Grid.Column="1"
+                       Grid.Row="2"
+                       Text="Value" 
+                       TextColor="White"
+                       BackgroundColor="Black"
+                       x:Name="peerReg1"/>
+                <Entry Grid.Column="2"
+                        Grid.Row="2"
+                         Grid.ColumnSpan="2"
+                       x:Name="userReg1"
+                        />
+                <Label Grid.Row="3"
+                       Text="Register 2"
+                       TextColor="White"
+                       BackgroundColor="Black"/>
+                <Label Grid.Column="1"
+                       Grid.Row="3"
+                       Text="Value"
+                       TextColor="White"
+                       BackgroundColor="Black"
+                       x:Name="peerReg2"/>
+                <Entry Grid.Row="3"
+                        Grid.Column="2"
+                        Grid.ColumnSpan="2"
+                       x:Name="userReg2"/>
+                <Editor Grid.Row="4"
+                        Grid.RowSpan="2"
+                        Grid.ColumnSpan="4"
+                        BackgroundColor="White"
+                        IsEnabled="False"
+                        x:Name="log"
+                        FontSize="8"
+                        TextColor="Black"
+                        />
+                <Button Grid.Row="6"
+                        Grid.Column="0"
+                        Grid.ColumnSpan="2"
+                        Text="Receive"
+                        IsEnabled="False"
+                        x:Name="receiveButton"
+                        BackgroundColor="Gray"
+                        Clicked="OnButtonReceiveClicked"
                     />
-            <Label Grid.Row="3"
-                   Text="Register 2"
-                   TextColor="White"
-                   BackgroundColor="Black"/>
-            <Label Grid.Column="1"
-                   Grid.Row="3"
-                   Text="Value"
-                   TextColor="White"
-                   BackgroundColor="Black"
-                   x:Name="peerReg2"/>
-            <Entry Grid.Row="3"
-                    Grid.Column="2"
-                    Grid.ColumnSpan="2"
-                   x:Name="userReg2"/>
-            <Editor Grid.Row="4"
-                    Grid.RowSpan="2"
-                    Grid.ColumnSpan="4"
-                    BackgroundColor="White"
-                    IsEnabled="False"
-                    x:Name="log"
-                    FontSize="8"
-                    TextColor="Black"
+                <Button Grid.Row="6"
+                        Grid.Column="2"
+                        Grid.ColumnSpan="2"
+                        Text="Send"
+                        IsEnabled="False"
+                        x:Name="sendButton"
+                        BackgroundColor="Gray"
+                        Clicked="OnButtonSendClicked"
                     />
-            <Button Grid.Row="6"
-                    Grid.Column="0"
-                    Grid.ColumnSpan="2"
-                    Text="Receive"
-                    IsEnabled="False"
-                    x:Name="receiveButton"
-                    BackgroundColor="Gray"
-                    Clicked="OnButtonReceiveClicked"
-                />
-            <Button Grid.Row="6"
-                    Grid.Column="2"
-                    Grid.ColumnSpan="2"
-                    Text="Send"
-                    IsEnabled="False"
-                    x:Name="sendButton"
-                    BackgroundColor="Gray"
-                    Clicked="OnButtonSendClicked"
-                />
-            <Button Grid.Row="7"
-                    Grid.Column="0"
-                    Grid.ColumnSpan="2"
-                    Text="Connect"
-                    IsEnabled="True"
-                    BackgroundColor="Gray"
-                    x:Name="connectButton"
-                    Clicked="OnButtonConnectClicked"
-                />
-            <Button Grid.Row="7"
-                    Grid.Column="2"
-                    Grid.ColumnSpan="2"
-                    Text="Disconnect"
-                    IsEnabled="False"
-                    x:Name="disconnectButton"
-                    BackgroundColor="Gray"
-                    Clicked="OnButtonDisconnectClicked"
-                />
-        </Grid>
+                <Button Grid.Row="7"
+                        Grid.Column="0"
+                        Grid.ColumnSpan="2"
+                        Text="Connect"
+                        IsEnabled="True"
+                        BackgroundColor="Gray"
+                        x:Name="connectButton"
+                        Clicked="OnButtonConnectClicked"
+                    />
+                <Button Grid.Row="7"
+                        Grid.Column="2"
+                        Grid.ColumnSpan="2"
+                        Text="Disconnect"
+                        IsEnabled="False"
+                        x:Name="disconnectButton"
+                        BackgroundColor="Gray"
+                        Clicked="OnButtonDisconnectClicked"
+                    />
+            </Grid>
+
+            <ContentView x:Name="popupView" BackgroundColor="#C0808080" Padding="10, 0" IsVisible="False" AbsoluteLayout.LayoutBounds="0, 0, 1, 1" AbsoluteLayout.LayoutFlags="All">
+                <StackLayout VerticalOptions="Center" HorizontalOptions="Center">
+                    <StackLayout Orientation="Vertical" HorizontalOptions="Center" VerticalOptions="Center" WidthRequest="350" BackgroundColor="White" Padding="5">
+                        <Frame BorderColor="Black"
+                               HasShadow="True"
+                               Padding="3"
+                               Margin="2,2,2,2">
+                            <Picker Title="Choose the device to connect with"
+                                    x:Name="usbList"/>
+                        </Frame>
+                        <Button Text="Cancel"
+                                x:Name="cancelButton"
+                                BackgroundColor="Gray"
+                                Clicked="OnButtonCancelClicked" 
+                                Margin="2,2,2,2"/>
+                        <Button Text="Validate" 
+                                x:Name="validateButton"
+                                BackgroundColor="Gray"
+                                Clicked="OnButtonValidateClicked"
+                                Margin="2,2,2,2"/>
+                    </StackLayout>
+                </StackLayout>
+            </ContentView>
+        </AbsoluteLayout>
     </StackLayout>
 </ContentPage>
     

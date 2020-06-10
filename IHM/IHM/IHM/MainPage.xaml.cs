@@ -1,9 +1,12 @@
-﻿using System;
+﻿using Android.Content;
+using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Xamarin.Forms;
+
 namespace IHM
 {
     public partial class MainPage : ContentPage
@@ -17,6 +20,8 @@ namespace IHM
         List<Entry> m_lRegsEntry;
         // Liste des valeurs lues
         List<Label> m_lRegsLbl;
+
+        IUsbManager usbManager_;
 
         public MainPage()
         {
@@ -36,6 +41,8 @@ namespace IHM
                 peerReg1,
                 peerReg2
             };
+
+            usbManager_ = Xamarin.Forms.DependencyService.Get<IUsbManager>();
         }
 
         void OnButtonSendClicked(object sender, EventArgs e)
@@ -45,11 +52,18 @@ namespace IHM
 
             for (int i = 0; i < m_lRegsEntry.Count; i++)
             {
-                if (m_lRegsEntry[i].Text.Length > 0)
+                if (m_lRegsEntry[i].Text != null && m_lRegsEntry[i].Text.Length > 0)
                 {
-                    regVal = byte.Parse(m_lRegsEntry[i].Text);
-                    status = m_dll_if.WriteRegister((byte)i, regVal);
-                    log.Text += "\n" + DateTime.Now.ToString(" HH:mm ") + "reg" + i.ToString() +  "val " + regVal.ToString() + ": " + dll_if.ProtoStatusGetString(status);
+                    try
+                    {
+                        regVal = byte.Parse(m_lRegsEntry[i].Text); // Lève une exception si la valeur n'est pas entre 0 et 255
+                        status = m_dll_if.WriteRegister((byte)i, regVal);
+                        log.Text += "\n" + DateTime.Now.ToString(" HH:mm ") + "reg" + i.ToString() + "val " + regVal.ToString() + ": " + dll_if.ProtoStatusGetString(status);
+                    }
+                    catch (Exception ex)
+                    {
+                        log.Text += "\n" + DateTime.Now.ToString(" HH:mm ") + "reg" + i.ToString() + " value must be between 0 and 255";
+                    }
                 }
                 else
                 {
@@ -75,44 +89,62 @@ namespace IHM
         void OnButtonConnectClicked(object sender, EventArgs e)
         {
             //To do : call method to connect
-
-            if (isConnected == false) // On a inversé les true et false pour les tests
+            ObservableCollection<string> usbNames = new ObservableCollection<string>();
+            popupView.IsVisible = true;
+            usbList.ItemsSource = usbNames;
+            usbNames.Add("EmulSlave");
+            ICollection<string> allNames = usbManager_.getListOfConnections();
+            foreach (string name in allNames)
+            {
+                usbNames.Add(name);
+            }
+        }
+        void OnButtonDisconnectClicked(object sender, EventArgs e)
+        {
+            // Fermeture de la connexion
+            m_dll_if.Close();
+            isConnected = false;
+            log.Text += "\n" + DateTime.Now.ToString(" HH:mm") + " Disconnected";
+            connectButton.IsEnabled = true;
+            receiveButton.IsEnabled = false;
+            sendButton.IsEnabled = false;
+            disconnectButton.IsEnabled = false;
+        }
+        void OnButtonCancelClicked(object sender, EventArgs e) // Annuler la selection de device
+        {
+            popupView.IsVisible = false;
+        }
+        void OnButtonValidateClicked(object sender, EventArgs e) // Valider la selection de device
+        {
+            popupView.IsVisible = false;
+            connect((string)usbList.SelectedItem);
+        }
+        void connect(string name)
+        {
+            Xamarin.Forms.DependencyService.Get<IUsbManager>().selectDevice(name);
+            if (name == "EmulSlave") // A enlever au final, mais permet de pouvoir tester l'application si l'on a pas de carte à connecter
+            {
+                // Test
+                // Ouverture de la connexion
+                isConnected = (0 == m_dll_if.Open(m_dll_if.CreateEmulslave(), "unused ;)")); // Si cette fonction retourne 0 alors on est connecté à la carte
+            }
+            else
+            {
+                isConnected = (0 == m_dll_if.Open(m_dll_if.CreateDevSerial(), "/dev/null")); // Si cette fonction retourne 0 alors on est connecté à la carte
+            }
+            if (isConnected == true) // On a inversé les true et false pour les tests
             {
                 log.Text += "\n" + DateTime.Now.ToString(" HH:mm") + " Connected";
                 connectButton.IsEnabled = false;
                 receiveButton.IsEnabled = true;
                 sendButton.IsEnabled = true;
                 disconnectButton.IsEnabled = true;
-
-                // Test
-                // Ouverture de la connexion
-                m_dll_if.Open(m_dll_if.CreateEmulslave(),"unused ;)");
+                
             }
-            if (isConnected == true)
+            if (isConnected == false)
             {
                 log.Text += "\n" + DateTime.Now.ToString(" HH:mm") + " Fail to connect";
             }
         }
-        void OnButtonDisconnectClicked(object sender, EventArgs e)
-            {
-                //To do : call method to disconnect
-
-                if (isConnected == false)
-                {
-                    log.Text += "\n" + DateTime.Now.ToString(" HH:mm") + " Disconnected";
-                    connectButton.IsEnabled = true;
-                    receiveButton.IsEnabled = false;
-                    sendButton.IsEnabled = false;
-                    disconnectButton.IsEnabled = false;
-
-                    // Test
-                    // Fermeture de la connexion
-                    m_dll_if.Close();
-                }
-                if (isConnected == true)
-                {
-                    log.Text += "\n" + DateTime.Now.ToString(" HH:mm") + " Fail to disconnect";
-                }
-            }
     }
 }

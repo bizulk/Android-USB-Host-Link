@@ -6,8 +6,10 @@ using Android.Runtime;
 using Android.Views;
 using Android.Widget;
 using Android.OS;
+using Android.Hardware.Usb;
 
 using IHM.Droid.Interfaces;
+using Android.Content;
 
 namespace IHM.Droid
 {
@@ -24,8 +26,8 @@ namespace IHM.Droid
 
             base.OnCreate(savedInstanceState);
             global::Xamarin.Forms.Forms.Init(this, savedInstanceState);
+            Xamarin.Forms.DependencyService.Get<IUsbManager>().Init(this);
             LoadApplication(new App());
-
 
         }
     }
