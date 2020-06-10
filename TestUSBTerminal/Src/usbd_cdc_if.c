@@ -53,7 +53,8 @@
 /* USER CODE BEGIN INCLUDE */
 #include <string.h>
 #include <stdio.h>
-#include "tst_iface.h"
+
+
 /* USER CODE END INCLUDE */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -297,6 +298,7 @@ static int8_t CDC_Receive_FS(uint8_t* Buf, uint32_t *Len)
   /* USER CODE BEGIN 6 */
   USBD_CDC_SetRxBuffer(&hUsbDeviceFS, &Buf[0]);
   USBD_CDC_ReceivePacket(&hUsbDeviceFS);
+
   // CIO - Add code here
   return _CDC_Receive_FS_user(Buf, Len);
   /* USER CODE END 6 */

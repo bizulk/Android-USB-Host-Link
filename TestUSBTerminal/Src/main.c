@@ -53,9 +53,11 @@
 #include "usb_device.h"
 #include "gpio.h"
 
+
 /* USER CODE BEGIN Includes */
 
 #include "tst_iface.h"
+#include "/libcomm/Inc/proto_iodevice.h"
 
 /* USER CODE END Includes */
 
@@ -63,7 +65,8 @@
 
 /* USER CODE BEGIN PV */
 /* Private variables ---------------------------------------------------------*/
-
+proto_Device_t monDevice;
+proto_hdle_t monSlave;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -89,6 +92,9 @@ int main(void)
 	// Cette variable sert à cadencer des traitements
   uint32_t ulStamp_ms = 0;
   uint32_t ulDly_ms = 0;
+
+  monDevice = devstm32_create();
+  monSlave = proto_slave_create(monDevice, &fonction_slave_receive, NULL);
   /* USER CODE END 1 */
 
   /* MCU Configuration----------------------------------------------------------*/

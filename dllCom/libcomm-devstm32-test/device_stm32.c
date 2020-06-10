@@ -95,8 +95,15 @@ static int devstm32_write(struct proto_IfaceIODevice* this, const void * buffer,
     UNUSED(this);
     // TODO: Il faut ajouter ici l'envoi des octets
     // Et retourner 0 si OK, et -1 si erreur
-
-    return -1;
+    CDC_Transmit_FS(buffer, size);
+    if (CDC_Transmit_FS(buffer, size)==USBD_OK)
+    {
+    	return 0;
+    }
+    else
+    {
+    	return -1;
+    }
 }
 
 

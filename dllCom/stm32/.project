@@ -25,9 +25,84 @@
 	</natures>
 	<linkedResources>
 		<link>
+			<name>Inc/device_emulslave.h</name>
+			<type>1</type>
+			<location>C:/Users/elise/Documents/GitHub/AndroidFilaire/dllCom/libcomm/devices/device_emulslave.h</location>
+		</link>
+		<link>
+			<name>Inc/device_serial.h</name>
+			<type>1</type>
+			<location>C:/Users/elise/Documents/GitHub/AndroidFilaire/dllCom/libcomm/devices/device_serial.h</location>
+		</link>
+		<link>
+			<name>Inc/device_stm32.h</name>
+			<type>1</type>
+			<location>C:/Users/elise/Documents/GitHub/AndroidFilaire/dllCom/libcomm-devstm32-test/device_stm32.h</location>
+		</link>
+		<link>
+			<name>Inc/libcomm_global.h</name>
+			<type>1</type>
+			<location>C:/Users/elise/Documents/GitHub/AndroidFilaire/dllCom/libcomm/libcomm_global.h</location>
+		</link>
+		<link>
+			<name>Inc/proto_iodevice.h</name>
+			<type>1</type>
+			<location>C:/Users/elise/Documents/GitHub/AndroidFilaire/dllCom/libcomm/proto_iodevice.h</location>
+		</link>
+		<link>
+			<name>Inc/protocomm-gnulinux.h</name>
+			<type>1</type>
+			<location>C:/Users/elise/Documents/GitHub/AndroidFilaire/dllCom/libcomm/protocomm-gnulinux.h</location>
+		</link>
+		<link>
+			<name>Inc/protocomm_ll.h</name>
+			<type>1</type>
+			<location>C:/Users/elise/Documents/GitHub/AndroidFilaire/dllCom/libcomm/protocomm_ll.h</location>
+		</link>
+		<link>
+			<name>Inc/protocomm_master.h</name>
+			<type>1</type>
+			<location>C:/Users/elise/Documents/GitHub/AndroidFilaire/dllCom/libcomm/protocomm_master.h</location>
+		</link>
+		<link>
+			<name>Inc/protocomm_slave.h</name>
+			<type>1</type>
+			<location>C:/Users/elise/Documents/GitHub/AndroidFilaire/dllCom/libcomm/protocomm_slave.h</location>
+		</link>
+		<link>
+			<name>src/device_emulslave.c</name>
+			<type>1</type>
+			<location>C:/Users/elise/Documents/GitHub/AndroidFilaire/dllCom/libcomm/devices/device_emulslave.c</location>
+		</link>
+		<link>
+			<name>src/device_serial.c</name>
+			<type>1</type>
+			<location>C:/Users/elise/Documents/GitHub/AndroidFilaire/dllCom/libcomm/devices/device_serial.c</location>
+		</link>
+		<link>
+			<name>src/device_stm32.c</name>
+			<type>1</type>
+			<location>C:/Users/elise/Documents/GitHub/AndroidFilaire/dllCom/libcomm-devstm32-test/device_stm32.c</location>
+		</link>
+		<link>
+			<name>src/protocomm-gnulinux.c</name>
+			<type>1</type>
+			<location>C:/Users/elise/Documents/GitHub/AndroidFilaire/dllCom/libcomm/protocomm-gnulinux.c</location>
+		</link>
+		<link>
 			<name>src/protocomm_ll.c</name>
 			<type>1</type>
 			<locationURI>PARENT-1-PROJECT_LOC/libcomm/protocomm_ll.c</locationURI>
+		</link>
+		<link>
+			<name>src/protocomm_master.c</name>
+			<type>1</type>
+			<location>C:/Users/elise/Documents/GitHub/AndroidFilaire/dllCom/libcomm/protocomm_master.c</location>
+		</link>
+		<link>
+			<name>src/protocomm_slave.c</name>
+			<type>1</type>
+			<location>C:/Users/elise/Documents/GitHub/AndroidFilaire/dllCom/libcomm/protocomm_slave.c</location>
 		</link>
 	</linkedResources>
 </projectDescription>

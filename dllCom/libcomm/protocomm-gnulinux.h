@@ -1,7 +1,7 @@
 #ifndef CIO_TSE_PROTOCOMM_GNULINUX
 #define CIO_TSE_PROTOCOMM_GNULINUX
 
-#include "protocomm.h"
+#include "protocomm_ll.h"
 
 #ifdef __cplusplus
 extern "C" {
