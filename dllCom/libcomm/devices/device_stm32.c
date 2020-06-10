@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <assert.h>
 #include "proto_iodevice.h"
-#include "device_serial.h"
+#include "device_stm32.h"
 #include <string.h>
 
 
@@ -90,20 +90,26 @@ static int devstm32_read(struct proto_IfaceIODevice* this, void* voidbuffer, uin
     return i;
 }
 
+/// \brief cette fonction est dans le Cube ST que l'on n'embarque pas ds la lib
+/// Méthode à opposer à l'ajout d'un parametre write_callback dans l'API du device
+/// Peut-être que l'on peut générer une lib avec STMCube MX ??
+extern uint8_t CDC_Transmit_FS(uint8_t* Buf, uint16_t Len);
+/// \brief on recopie le symbole de retour de retour de la fonction
+#ifndef USBD_OK
+#define USBD_OK 0
+#endif
+
 static int devstm32_write(struct proto_IfaceIODevice* this, const void * buffer, uint8_t size)
 {
     UNUSED(this);
+    int ret = 0;
     // TODO: Il faut ajouter ici l'envoi des octets
     // Et retourner 0 si OK, et -1 si erreur
-    CDC_Transmit_FS(buffer, size);
-    if (CDC_Transmit_FS(buffer, size)==USBD_OK)
+    if (CDC_Transmit_FS((uint8_t*)buffer, size) != USBD_OK)
     {
-    	return 0;
+    	ret =-1;
     }
-    else
-    {
-    	return -1;
-    }
+    return ret;
 }
 
 

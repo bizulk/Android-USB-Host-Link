@@ -50,11 +50,6 @@
 			<locationURI>PARENT-1-PROJECT_LOC/libcomm/proto_iodevice.h</locationURI>
 		</link>
 		<link>
-			<name>Inc/protocomm-gnulinux.h</name>
-			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/libcomm/protocomm-gnulinux.h</locationURI>
-		</link>
-		<link>
 			<name>Inc/protocomm_ll.h</name>
 			<type>1</type>
 			<locationURI>PARENT-1-PROJECT_LOC/libcomm/protocomm_ll.h</locationURI>
@@ -83,11 +78,6 @@
 			<name>src/device_stm32.c</name>
 			<type>1</type>
 			<locationURI>PARENT-1-PROJECT_LOC/libcomm/devices/device_stm32.c</locationURI>
-		</link>
-		<link>
-			<name>src/protocomm-gnulinux.c</name>
-			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/libcomm/protocomm-gnulinux.c</locationURI>
 		</link>
 		<link>
 			<name>src/protocomm_ll.c</name>
