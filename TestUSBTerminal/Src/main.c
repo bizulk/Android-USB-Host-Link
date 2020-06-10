@@ -53,6 +53,7 @@
 #include "usb_device.h"
 #include "gpio.h"
 
+
 /* USER CODE BEGIN Includes */
 
 #include "tst_iface.h"
@@ -89,6 +90,7 @@ int main(void)
 	// Cette variable sert à cadencer des traitements
   uint32_t ulStamp_ms = 0;
   uint32_t ulDly_ms = 0;
+
   /* USER CODE END 1 */
 
   /* MCU Configuration----------------------------------------------------------*/
@@ -112,7 +114,7 @@ int main(void)
   MX_USART3_UART_Init();
   MX_USB_DEVICE_Init();
   /* USER CODE BEGIN 2 */
-
+  tst_init();
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -132,6 +134,7 @@ int main(void)
 		  ulStamp_ms = ulDly_ms;
 		  tst_loop_1hz();
 	  }
+	  tst_loop_main();
   }
   /* USER CODE END 3 */
 

@@ -22,3 +22,8 @@ dllCom/xamarin/swig/protocomm_wrap.c
 IHM/IHM/IHM.Android/libs/update_libs_env_user.bat
 
 TestUSBTerminal/.settings/language.settings.xml
+
+dllCom/stm32/.settings/language.settings.xml
+
+dllCom/stm32/.settings/com.atollic.truestudio.debug.hardware_device.prefs
+/TestUSBTerminal/Release
