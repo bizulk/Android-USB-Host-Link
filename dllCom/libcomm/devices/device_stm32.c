@@ -103,7 +103,6 @@ static int devstm32_write(struct proto_IfaceIODevice* this, const void * buffer,
 {
     UNUSED(this);
     int ret = 0;
-    // TODO: Il faut ajouter ici l'envoi des octets
     // Et retourner 0 si OK, et -1 si erreur
     if (CDC_Transmit_FS((uint8_t*)buffer, size) != USBD_OK)
     {

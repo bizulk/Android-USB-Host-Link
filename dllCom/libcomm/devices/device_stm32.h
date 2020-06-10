@@ -16,11 +16,6 @@ proto_Device_t  devstm32_create(void);
 
 /// \brief Ajouter des octets qui seront lus dans le read() du device
 void devstm32_pushBytes(proto_Device_t _this, uint8_t* bytes, uint8_t nbBytes);
-/*
-\\\ \brief STM Hal
-typedef CDC_Transmit_FS
-/// \brief définir la fonction d'écriture STM32
-///
-void devstm32_setWrite()*/
+
 
 #endif // DEVICE_STM32_H

@@ -26,3 +26,4 @@ TestUSBTerminal/.settings/language.settings.xml
 dllCom/stm32/.settings/language.settings.xml
 
 dllCom/stm32/.settings/com.atollic.truestudio.debug.hardware_device.prefs
+/TestUSBTerminal/Release
