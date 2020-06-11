@@ -25,6 +25,16 @@ namespace IHM.Droid
             ToolbarResource = Resource.Layout.Toolbar;
 
             base.OnCreate(savedInstanceState);
+
+            //Fichier de log
+            Plugin.XFLogger.CrossXFLogger.Current.Configure(Plugin.XFLogger.Abstractions.LogTimeOption.DateTimeNow, "FileLog.log", 3, 1024, Plugin.XFLogger.Abstractions.LogLevel.Info, true);
+
+            //Pour l'utilisation du service de partage
+            Xamarin.Forms.DependencyService.Register<DroidShareService>();
+
+            //Pour l'utilisation du service de téléchargement et de partage, récupération du path où enregistrer le fichier
+            Xamarin.Forms.DependencyService.Register<DroidLocalStoragePath>();
+
             global::Xamarin.Forms.Forms.Init(this, savedInstanceState);
             Xamarin.Forms.DependencyService.Get<IUsbManager>().Init(this);
             LoadApplication(new App());
