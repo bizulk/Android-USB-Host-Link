@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -19,6 +20,15 @@ namespace IHM
         List<Entry> m_lRegsEntry;
         // Liste des valeurs lues
         List<Label> m_lRegsLbl;
+
+        // Pour le fichier de log
+        public List<string> textLogList;
+        LogFile logfile = LogFile.Instance();
+        //Nom complet du fichier (chemin + nom)
+        private string m_filename = "";
+        //Texte à afficher log
+        ObservableCollection<string> m_textLog = new ObservableCollection<string>();
+
 
         IUsbManager usbManager_;
 
@@ -42,10 +52,21 @@ namespace IHM
             };
 
             usbManager_ = Xamarin.Forms.DependencyService.Get<IUsbManager>();
+
+            // Pour le log
+            m_filename = "FileLog.log";
+            string path = logfile.GetLocalStoragePath();
+            m_filename = Path.Combine(path, m_filename);
+
+            fillLog();
+
+            //On remplit la listview
+            listLog.ItemsSource = m_textLog;
         }
 
         void OnButtonSendClicked(object sender, EventArgs e)
         {
+            string msgSend = "";
             byte regVal;
             proto_Status_t status;
 
@@ -57,33 +78,46 @@ namespace IHM
                     {
                         regVal = byte.Parse(m_lRegsEntry[i].Text); // Lève une exception si la valeur n'est pas entre 0 et 255
                         status = m_dll_if.WriteRegister((byte)i, regVal);
-                        log.Text += "\n" + DateTime.Now.ToString(" HH:mm ") + "reg" + i.ToString() + "val " + regVal.ToString() + ": " + dll_if.ProtoStatusGetString(status);
+                        msgSend = "reg" + i.ToString() + "val " + regVal.ToString() + ": " + dll_if.ProtoStatusGetString(status);
+                        m_textLog.Insert(0, DateTime.Now.ToString(" HH:mm ") + " " + msgSend);   //Pour l'affichage en temps réelle dans la dialogue
+                        logfile.Info(msgSend, "");  // Pour le stockage dans le fichier
                     }
                     catch (Exception ex)
                     {
-                        log.Text += "\n" + DateTime.Now.ToString(" HH:mm ") + "reg" + i.ToString() + " value must be between 0 and 255";
+                        msgSend = "reg" + i.ToString() + " value must be between 0 and 255";
+                        m_textLog.Insert(0, DateTime.Now.ToString(" HH:mm ") + " " + msgSend);   //Pour l'affichage en temps réelle dans la dialogue
+                        logfile.Error(msgSend, ""); // Pour le stockage dans le fichier
                     }
                 }
                 else
                 {
-                    log.Text += "\n" + DateTime.Now.ToString(" HH:mm ") + "reg" + i.ToString() + "not set (empty user)";
+                    msgSend = "reg" + i.ToString() + "not set (empty user)";
+                    m_textLog.Insert(0, DateTime.Now.ToString(" HH:mm ") + " " + msgSend);   //Pour l'affichage en temps réelle dans la dialogue
+                    logfile.Error(msgSend, ""); // Pour le stockage dans le fichier
                 }
             }
+
+            
         }
         void OnButtonReceiveClicked(object sender, EventArgs e)
         {
+            string msgReceive = "";
             byte regVal = 0;
             proto_Status_t status;
 
             for (int i = 0; i < m_lRegsLbl.Count; i++)
             {
                 status = m_dll_if.ReadRegister((byte)i, ref regVal);
-                log.Text += "\n" + DateTime.Now.ToString(" HH:mm ") + "reg" + i.ToString() + "read : " + dll_if.ProtoStatusGetString(status);
+                msgReceive = "reg" + i.ToString() + "read : " + dll_if.ProtoStatusGetString(status);
+                logfile.Info(msgReceive, ""); // Pour le stockage dans le fichier
+                m_textLog.Insert(0, DateTime.Now.ToString(" HH:mm ") + " " + msgReceive);   //Pour l'affichage en temps réelle dans la dialogue
                 if (status == proto_Status_t.proto_NO_ERROR)
                 {
                     m_lRegsLbl[i].Text = regVal.ToString();
                 }
             }
+
+            
         }
         void OnButtonConnectClicked(object sender, EventArgs e)
         {
@@ -100,10 +134,13 @@ namespace IHM
         }
         void OnButtonDisconnectClicked(object sender, EventArgs e)
         {
+            string msgDeco = "Disconnected";
+
             // Fermeture de la connexion
             m_dll_if.Close();
             isConnected = false;
-            log.Text += "\n" + DateTime.Now.ToString(" HH:mm") + " Disconnected";
+            logfile.Info(msgDeco, ""); // Pour le stockage dans le fichier
+            m_textLog.Insert(0, DateTime.Now.ToString(" HH:mm ") + " " + msgDeco);   //Pour l'affichage en temps réelle dans la dialogue
             connectButton.IsEnabled = true;
             receiveButton.IsEnabled = false;
             sendButton.IsEnabled = false;
@@ -133,7 +170,9 @@ namespace IHM
             }
             if (isConnected == true) // On a inversé les true et false pour les tests
             {
-                log.Text += "\n" + DateTime.Now.ToString(" HH:mm") + " Connected";
+                string msgCo = "Connected";
+                logfile.Info(msgCo, ""); // Pour le stockage dans le fichier
+                m_textLog.Insert(0, DateTime.Now.ToString(" HH:mm ") + " " + msgCo);   //Pour l'affichage en temps réelle dans la dialogue
                 connectButton.IsEnabled = false;
                 receiveButton.IsEnabled = true;
                 sendButton.IsEnabled = true;
@@ -142,8 +181,43 @@ namespace IHM
             }
             if (isConnected == false)
             {
-                log.Text += "\n" + DateTime.Now.ToString(" HH:mm") + " Fail to connect";
+                string msgFailCo = "Fail to connect";
+                logfile.Error(msgFailCo, ""); // Pour le stockage dans le fichier
+                m_textLog.Insert(0, DateTime.Now.ToString(" HH:mm ") + " " + msgFailCo);   //Pour l'affichage en temps réelle dans la dialogue
             }
         }
+
+        // ******************* Pour le log ***************************
+        private void onClickedLog(object sender, EventArgs e)
+        {
+            var shareService = Xamarin.Forms.DependencyService.Get<IShareService>();
+
+            shareService.Share(m_filename, "Log");
+        }
+
+        private void fillLog()
+        {
+            m_textLog.Clear();
+
+            //Création du fichier
+            if (!File.Exists(m_filename))
+            {
+                File.Create(m_filename);
+            }
+
+            foreach (string line in File.ReadAllLines(m_filename))
+            {
+                m_textLog.Insert(0, line);
+            }
+        }
+
+        private void onClickedresetLog(object sender, EventArgs e)
+        {
+            m_textLog.Clear();
+            logfile.Clear();
+
+            File.WriteAllText(m_filename, "");
+        }
+        // *************************************************************
     }
 }

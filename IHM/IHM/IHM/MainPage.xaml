@@ -3,7 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="IHM.MainPage">
     <StackLayout Margin="0,0,0,0"
-                 BackgroundColor="MidnightBlue">
+                 BackgroundColor="LightBlue">
 
         <AbsoluteLayout Padding="0" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand">
             <Grid Margin="0,0,0,0"  AbsoluteLayout.LayoutBounds="0, 0, 1, 1" AbsoluteLayout.LayoutFlags="All">
@@ -22,6 +22,7 @@
                     <RowDefinition Height="38" />
                     <RowDefinition Height="38" />
                     <RowDefinition Height="38" />
+                    <RowDefinition Height="AUTO" />
                 </Grid.RowDefinitions>
                 <Label Text="Titre - Version"
                        TextColor="White"
@@ -59,15 +60,6 @@
                         Grid.Column="2"
                         Grid.ColumnSpan="2"
                        x:Name="userReg2"/>
-                <Editor Grid.Row="4"
-                        Grid.RowSpan="2"
-                        Grid.ColumnSpan="4"
-                        BackgroundColor="White"
-                        IsEnabled="False"
-                        x:Name="log"
-                        FontSize="8"
-                        TextColor="Black"
-                        />
                 <Button Grid.Row="6"
                         Grid.Column="0"
                         Grid.ColumnSpan="2"
@@ -104,6 +96,44 @@
                         BackgroundColor="Gray"
                         Clicked="OnButtonDisconnectClicked"
                     />
+                
+                <Grid Grid.Row="8" Grid.ColumnSpan="4" BackgroundColor="White">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="7*"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <Grid Grid.Row="0">
+                        <Grid.ColumnDefinitions >
+                            <ColumnDefinition Width="AUTO" ></ColumnDefinition>
+                        </Grid.ColumnDefinitions>
+
+                        <ListView Grid.Column="0"
+                          x:Name="listLog"
+                          SeparatorVisibility="None"
+                          Margin="10"
+                          RowHeight="20">
+
+                            <ListView.ItemTemplate>
+                                <DataTemplate>
+                                    <ViewCell>
+                                        <Label Text="{Binding .}"/>
+                                    </ViewCell>
+                                </DataTemplate>
+                            </ListView.ItemTemplate>
+                        </ListView>
+                    </Grid>
+
+                    <Grid Grid.Row="1" ColumnSpacing="5">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <Button x:Name="ButtonLog" Grid.Column="0" BackgroundColor="Gray" Clicked="onClickedLog" Text="Récupération du fichier de log"/>
+                        <Button x:Name="ButtonPurge" Grid.Column="1" BackgroundColor="Gray" Clicked="onClickedresetLog" Text="Effacer les informations de log"/>
+                    </Grid>
+                </Grid>
             </Grid>
 
             <ContentView x:Name="popupView" BackgroundColor="#C0808080" Padding="10, 0" IsVisible="False" AbsoluteLayout.LayoutBounds="0, 0, 1, 1" AbsoluteLayout.LayoutFlags="All">

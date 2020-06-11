@@ -40,4 +40,21 @@ namespace IHM
         /// <returns></returns>
         int Close();
     }
+
+    /// <summary>
+    /// Récupération du chemin vers l'emplcament de stockage local
+    /// </summary>
+    public interface ILocalStoragePath
+    {
+        string GetLocalStoragePath();
+    }
+
+    /// <summary>
+    /// Pour le partage
+    /// </summary>
+    public interface IShareService
+    {
+        bool Share(string filename, string title);
+    }
+
 }
