@@ -3,6 +3,7 @@
 	<name>TestUSBTerminal</name>
 	<comment></comment>
 	<projects>
+		<project>libcomm</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>
