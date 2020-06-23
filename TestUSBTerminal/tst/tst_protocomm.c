@@ -46,7 +46,6 @@ void tst_init(void)
 
 int8_t _CDC_Receive_FS_user(uint8_t* Buf, uint32_t *Len)
 {
-	// TODO
 	devstm32_pushBytes(_stm32dev, Buf, *Len);
 	return USBD_OK;
 }
