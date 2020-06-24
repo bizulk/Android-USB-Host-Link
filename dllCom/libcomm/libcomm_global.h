@@ -15,4 +15,10 @@
 #  define LIBCOMM_EXPORT Q_DECL_IMPORT
 #endif
 
+// Pour le parse par CFFI (python) ou SWIG il faut désactiver le symbole qui ne peut être traité
+#ifdef SWIG_FFI_BINDING
+#undef LIBCOMM_EXPORT
+#define LIBCOMM_EXPORT
+#endif
+
 #endif // LIBCOMM_GLOBAL_H
