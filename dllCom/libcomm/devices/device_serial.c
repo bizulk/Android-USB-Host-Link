@@ -183,25 +183,37 @@ int devserial_getFD(proto_Device_t this) {
 
 static int devserial_open(struct proto_IfaceIODevice* this, const char * szPath)
 {
+    UNUSED(this);
+    UNUSED(szPath);
     return -1;
 }
 
 static int devserial_close(struct proto_IfaceIODevice* this)
 {
+    UNUSED(this);
     return -1;
 }
 
 static int devserial_read(struct proto_IfaceIODevice* this, void* buffer, uint8_t bufferSize, int16_t tout_ms)
 {
+    UNUSED(this);
+    UNUSED(buffer);
+    UNUSED(bufferSize);
+    UNUSED(tout_ms);
     return 0;
 }
 
 static int devserial_write(struct proto_IfaceIODevice* this, const void * buffer, uint8_t size)
 {
+    UNUSED(this);
+    UNUSED(buffer);
+    UNUSED(size);
     return 0;
 }
 
 int devserial_openFD(proto_Device_t _this, int fileDescriptor) {
+    UNUSED(_this);
+    UNUSED(fileDescriptor);
     return -1;
 }
 
