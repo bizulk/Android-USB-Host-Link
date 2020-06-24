@@ -19,6 +19,7 @@ DEFINES += QT_DEPRECATED_WARNINGS
 SOURCES += \
     devices/device_emulslave.c \
     devices/device_serial.c \
+    log.c \
     protocomm_ll.c \
     protocomm_master.c \
     protocomm_slave.c
@@ -27,6 +28,7 @@ HEADERS += \
     devices/device_emulslave.h \
     devices/device_serial.h \
     libcomm_global.h \
+    log.h \
     proto_iodevice.h \
     protocomm_ll.h \
     protocomm_master.h \
