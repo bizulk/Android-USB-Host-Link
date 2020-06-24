@@ -26,7 +26,7 @@ typedef struct log_handle
 } log_handle_t;
 
 //-----------------------------------------------------------------------------
-log_phandle_t log_init(uint32_t nbMsg)
+log_phandle_t log_create(uint32_t nbMsg)
 {
     log_phandle_t _this = (log_phandle_t)malloc(sizeof (log_handle_t));
     // Pour la gestion des pointeurs il faut sacrifier un emplacement
@@ -123,6 +123,50 @@ void log_clear(log_phandle_t _this)
 {
     assert(_this);
     _this->begin = _this->end;
+}
+
+//-----------------------------------------------------------------------------
+static log_phandle_t _log_global_this = NULL;
+int log_global_create(uint32_t nbMsg)
+{
+    _log_global_this = log_create(nbMsg);
+    return (_log_global_this!=NULL) ? 0 : -1;
+}
+
+//-----------------------------------------------------------------------------
+int log_global_destroy(void)
+{
+    return log_destroy(_log_global_this);
+}
+
+//-----------------------------------------------------------------------------
+int log_global_push(const char * szMsg)
+{
+    return log_push(_log_global_this, szMsg);
+}
+
+//-----------------------------------------------------------------------------
+int log_global_pop(char * szMsg)
+{
+    return log_pop(_log_global_this, szMsg);
+}
+
+//-----------------------------------------------------------------------------
+size_t log_global_getsize(void)
+{
+    return log_getsize(_log_global_this);
+}
+
+//-----------------------------------------------------------------------------
+LIBCOMM_EXPORT size_t log_global_getfree(void)
+{
+    return log_getfree(_log_global_this);
+}
+
+//-----------------------------------------------------------------------------
+void log_global_clear(void)
+{
+    return log_clear(_log_global_this);
 }
 
 //-----------------------------------------------------------------------------
