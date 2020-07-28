@@ -111,7 +111,8 @@ namespace Hoho.Android.UsbSerial.Examples
 			// adding a custom driver to the default probe table
 			var table = UsbSerialProber.DefaultProbeTable;
 			table.AddProduct(0x1b4f, 0x0008, Java.Lang.Class.FromType(typeof(CdcAcmSerialDriver))); // IOIO OTG
-			var prober = new UsbSerialProber (table);
+            table.AddProduct(0x0483, 0x5740, Java.Lang.Class.FromType(typeof(CdcAcmSerialDriver))); // ST Virtual Com Port
+            var prober = new UsbSerialProber (table);
 			return prober.FindAllDriversAsync (usbManager);
 		}
 
