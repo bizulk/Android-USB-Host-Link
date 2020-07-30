@@ -53,6 +53,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="LusoVU.XamarinUsbSerialForAndroid">
+      <Version>0.2.3</Version>
+    </PackageReference>
     <PackageReference Include="Xamarin.Forms" Version="3.4.0.1008975" />
     <PackageReference Include="Xamarin.Android.Support.Design" Version="27.0.2.1" />
     <PackageReference Include="Xamarin.Android.Support.v7.AppCompat" Version="27.0.2.1" />
@@ -62,6 +65,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Interfaces\DroidLocalStoragePath.cs" />
+    <Compile Include="Interfaces\DroidPandaVcom.cs" />
     <Compile Include="Interfaces\DroidShareService.cs" />
     <Compile Include="Interfaces\DroidUsbManager.cs" />
     <Compile Include="MainActivity.cs" />

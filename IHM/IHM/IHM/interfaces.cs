@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace IHM
 {
@@ -21,6 +22,8 @@ namespace IHM
         /// </summary>
         /// <returns> une liste du nom de chaque connections </returns>
         ICollection<string> getListOfConnections();
+
+       Task<ICollection<string>> getListOfConnectionsAsync();
 
         /// <summary>
         /// Fonction pour choisir le nom du device avec lequel effectuer la connection 
