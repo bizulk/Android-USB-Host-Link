@@ -36,7 +36,15 @@ extern "C" {
 
 /// si défini, alors on utilisera une fifo, sinon on utilisera un printf
 /// TODO
-#define LOG_USE_FIFO
+//#define LOG_USE_FIFO
+#define LOG_USE_CONSOLE
+#ifdef LOG_USE_FIFO
+#define LOG(fmt, args...) LOG_PUSH(_this, fmt##args)
+#elif defined(LOG_USE_CONSOLE)
+#define LOG(fmt, args...) printf(fmt,##args)
+#else
+#define LOG(fmt, args...)
+#endif
 
 /// Instance de notre log
 typedef struct log_handle * log_phandle_t;
@@ -49,11 +57,23 @@ typedef struct log_handle * log_phandle_t;
 /** Helper pour envoyer un message de log d'exécution
  * Ajoute l'emplacement 'fonction' et le numéro de ligne au message
 */
-#define LOG_PUSH(_this, szMg, format, args...) do\
+#define LOG_PUSH(_this, fmt, args...) do\
 {\
-    snprintf( szMg, LOG_MSG_LEN, "%s:%d -"##format, __FUNCTION__, __LINE__ -2,##args);\
+    char szMsg[100]={0};\
+    snprintf( szMg, LOG_MSG_LEN, "%s:%d -"##fmt, __FUNCTION__, __LINE__ -2,##args);\
     log_push(_this, szMg);\
  } while(0);
+
+/** Helper pour envoyer un message de log d'exécution
+ * Ajoute l'emplacement 'fonction' et le numéro de ligne au message
+*/
+#define LOG_GLOBAL_PUSH(fmt, args...) do\
+{\
+    char szMsg[100]={0};\
+    snprintf( szMg, LOG_MSG_LEN, "%s:%d -"##fmt, __FUNCTION__, __LINE__ -2,##args);\
+    log_global_push(szMg);\
+ } while(0);
+
 
 /** Création de notre log
     @param nbMsg nombre maximal de message

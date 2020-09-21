@@ -44,18 +44,25 @@ namespace IHM
         /// <returns></returns>
         public int Open(SWIGTYPE_p_proto_Device_t device, string szPath)
         {
-            int ret = -1;
+            int ret = 0;
 
             m_device = device;
 
             //On ouvre la connexion
             m_handle = protocomm.proto_master_create(m_device); //5s de timeout TODO a moditifer plus tard pour le rendre paramètrable
             //On vérifie qu'il n'y a pas eu de problème lors de la connexion
-            if(m_handle != null)
+            if(m_handle == null)
             {
-                ret = 0;
+                return -1;
             }
-            protocomm.proto_master_open(m_handle, szPath);
+            ret = protocomm.proto_master_open(m_handle, szPath);
+            if (ret != 0)
+            {
+                return -1;
+            }
+            // Récupére notre FD avec l'USBManager pour l'affecter à la lib
+            int fd = Xamarin.Forms.DependencyService.Get<IUsbManager>().getDeviceConnection();
+            ret = protocomm.devserial_setFD(device, fd);
             return ret;
         }
 
@@ -126,11 +133,7 @@ namespace IHM
         public SWIGTYPE_p_proto_Device_t CreateDevSerial()
         {
             SWIGTYPE_p_proto_Device_t dev;
-
-            // Récupére notre FD avec l'USBManager
-            int fd = Xamarin.Forms.DependencyService.Get<IUsbManager>().getDeviceConnection();
             dev = protocomm.devserial_create();
-            int ret = protocomm.devserial_setFD(dev, fd);
             return dev;
         }
         
