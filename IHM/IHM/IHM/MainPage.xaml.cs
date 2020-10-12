@@ -156,19 +156,32 @@ namespace IHM
             connect((string)usbList.SelectedItem);
         }
         void connect(string name)
-        {
-            Xamarin.Forms.DependencyService.Get<IUsbManager>().selectDevice(name);
-            if (name == "EmulSlave") // A enlever au final, mais permet de pouvoir tester l'application si l'on a pas de carte à connecter
+        {         
+            if (name == "EmulSlave") 
             {
                 // Test
                 // Ouverture de la connexion
-                isConnected = (0 == m_dll_if.Open(m_dll_if.CreateEmulslave(), "unused ;)")); // Si cette fonction retourne 0 alors on est connecté à la carte
+                isConnected = (0 == m_dll_if.Open(m_dll_if.CreateEmulslave(), "")); 
             }
             else
             {
-                isConnected = (0 == m_dll_if.Open(m_dll_if.CreateDevSerial(), "/dev/null")); // Si cette fonction retourne 0 alors on est connecté à la carte
+                int fd;
+                // La couche USB créé le driver et initialise son fd
+                IUsbManager iusbManager = Xamarin.Forms.DependencyService.Get<IUsbManager>();
+                iusbManager.selectDevice(name);
+                // On demande a la dll de s'initialiser sans essayer d'ouvrir un port, car on va s'en occuper
+                SWIGTYPE_p_proto_Device_t dev = m_dll_if.CreateDevSerial();
+                isConnected = (0 == m_dll_if.Open(dev, ""));
+                if (isConnected)
+                {
+                    // Récupére notre FD avec l'USBManager pour l'affecter à la lib
+                    fd = iusbManager.getDeviceConnection();
+                    int ret = m_dll_if.SerialSetFd(dev, fd);
+                    if( ret < )
+                };
             }
-            if (isConnected == true) // On a inversé les true et false pour les tests
+            // Gestion de l'affichage
+            if (isConnected) 
             {
                 string msgCo = "Connected";
                 logfile.Info(msgCo, ""); // Pour le stockage dans le fichier

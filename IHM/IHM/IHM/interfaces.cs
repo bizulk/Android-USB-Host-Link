@@ -18,9 +18,9 @@ namespace IHM
         void Init(Object context);
 
         /// <summary>
-        /// Fonctions pour pouvoir afficher la liste des devices connecter
+        /// Fonctions pour pouvoir afficher la liste des devices connectés
         /// </summary>
-        /// <returns> une liste du nom de chaque connections </returns>
+        /// <returns> une liste du nom de chaque connexion </returns>
         ICollection<string> getListOfConnections();
 
        Task<ICollection<string>> getListOfConnectionsAsync();

@@ -44,6 +44,9 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)..\..\..\..\libcomm\devices\device_serial.h">
       <Filter>dll</Filter>
     </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\..\..\libcomm\log.h">
+      <Filter>dll</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="SWIG">

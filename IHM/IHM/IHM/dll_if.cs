@@ -41,14 +41,15 @@ namespace IHM
         /// Ouverture de la connexion
         /// </summary>
         /// <param name="device"> device pour la connexion </param>
-        /// <returns></returns>
+        /// <param name="szPath"> path à passer au protocole </param>
+        /// <returns> 0 if OK, otherwise < 0</returns>
         public int Open(SWIGTYPE_p_proto_Device_t device, string szPath)
         {
             int ret = 0;
 
             m_device = device;
 
-            //On ouvre la connexion
+            // On cree l'instance de protocole
             m_handle = protocomm.proto_master_create(m_device); //5s de timeout TODO a moditifer plus tard pour le rendre paramètrable
             //On vérifie qu'il n'y a pas eu de problème lors de la connexion
             if(m_handle == null)
@@ -60,9 +61,6 @@ namespace IHM
             {
                 return -1;
             }
-            // Récupére notre FD avec l'USBManager pour l'affecter à la lib
-            int fd = Xamarin.Forms.DependencyService.Get<IUsbManager>().getDeviceConnection();
-            ret = protocomm.devserial_setFD(device, fd);
             return ret;
         }
 
@@ -136,7 +134,13 @@ namespace IHM
             dev = protocomm.devserial_create();
             return dev;
         }
-        
+
+        public int SerialSetFd(SWIGTYPE_p_proto_Device_t dev, int fd)
+        {
+            int ret = protocomm.devserial_setFD(dev, fd);
+            return ret;
+        }
+
         /// <summary>
         /// Fournit une string de description du status
         /// </summary>
@@ -155,5 +159,6 @@ namespace IHM
             };
             return lszStatus[(int)status];
         }
+
     }
 }

@@ -176,12 +176,15 @@ int devserial_setFD(proto_Device_t this, int fileDescriptor) {
 	// On ferme les ressources existantes
 	devserial_close(this);
 
+// 20200924 SLI - Sous android on n'a peut-être pas la possibilité 
+#ifdef SET_FD_MODE
     int ret = setFdMode(fileDescriptor, 0, 0);
 	if (ret < 0)
 	{
 		LOG("setFdMode error : aborted");
 		return -1;
 	}
+#endif
     proto_dev_serial_t* infos = this->user;
     infos->fileDescriptor = fileDescriptor;
     return 0;
