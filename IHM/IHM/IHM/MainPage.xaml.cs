@@ -81,6 +81,18 @@ namespace IHM
                         msgSend = "reg" + i.ToString() + "val " + regVal.ToString() + ": " + dll_if.ProtoStatusGetString(status);
                         m_textLog.Insert(0, DateTime.Now.ToString(" HH:mm ") + " " + msgSend);   //Pour l'affichage en temps réelle dans la dialogue
                         logfile.Info(msgSend, "");  // Pour le stockage dans le fichier
+
+                        //Affichage du log de la dll
+                        msgSend = "";
+                        while (protocomm.log_global_pop(msgSend) != 0)
+                        {
+                            if( string.Compare(msgSend,"") != 0 )
+                            {
+                                m_textLog.Insert(0, DateTime.Now.ToString(" HH:mm ") + " " + msgSend);   //Pour l'affichage en temps réelle dans la dialogue
+                                logfile.Info(msgSend, "");  // Pour le stockage dans le fichier
+                            }
+                        }
+                            
                     }
                     catch (Exception ex)
                     {
@@ -115,6 +127,17 @@ namespace IHM
                 {
                     m_lRegsLbl[i].Text = regVal.ToString();
                 }
+
+                //Affichage du log de la dll
+                msgReceive = "";
+                while ( protocomm.log_global_pop(msgReceive) != 0 )
+                {
+                    if (string.Compare(msgReceive, "") != 0)
+                    {
+                        m_textLog.Insert(0, DateTime.Now.ToString(" HH:mm ") + " " + msgReceive);   //Pour l'affichage en temps réelle dans la dialogue
+                        logfile.Info(msgReceive, "");  // Pour le stockage dans le fichier
+                    }
+                }
             }
 
             
@@ -124,13 +147,14 @@ namespace IHM
             //To do : call method to connect
             ObservableCollection<string> usbNames = new ObservableCollection<string>();
             popupView.IsVisible = true;
-            usbList.ItemsSource = usbNames;
             usbNames.Add("EmulSlave");
             ICollection<string> allNames = usbManager_.getListOfConnections();
             foreach (string name in allNames)
             {
                 usbNames.Add(name);
             }
+
+            usbList.ItemsSource = usbNames;
         }
         void OnButtonDisconnectClicked(object sender, EventArgs e)
         {
@@ -177,7 +201,7 @@ namespace IHM
                     // Récupére notre FD avec l'USBManager pour l'affecter à la lib
                     fd = iusbManager.getDeviceConnection();
                     int ret = m_dll_if.SerialSetFd(dev, fd);
-                    if( ret < )
+                    //if( ret < )
                 };
             }
             // Gestion de l'affichage
@@ -210,12 +234,14 @@ namespace IHM
 
         private void fillLog()
         {
+            FileStream fileLog;
             m_textLog.Clear();
 
             //Création du fichier
             if (!File.Exists(m_filename))
             {
-                File.Create(m_filename);
+                fileLog = File.Create(m_filename);
+                fileLog.Close();
             }
 
             foreach (string line in File.ReadAllLines(m_filename))

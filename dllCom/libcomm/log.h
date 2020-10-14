@@ -40,6 +40,8 @@ extern "C" {
 #define LOG_USE_CONSOLE
 #ifdef LOG_USE_FIFO
 #define LOG(fmt, args...) LOG_PUSH(_this, fmt##args)
+#elif defined(LOG_USE_GLOBAL_FIFO)
+#define LOG(fmt, args...) LOG_GLOBAL_PUSH(fmt##args)
 #elif defined(LOG_USE_CONSOLE)
 #define LOG(fmt, args...) printf(fmt,##args)
 #else

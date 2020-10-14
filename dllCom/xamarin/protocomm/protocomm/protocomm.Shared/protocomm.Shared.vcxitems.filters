@@ -20,6 +20,9 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)..\..\..\..\libcomm\devices\device_serial.c">
       <Filter>dll</Filter>
     </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\..\..\libcomm\log.c">
+      <Filter>dll</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="$(MSBuildThisFileDirectory)protocomm.h" />

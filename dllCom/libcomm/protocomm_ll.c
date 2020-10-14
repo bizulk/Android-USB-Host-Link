@@ -1,4 +1,5 @@
 #include "protocomm_ll.h"
+#include "log.h"
 
 #include <assert.h>
 #include <string.h>
@@ -63,8 +64,12 @@ void proto_setReceiver(proto_hdle_t* this, proto_OnReception_t callback, void* u
 }
 
 int proto_writeFrame(proto_hdle_t* this, proto_Command_t command, proto_frame_data_t const* args) {
-    uint8_t nbBytes = proto_makeFrame(&this->priv_frame, command, args);
-    return this->priv_iodevice->write(this->priv_iodevice, &this->priv_frame, nbBytes);
+    int ret = 0;
+	uint8_t nbBytes = proto_makeFrame(&this->priv_frame, command, args);
+    ret = this->priv_iodevice->write(this->priv_iodevice, &this->priv_frame, nbBytes);
+
+    LOG("error : proto_writeFrame nbBytes : %d", nbBytes);
+    return ret;
 }
 
 uint8_t proto_makeFrame(proto_Frame_t* frame, proto_Command_t command, proto_frame_data_t const* args) {
@@ -104,6 +109,7 @@ proto_Status_t proto_readFrame(proto_hdle_t* this, int16_t tout_ms) {
     else if( nbRead < 0)
     {
         ret = proto_ERR_SYS;
+        LOG("error : nbRead est inférieur à O (protocomm_ll.c) len :%d nbRead : %d", len, nbRead);
     }
     else if( nbRead == 0)
     {

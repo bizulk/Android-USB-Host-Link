@@ -14,7 +14,7 @@ using Android.Content;
 namespace IHM.Droid
 {
     [Activity(Label = "IHM", Icon = "@mipmap/icon", Theme = "@style/MainTheme", MainLauncher = true, ConfigurationChanges = ConfigChanges.ScreenSize | ConfigChanges.Orientation)]
-    public class MainActivity : global::Xamarin.Forms.Platform.Android.FormsAppCompatActivity
+    public class MainActivity : Xamarin.Forms.Platform.Android.FormsAppCompatActivity
     {
         protected override void OnCreate(Bundle savedInstanceState)
         {
@@ -35,7 +35,7 @@ namespace IHM.Droid
             //Pour l'utilisation du service de téléchargement et de partage, récupération du path où enregistrer le fichier
             Xamarin.Forms.DependencyService.Register<DroidLocalStoragePath>();
 
-            global::Xamarin.Forms.Forms.Init(this, savedInstanceState);
+            Xamarin.Forms.Forms.Init(this, savedInstanceState);
             Xamarin.Forms.DependencyService.Get<IUsbManager>().Init(this);
             LoadApplication(new App());
 
