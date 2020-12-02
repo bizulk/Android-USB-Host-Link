@@ -171,6 +171,75 @@ public class protocomm {
     return ret;
   }
 
+  public static SWIGTYPE_p_log_handle log_create(uint nbMsg) {
+    global::System.IntPtr cPtr = protocommPINVOKE.log_create(nbMsg);
+    SWIGTYPE_p_log_handle ret = (cPtr == global::System.IntPtr.Zero) ? null : new SWIGTYPE_p_log_handle(cPtr, false);
+    return ret;
+  }
+
+  public static int log_destroy(SWIGTYPE_p_log_handle _this) {
+    int ret = protocommPINVOKE.log_destroy(SWIGTYPE_p_log_handle.getCPtr(_this));
+    return ret;
+  }
+
+  public static int log_push(SWIGTYPE_p_log_handle _this, string szMsg) {
+    int ret = protocommPINVOKE.log_push(SWIGTYPE_p_log_handle.getCPtr(_this), szMsg);
+    return ret;
+  }
+
+  public static int log_pop(SWIGTYPE_p_log_handle _this, string szMsg) {
+    int ret = protocommPINVOKE.log_pop(SWIGTYPE_p_log_handle.getCPtr(_this), szMsg);
+    return ret;
+  }
+
+  public static uint log_getsize(SWIGTYPE_p_log_handle _this) {
+    uint ret = protocommPINVOKE.log_getsize(SWIGTYPE_p_log_handle.getCPtr(_this));
+    return ret;
+  }
+
+  public static uint log_getfree(SWIGTYPE_p_log_handle _this) {
+    uint ret = protocommPINVOKE.log_getfree(SWIGTYPE_p_log_handle.getCPtr(_this));
+    return ret;
+  }
+
+  public static void log_clear(SWIGTYPE_p_log_handle _this) {
+    protocommPINVOKE.log_clear(SWIGTYPE_p_log_handle.getCPtr(_this));
+  }
+
+  public static int log_global_create(uint nbMsg) {
+    int ret = protocommPINVOKE.log_global_create(nbMsg);
+    return ret;
+  }
+
+  public static int log_global_destroy() {
+    int ret = protocommPINVOKE.log_global_destroy();
+    return ret;
+  }
+
+  public static int log_global_push(string szMsg) {
+    int ret = protocommPINVOKE.log_global_push(szMsg);
+    return ret;
+  }
+
+  public static int log_global_pop(string szMsg) {
+    int ret = protocommPINVOKE.log_global_pop(szMsg);
+    return ret;
+  }
+
+  public static uint log_global_getsize() {
+    uint ret = protocommPINVOKE.log_global_getsize();
+    return ret;
+  }
+
+  public static uint log_global_getfree() {
+    uint ret = protocommPINVOKE.log_global_getfree();
+    return ret;
+  }
+
+  public static void log_global_clear() {
+    protocommPINVOKE.log_global_clear();
+  }
+
   public static readonly int PROTO_FRAME_RECV_TOUT_MS = protocommPINVOKE.PROTO_FRAME_RECV_TOUT_MS_get();
   public static readonly int proto_START_OF_FRAME = protocommPINVOKE.proto_START_OF_FRAME_get();
   public static readonly int proto_COMMAND_OFFSET = protocommPINVOKE.proto_COMMAND_OFFSET_get();
@@ -179,4 +248,5 @@ public class protocomm {
 
   public static readonly int PROTO_WAIT_FOREVER = protocommPINVOKE.PROTO_WAIT_FOREVER_get();
   public static readonly int EMULSLAVE_NB_REGS = protocommPINVOKE.EMULSLAVE_NB_REGS_get();
+  public static readonly int LOG_MSG_LEN = protocommPINVOKE.LOG_MSG_LEN_get();
 }

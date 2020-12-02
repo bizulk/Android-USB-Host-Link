@@ -45,6 +45,11 @@
 			<locationURI>PARENT-1-PROJECT_LOC/libcomm/libcomm_global.h</locationURI>
 		</link>
 		<link>
+			<name>Inc/log.h</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/libcomm/log.h</locationURI>
+		</link>
+		<link>
 			<name>Inc/proto_iodevice.h</name>
 			<type>1</type>
 			<locationURI>PARENT-1-PROJECT_LOC/libcomm/proto_iodevice.h</locationURI>
@@ -78,6 +83,11 @@
 			<name>src/device_stm32.c</name>
 			<type>1</type>
 			<locationURI>PARENT-1-PROJECT_LOC/libcomm/devices/device_stm32.c</locationURI>
+		</link>
+		<link>
+			<name>src/log.c</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/libcomm/log.c</locationURI>
 		</link>
 		<link>
 			<name>src/protocomm_ll.c</name>

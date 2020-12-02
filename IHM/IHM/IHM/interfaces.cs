@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace IHM
 {
@@ -17,10 +18,12 @@ namespace IHM
         void Init(Object context);
 
         /// <summary>
-        /// Fonctions pour pouvoir afficher la liste des devices connecter
+        /// Fonctions pour pouvoir afficher la liste des devices connectés
         /// </summary>
-        /// <returns> une liste du nom de chaque connections </returns>
+        /// <returns> une liste du nom de chaque connexion </returns>
         ICollection<string> getListOfConnections();
+
+       Task<ICollection<string>> getListOfConnectionsAsync();
 
         /// <summary>
         /// Fonction pour choisir le nom du device avec lequel effectuer la connection 

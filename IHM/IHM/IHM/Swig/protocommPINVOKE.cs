@@ -411,4 +411,49 @@ class protocommPINVOKE {
 
   [global::System.Runtime.InteropServices.DllImport("protocomm", EntryPoint="CSharp_devserial_getFD")]
   public static extern int devserial_getFD(global::System.Runtime.InteropServices.HandleRef jarg1);
+
+  [global::System.Runtime.InteropServices.DllImport("protocomm", EntryPoint="CSharp_LOG_MSG_LEN_get")]
+  public static extern int LOG_MSG_LEN_get();
+
+  [global::System.Runtime.InteropServices.DllImport("protocomm", EntryPoint="CSharp_log_create")]
+  public static extern global::System.IntPtr log_create(uint jarg1);
+
+  [global::System.Runtime.InteropServices.DllImport("protocomm", EntryPoint="CSharp_log_destroy")]
+  public static extern int log_destroy(global::System.Runtime.InteropServices.HandleRef jarg1);
+
+  [global::System.Runtime.InteropServices.DllImport("protocomm", EntryPoint="CSharp_log_push")]
+  public static extern int log_push(global::System.Runtime.InteropServices.HandleRef jarg1, string jarg2);
+
+  [global::System.Runtime.InteropServices.DllImport("protocomm", EntryPoint="CSharp_log_pop")]
+  public static extern int log_pop(global::System.Runtime.InteropServices.HandleRef jarg1, string jarg2);
+
+  [global::System.Runtime.InteropServices.DllImport("protocomm", EntryPoint="CSharp_log_getsize")]
+  public static extern uint log_getsize(global::System.Runtime.InteropServices.HandleRef jarg1);
+
+  [global::System.Runtime.InteropServices.DllImport("protocomm", EntryPoint="CSharp_log_getfree")]
+  public static extern uint log_getfree(global::System.Runtime.InteropServices.HandleRef jarg1);
+
+  [global::System.Runtime.InteropServices.DllImport("protocomm", EntryPoint="CSharp_log_clear")]
+  public static extern void log_clear(global::System.Runtime.InteropServices.HandleRef jarg1);
+
+  [global::System.Runtime.InteropServices.DllImport("protocomm", EntryPoint="CSharp_log_global_create")]
+  public static extern int log_global_create(uint jarg1);
+
+  [global::System.Runtime.InteropServices.DllImport("protocomm", EntryPoint="CSharp_log_global_destroy")]
+  public static extern int log_global_destroy();
+
+  [global::System.Runtime.InteropServices.DllImport("protocomm", EntryPoint="CSharp_log_global_push")]
+  public static extern int log_global_push(string jarg1);
+
+  [global::System.Runtime.InteropServices.DllImport("protocomm", EntryPoint="CSharp_log_global_pop")]
+  public static extern int log_global_pop(string jarg1);
+
+  [global::System.Runtime.InteropServices.DllImport("protocomm", EntryPoint="CSharp_log_global_getsize")]
+  public static extern uint log_global_getsize();
+
+  [global::System.Runtime.InteropServices.DllImport("protocomm", EntryPoint="CSharp_log_global_getfree")]
+  public static extern uint log_global_getfree();
+
+  [global::System.Runtime.InteropServices.DllImport("protocomm", EntryPoint="CSharp_log_global_clear")]
+  public static extern void log_global_clear();
 }

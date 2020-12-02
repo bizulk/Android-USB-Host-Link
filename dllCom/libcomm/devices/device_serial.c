@@ -11,7 +11,7 @@
 #include <string.h>
 #include <ctype.h>
 #include <errno.h>
-
+#include "log.h"
 
 /******************************************************************************
  * TYPES & VARIABLES
@@ -99,6 +99,8 @@ static int devserial_close(struct proto_IfaceIODevice* this)
 
     proto_dev_serial_t* infos = this->user;
 
+	log_global_destroy();
+
 	if (infos->fileDescriptor >=0)
 	{
 		ret = close(infos->fileDescriptor);
@@ -112,21 +114,28 @@ static int devserial_close(struct proto_IfaceIODevice* this)
 
 static int devserial_open(struct proto_IfaceIODevice* this, const char * szPath)
 {
-
     assert(this && szPath);
 
     proto_dev_serial_t* infos = this->user;
 
     devserial_close(this);
 
-    int fd = open(szPath, O_RDWR);
-    if (fd < 0)
-        return fd;
+    log_global_create(10);
 
-    infos->fileDescriptor = fd;
-    // vtime = 0, vmin = 0 : les appels à "read" sont non-bloquants
-	// TODO SLI : c'était possible de les rendre bloquants, la fonction de haut niveau contrôlant le temps écoulé
-    return setFdMode(infos->fileDescriptor, 0, 0);
+	/* On autorise un path vide pour la récupération */
+	if (strlen(szPath) > 0)
+	{
+		int fd = open(szPath, O_RDWR);
+		LOG("OPEN fd :%d", fd);
+		if (fd < 0)
+			return fd;
+		infos->fileDescriptor = fd;
+		// vtime = 0, vmin = 0 : les appels à "read" sont non-bloquants
+		// TODO SLI : c'était possible de les rendre bloquants, la fonction de haut niveau contrôlant le temps écoulé
+		return setFdMode(infos->fileDescriptor, 0, 0);
+	}
+	
+	return 0;
 }
 
 
@@ -148,13 +157,17 @@ static int devserial_write(struct proto_IfaceIODevice* this, const void * buffer
 		return -1;
     while (size > 0) {
         int ret = write(infos->fileDescriptor, buffer, size);
-        if (ret < 0)
-            return -1;
+		if (ret < 0)
+		{
+			LOG("error : %s", strerror(ret));
+			return -1;
+		}
         else {
             buffer += ret; // octets qui restent à transmettre
             size -= ret;
         }
     }
+	LOG("%d bytes sent", size);
     return 0;
 }
 
@@ -163,11 +176,19 @@ int devserial_setFD(proto_Device_t this, int fileDescriptor) {
 
 	if (fileDescriptor < 0)
 		return -1;
-    int ret = setFdMode(fileDescriptor, 0, 0);
-    if (ret < 0)
-        return -1;
 
-    devserial_close(this);
+	// On ferme les ressources existantes
+	devserial_close(this);
+
+// 20200924 SLI - Sous android on n'a peut-être pas la possibilité 
+#ifdef SET_FD_MODE
+    int ret = setFdMode(fileDescriptor, 0, 0);
+	if (ret < 0)
+	{
+		LOG("setFdMode error : aborted");
+		return -1;
+	}
+#endif
     proto_dev_serial_t* infos = this->user;
     infos->fileDescriptor = fileDescriptor;
     return 0;

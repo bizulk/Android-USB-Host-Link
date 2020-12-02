@@ -1,0 +1,56 @@
+Test du projet UsbSerialForAndroid porté sur Xamarin.
+Téléchargement du zip
+mise au point pour la génération : 
+	déploiement à activer (capricieux ça se désactive, il faut 'senfoncer dasn la configuration')
+	il faut ajouter le device St à la liste des drivers connus : ccb3696fe0537ce773aed99e5a82aa619955e19f
+	
+Test : le device est listé, le driver est appliqué et on va pas plus loin. pas possible de debogger pour l'instant ! (il faut la tablette solsolution)
+
+
+Installation du paquetage Nuget dans le projet Android Filaire.
+	https://www.nuget.org/packages/LusoVU.XamarinUsbSerialForAndroid/
+
+J'ai essayé "dépioter le code de démo" pour l'intégrer dans l'interface de l'IHM de test mais c'est impossible : le driver est fortement ancré dans la notion de tâche et la notion d'activité android, et basé sur la notification.
+Il faut réaliser une intégration de plus haut niveau ou indépendamment de l'application
+
+note : attention la connexion des câbles ne supporte qu'un sens : l'adaptateur mâle-femelle doit être du côté de la tablette.
+
+-------------------------------------------------------------------------------
+Jeudi 30/07
+
+Je me rabats sur le getting started du projet d'origine qui est plus simple.
+J'ai réussi à implémenter le driver : 
+	- je ne suis pas arrivé à utiliser la fonction async FindAllDriver de UsbSerialForAndroid : l'attente sur le thread bloque indéfiniment. C'est surement conçu de cette façon. ==> Je me suis rabattu sur la méthode utilisant directement l'USBManager
+	- En conséquence j'obtiens seulement un usbdevice (USBManager) mais la méthode UsbSerialForAndroid::ProbeDevice existe pour créer le driver à partir de l'USBDevice (ouf)
+	
+La connexion est capricieuse l'appli crash à la première demande d'autorisation, mais à la relance la connexion semble réussir.
+Le échange ne fonctionnent  pas : timeout (pas implémentée ?) 
+
+-------------------------------------------------------------------------------
+Jeudi 31/07
+
+je teste en debug avec ma tablette iWork
+Lors de la première demande de permission une exception est levée : _usbManager.GetAccessoryList()[0] (pas d'élément)
+Mais la demande est confirmée et la relance de l'application passe l'étape.
+
+Revue la création du devserial : m_dll_if.CreateDevSerial(), "/dev/null")
+==> permettre une chaine vide pour l'application d'un FD
+
+Correction ordre des appels : open en doublon, close mal placé ce qui fait que ça n'aurait jamais pu marcher.
+
+Ajout log d'appel dans la lib (printf) mais je n'arrive pas à les visualiser (syslog, console debogger... ?)
+
+-------------------------------------------------------------------------------
+Jeudi 21/09/
+
+
+Reprise du code pour ajouter commentaire.
+relecture doc android à propos de la connectivité USB : Accessoire ou Périphérique alimenté.
+
+https://developer.android.com/guide/topics/connectivity/usb/accessory#java
+https://developer.android.com/guide/topics/connectivity/usb/host
+
+On est normalement dans le second cas il faut utiliser la fonction openDevice et non OPen accessory
+
+Je test si le setfd dans la dll pose problème.
+

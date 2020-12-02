@@ -16,6 +16,7 @@
   <ItemGroup>
     <ClCompile Include="$(MSBuildThisFileDirectory)..\..\..\..\libcomm\devices\device_emulslave.c" />
     <ClCompile Include="$(MSBuildThisFileDirectory)..\..\..\..\libcomm\devices\device_serial.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\..\..\libcomm\log.c" />
     <ClCompile Include="$(MSBuildThisFileDirectory)..\..\..\..\libcomm\protocomm_ll.c" />
     <ClCompile Include="$(MSBuildThisFileDirectory)..\..\..\..\libcomm\protocomm_master.c" />
     <ClCompile Include="$(MSBuildThisFileDirectory)..\..\..\..\libcomm\protocomm_slave.c" />
@@ -26,6 +27,7 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)..\..\..\..\libcomm\devices\device_emulslave.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)..\..\..\..\libcomm\devices\device_serial.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)..\..\..\..\libcomm\libcomm_global.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\..\..\libcomm\log.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)..\..\..\..\libcomm\protocomm_ll.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)..\..\..\..\libcomm\protocomm_master.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)..\..\..\..\libcomm\protocomm_slave.h" />

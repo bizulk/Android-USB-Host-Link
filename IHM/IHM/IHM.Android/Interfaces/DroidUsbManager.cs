@@ -13,7 +13,7 @@ using Android.Widget;
 using Android.Hardware.Usb;
 
 using IHM;
-
+using System.Threading.Tasks;
 
 namespace IHM.Droid.Interfaces
 {
@@ -26,14 +26,18 @@ namespace IHM.Droid.Interfaces
 
         public void Init(Object context)
         {
-            /* TODO : Do Droid Stuff */
-            // Je mets -1 exprès pour mettre en evidence le fait que l'on a pas encore fait le taff
             usbManager_ = (UsbManager)((ContextWrapper)context).GetSystemService(Context.UsbService);
         }
 
         public ICollection<string> getListOfConnections()
         {
             return usbManager_.DeviceList.Keys;
+        }
+
+        public Task<ICollection<string>> getListOfConnectionsAsync()
+        {
+            // On fait la meme chose
+            return new Task<ICollection<string>> (getListOfConnections);
         }
 
         public void selectDevice(string name)
