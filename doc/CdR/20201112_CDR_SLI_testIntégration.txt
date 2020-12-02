@@ -13,7 +13,7 @@ Installation du paquetage Nuget dans le projet Android Filaire.
 J'ai essayé "dépioter le code de démo" pour l'intégrer dans l'interface de l'IHM de test mais c'est impossible : le driver est fortement ancré dans la notion de tâche et la notion d'activité android, et basé sur la notification.
 Il faut réaliser une intégration de plus haut niveau ou indépendamment de l'application
 
-note : attention la connexion des câbles ne supporte qu'un sens : l'adaptateur mal-femelle doit être du côté de la tablette.
+note : attention la connexion des câbles ne supporte qu'un sens : l'adaptateur mâle-femelle doit être du côté de la tablette.
 
 -------------------------------------------------------------------------------
 Jeudi 30/07

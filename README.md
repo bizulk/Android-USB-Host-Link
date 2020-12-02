@@ -2,7 +2,7 @@
 
 Le but du projet est de mettre en oeuvre une solution de communication entre une Interface développée avec Xamarin pour Android, et une cible ARM implémentant le Virtual COM Port sur un port USB.
 
-Regroupe les projets sur cible, PC et tablette... 
+Regroupe les projets sur cible, PC et tablette, et la documentation (retour d'expérience, compte-rendu de projet).
 
 1. TestUSBTerminal : Projet sur cible STM32 Nucléo, embarquant plusieurs projets : test de communication USB, le protocole dllCom, ...
 2. IHMTablette : IHM de test tablette de communication sur USB, embarquant le protocole dllCom.
