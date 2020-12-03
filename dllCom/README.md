@@ -1,18 +1,5 @@
 Ici se trouvent les codes source sur la partie dllComm en C.
 
-SLI 
-	OK je vois bien qu'il y a des instructions de compilation, mais moi je travaille sous windows,
-	OK je pourrais tester les WSL pour compiler, Mais cela serait plus satisfaisant d'avoir une gestion de projet : 
-		> il faut générer une lib,
-		> Les applis de test se link dessus.
-		> il faut un profil debug/release, vous ne maîtrisez pas actuellement votre profil de compilation. A la livraison tout sera testé en Release (ie avec les optimisations activées).
-		
-	Générer un projet de lib sous QtCreator c'est assez rapide, et proposera une abstraction par rapport au toolkit utilisé. Une souplesse par rapport aux fichier à inclure ou pas.
-	Prenez le toolkit Qt mingw qui vous convient sur l'installeur Qt (je peux vous passer l'installeur en ligne)
-SLI END
-
-	ATTENTION ! Il ne s'agit de faire une lib qui correspond à ce que CIO dispose, même s'il existe de meilleurs implémentation.
-	L'implémentation sous-jacente peut présenter un découplage fort comme actuellement fait mais il me faut une implémentation d'une lib côté master qui correspond à ce que j'ai :
 	ouverture d'un port : proto_cio_master_open( "/dev/ttyS0" )
 	envoie d'une demande avec récupération de la réponse : 
 		- proto_cio_master_write( args ) (ret : OK ou error)
@@ -47,27 +34,12 @@ fichiers qui nous intéressent.
 
 ### libcomm-emulslave-test
 
-Compilation puis exécution (sous Linux) :
-```
-gcc libcomm/libcomm.c libcomm/libcomm-emulslave.c -Ilibcomm libcomm-emulslave-test/main.c -o out
-./out
-```
-Résultat attendu :
-```
-Tous les tests ont réussi !
-```
+Compilation puis exécution : use Qt Creator.
 
 ### libcomm-gnulinux-test
 
 Ce test ne fonctionne que sous GNU/Linux avec un pseudo-terminal.
 Il faut également avoir un compilateur gérant la norme C11 ainsi que la bibliothèque standard des threads `<threads.h>`.
 
-Compilation puis exécution :
-```
-gcc libcomm/libcomm.c libcomm/libcomm-gnulinux.c -Ilibcomm libcomm-gnulinux-test/main.c -o out -lpthread
-./out
-```
-Résultat attendu :
-```
-Tout s'est bien passé !
-```
+
+Compilation puis exécution : use Qt Creator.
