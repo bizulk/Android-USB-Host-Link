@@ -37,7 +37,8 @@ extern "C" {
 /// si défini, alors on utilisera une fifo, sinon on utilisera un printf
 /// TODO
 //#define LOG_USE_FIFO
-#define LOG_USE_CONSOLE
+//#define LOG_USE_CONSOLE
+#define LOG_USE_GLOBAL_FIFO
 #ifdef LOG_USE_FIFO
 #define LOG(fmt, args...) LOG_PUSH(_this, fmt##args)
 #elif defined(LOG_USE_GLOBAL_FIFO)

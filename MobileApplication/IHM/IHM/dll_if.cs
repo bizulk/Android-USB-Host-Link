@@ -65,6 +65,12 @@ namespace IHM
             {
                 return -1;
             }
+
+            ret = protocomm.log_global_create(10);
+            if (ret != 0)
+            {
+                return -1;
+            }
             return ret;
         }
 
@@ -79,6 +85,8 @@ namespace IHM
             protocomm.proto_master_destroy(m_handle);
             //On met l'handle à null pour signifier qu'on s'est déconnecté
             m_handle = null;
+            // Réinitialisation du log
+            protocomm.log_global_destroy();
         }
 
         /// <summary>
