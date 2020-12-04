@@ -37,7 +37,8 @@ extern "C" {
 /// si défini, alors on utilisera une fifo, sinon on utilisera un printf
 /// TODO
 //#define LOG_USE_FIFO
-#define LOG_USE_CONSOLE
+//#define LOG_USE_CONSOLE
+//#define LOG_USE_GLOBAL_FIFO
 #ifdef LOG_USE_FIFO
 #define LOG(fmt, args...) LOG_PUSH(_this, fmt##args)
 #elif defined(LOG_USE_GLOBAL_FIFO)
@@ -47,6 +48,8 @@ extern "C" {
 #else
 #define LOG(fmt, args...)
 #endif
+
+#define CONCAT(x,y) x##y
 
 /// Instance de notre log
 typedef struct log_handle * log_phandle_t;
@@ -62,7 +65,7 @@ typedef struct log_handle * log_phandle_t;
 #define LOG_PUSH(_this, fmt, args...) do\
 {\
     char szMsg[100]={0};\
-    snprintf( szMg, LOG_MSG_LEN, "%s:%d -"##fmt, __FUNCTION__, __LINE__ -2,##args);\
+    snprintf( szMg, LOG_MSG_LEN, CONCAT("%s:%d -", fmt), __FUNCTION__, __LINE__ -2, ## args);\
     log_push(_this, szMg);\
  } while(0);
 
@@ -72,8 +75,8 @@ typedef struct log_handle * log_phandle_t;
 #define LOG_GLOBAL_PUSH(fmt, args...) do\
 {\
     char szMsg[100]={0};\
-    snprintf( szMg, LOG_MSG_LEN, "%s:%d -"##fmt, __FUNCTION__, __LINE__ -2,##args);\
-    log_global_push(szMg);\
+    snprintf( szMsg, LOG_MSG_LEN, CONCAT("%s:%d -", fmt), __FUNCTION__, __LINE__ -2, ## args);\
+    log_global_push(szMsg);\
  } while(0);
 
 

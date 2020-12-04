@@ -99,8 +99,6 @@ static int devserial_close(struct proto_IfaceIODevice* this)
 
     proto_dev_serial_t* infos = this->user;
 
-	log_global_destroy();
-
 	if (infos->fileDescriptor >=0)
 	{
 		ret = close(infos->fileDescriptor);
@@ -119,8 +117,6 @@ static int devserial_open(struct proto_IfaceIODevice* this, const char * szPath)
     proto_dev_serial_t* infos = this->user;
 
     devserial_close(this);
-
-    log_global_create(10);
 
 	/* On autorise un path vide pour la récupération */
 	if (strlen(szPath) > 0)
@@ -206,6 +202,7 @@ static int devserial_open(struct proto_IfaceIODevice* this, const char * szPath)
 {
     UNUSED(this);
     UNUSED(szPath);
+
     return -1;
 }
 
@@ -239,7 +236,7 @@ int devserial_openFD(proto_Device_t _this, int fileDescriptor) {
 }
 
 
-#endif
+#endif // if __linux__ not defined
 
 proto_Device_t devserial_create(void)
 {

@@ -4,6 +4,10 @@ using System.Text;
 
 namespace IHM
 {
+    /// <summary>
+    /// this is a wrapper generated of the dllComm library.
+    /// </summary>
+    /// 
     /* vu comme c'est crée : je pense qu'il faut déifnir une IProtoIFace, et dll_if l'instancie
      Et elle contient son instance de protocomm.
      Sinon pour le singleton, pas obligatoire peut-être pour cette appli, et le "lazy" ça peut marcher (moins lourd a lire mais tu as peut-être un avis là dessus ?)
@@ -38,7 +42,7 @@ namespace IHM
         }
 
         /// <summary>
-        /// Ouverture de la connexion
+        /// Initialize library
         /// </summary>
         /// <param name="device"> device pour la connexion </param>
         /// <param name="szPath"> path à passer au protocole </param>
@@ -61,6 +65,12 @@ namespace IHM
             {
                 return -1;
             }
+
+            ret = protocomm.log_global_create(10);
+            if (ret != 0)
+            {
+                return -1;
+            }
             return ret;
         }
 
@@ -75,6 +85,8 @@ namespace IHM
             protocomm.proto_master_destroy(m_handle);
             //On met l'handle à null pour signifier qu'on s'est déconnecté
             m_handle = null;
+            // Réinitialisation du log
+            protocomm.log_global_destroy();
         }
 
         /// <summary>

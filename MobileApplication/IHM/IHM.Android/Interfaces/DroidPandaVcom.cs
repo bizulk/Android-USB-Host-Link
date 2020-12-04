@@ -19,23 +19,25 @@ using IHM;
 namespace IHM.Droid.Interfaces
 {
     /// <summary>
-    /// Implementation de l'USB Manager en utilisant USBSerialForAndroid
-    /// Selso LIBERADO
-    /// Pour les essais on utilise l'API direct car l'async exige de revoir la conception
+    /// THIS IS THE USB INTERFACE WE ARE WORKING ON 
+    /// It requires the nuget package USBSerialForAndroid
+    /// We don't use the await/async call as they are not adapted to final application.
+    /// 
+    /// Selso LIBERADO selso.liberado@ciose.fr
     /// </summary>
     class DroidPandaVcom : IUsbManager
     {
         public static String ACTION_USB_PERMISSION = "com.android.example.USB_PERMISSION";
-        private UsbManager _usbManager; // Usb Manager d'Androïd
-        private IList<IUsbSerialDriver> _availableDrivers; // Utilise pour l'écoute de connexion USB
-        IUsbSerialDriver _currDriver; // Driver appliqué à la sélection d'un périphérique
-        Object _context; // C'est l'instance d'activity Android 
-        int _fd; // Le descripteur de fichier crée avec l'usbmanager à passer à la lib.
-        public const int iVendorId = 0x0483;
-        public const int iProductID = 0x5740;
+        private UsbManager _usbManager; // Android Usb Manager
+        private IList<IUsbSerialDriver> _availableDrivers; // Manage all available driver from package
+        IUsbSerialDriver _currDriverIface; // Currently applied driver
+        Object _context; // Android activity context
+        int _fd; // System file descriptor we will pass to dllCom library.
+        public const int iVendorId = 0x0483; // Id for the STM32Nucleo
+        public const int iProductID = 0x5740; // Id for the STM32Nucleo
 
         /// <summary>
-        /// L'initialisation des membres et récupération de l'instance d'USBManager
+        /// We initialize all Android context
         /// </summary>
         /// <param name="context"></param>
         public void Init(Object context)
@@ -45,21 +47,26 @@ namespace IHM.Droid.Interfaces
             _usbManager = (UsbManager)((ContextWrapper)context).GetSystemService(Context.UsbService);
         }
 
-        // Récupération synchrone de la liste des périphériques connectés
+        // Retreive the connected device.
         public ICollection<string> getListOfConnections()
         {
+            // Two ways : 
+            // - Use the usbserial to retreive names
+            // - Use the UsbManager (but we get system path, not pretty)
 #if USE_USBSERIAL_FINDER
-            // On appelle la méthode USB Sérial de façon synchrone
-            // Mais ça bloque et je ne sais pas pourquoi
+            // BUG : freezed code :(
             return getListOfConnectionsAsync().GetAwaiter().GetResult();
 #else
-           // L'autre méthode est d'interrroger l'USB Manager qui liste ce qu'il a
-           // A vérifier : je pense que la liste est moins parlante qu'avec l'autre méthode
             return _usbManager.DeviceList.Keys;
 #endif
         }
 
-
+        /// <summary>
+        /// This method is based on the USBSerial package example
+        /// We add the STM32 as a CDC product.
+        /// BUG : we stay blocked in the FindAllDriversAsync wen calling getListOfConnections()
+        /// </summary>
+        /// <returns></returns>
         public async Task<ICollection<string>> getListOfConnectionsAsync()
         {
 
@@ -69,7 +76,6 @@ namespace IHM.Droid.Interfaces
             table.AddProduct(iVendorId, iProductID, Java.Lang.Class.FromType(typeof(CdcAcmSerialDriver)));
             var prober = new UsbSerialProber(table);
 
-            // !!! On reste bloqué dans la fonction
             _availableDrivers = await prober.FindAllDriversAsync(_usbManager);
             if (_availableDrivers.Count == 0)
             {
@@ -92,37 +98,42 @@ namespace IHM.Droid.Interfaces
 #if USE_USBSERIAL_FINDER
             // TODO (mais le finder marche pas pour l'instant c'est bloqué)
 #else
-            // setting a unique  driver  CDC Acm for the St Eval Board
+            // Because we did not use the UsbSerial to probe the device we do theses steps here 
+            // Steps are : 
+            //  - Probe device
+            //  
+            // Probing a unique  driver  CDC Acm for the St Eval Board
             var table = new ProbeTable();
             table.AddProduct(iVendorId, iProductID, Java.Lang.Class.FromType(typeof(CdcAcmSerialDriver)));
             var prober = new UsbSerialProber(table);
-            _currDriver = prober.ProbeDevice(_usbManager.DeviceList[name]);
+            _currDriverIface = prober.ProbeDevice(_usbManager.DeviceList[name]);
             // Ask for permission to access the created device
-            if (!_usbManager.HasPermission(_currDriver.Device))
+            if (!_usbManager.HasPermission(_currDriverIface.Device))
             {
                 PendingIntent pi = PendingIntent.GetBroadcast((ContextWrapper)_context, 0, new Intent(ACTION_USB_PERMISSION), 0);
-                _usbManager.RequestPermission(_currDriver.Device, pi);
+                _usbManager.RequestPermission(_currDriverIface.Device, pi);
 
-                /* On redemande car il se peut que ça n'est pas été donnée.
-                 * _usbManager.GetAccessoryList()[0])
-                 * Normalement on est sur un device donc pas de requête sur accessory
+                /* We check the permission was given
                  */
-                if (! _usbManager.HasPermission(_currDriver.Device) )
+                if (! _usbManager.HasPermission(_currDriverIface.Device) )
                 {
                     return;
                 }
             }
-
+            // Now open the port, two ways :
+            // - Use the USB Manager : we get the FD and pass to library, no more
+            // - Use USbSerial : We can do more things like R/W operations
 #if true
             // Use the UsbManager to retreive the native file descriptor
-            UsbDeviceConnection connection = _usbManager.OpenDevice(_currDriver.Device);
+            UsbDeviceConnection connection = _usbManager.OpenDevice(_currDriverIface.Device);
             if (connection != null)
             {
                 _fd = connection.FileDescriptor;
+                // The FD has a valid value, so I thought it should work :(
             }
 #else
-            CdcAcmSerialDriver cdcDriver = new CdcAcmSerialDriver(_currDriver.Device);
-            UsbDeviceConnection connection = _usbManager.OpenDevice(_currDriver.Device);
+            CdcAcmSerialDriver cdcDriver = new CdcAcmSerialDriver(_currDriverIface.Device);
+            UsbDeviceConnection connection = _usbManager.OpenDevice(_currDriverIface.Device);
             if (connection != null)
             {
                 _fd = connection.FileDescriptor;
@@ -137,14 +148,14 @@ namespace IHM.Droid.Interfaces
         }
 
     /// <summary>
-    /// Retourner le descripteur de fichier
-    /// Il est retourné dans son état courant invalide ou pas.
+    /// Returns current file descriptor
+    /// 
     /// </summary>
-    /// <returns></returns>
+    /// <returns> v </returns>
     public int getDeviceConnection() { return _fd; }
 
     /// <summary>
-    /// Ferme la ressource proprement
+    /// close all created ressource (except at init). So we can creat a new connection
     /// </summary>
     /// <returns></returns>
     public int Close() { /*TODO */return 0;  }
