@@ -15,6 +15,13 @@ using Android.Hardware.Usb;
 using IHM;
 using System.Threading.Tasks;
 
+/// <summary>
+/// NON WORKING USB INTERFACE. Keep for hisstory log
+/// This interface was developped by telecom student
+///     - It only uses the Android API USB.
+///     - It manages to list the connected device, displaying the system path, ex : /dev/bus/usb/001/004
+///     - I'm not sure the file descriptor is valid.
+/// </summary>
 namespace IHM.Droid.Interfaces
 {
     public class DroidUsbManager : IUsbManager
