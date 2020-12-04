@@ -142,12 +142,19 @@ int log_global_destroy(void)
 //-----------------------------------------------------------------------------
 int log_global_push(const char * szMsg)
 {
+    if( !_log_global_this )
+        return 0;
     return log_push(_log_global_this, szMsg);
 }
 
 //-----------------------------------------------------------------------------
 int log_global_pop(char * szMsg)
 {
+    if( !_log_global_this )
+    {
+        *szMsg = '\0';
+        return 0;
+    }
     return log_pop(_log_global_this, szMsg);
 }
 
