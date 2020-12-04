@@ -5,14 +5,14 @@
  * Interface de log pour ajouter des traces d'exécution dans la lib.
  * Pour répondre aussi au besoin de debug filaire sous android on propose une FIFO de messages
  * On peut sélectionner à la compilation un fonctionnement à base de printf/ FIFO
- * Dans le cas d'un printf null pas de fifo utilisé : la trace est directement affichée TODO TODO
+ * Dans le cas d'un printf null pas de fifo utilisé : la trace est directement affichée
  *
  * \warning inutile d'inclure ce code dans le STM32, mais si besoin attention à la taille de la pile,
  * voir revoir ce code pour allouer dans la sdram
  *
  * Deux fonctionnements :
  * - le fonctionnement qui permet d'avoir plusieurs instances de log (on passe le handle en paramètre)
- * - un fonctionnement simplifié qui crée une instance globale caché.
+ * - un fonctionnement simplifié qui crée une instance globale statique.
  *
 */
 
@@ -29,17 +29,24 @@ extern "C" {
  * TYPES & VARIABLES
 ******************************************************************************/
 
-/// Taille moyenne d'un message
+/// Message size max
 /// \sa log_push
 ///  Vous pouvez modifier ce paramètre, il faudrat recompiler la lib
 #define LOG_MSG_LEN 100
 
-/// si défini, alors on utilisera une fifo, sinon on utilisera un printf
-/// TODO
+/// We define a message type for helping bindings, it's is difficult for these tool to handle C output string
+typedef struct
+{
+    char szMsg[LOG_MSG_LEN];
+} msg_t;
+
+//-----------------------------------------------------------------------------
+// You select Here with method you want to use
+// If none the logs are disabled
 //#define LOG_USE_FIFO
 //#define LOG_USE_CONSOLE
-//#define LOG_USE_GLOBAL_FIFO
-
+#define LOG_USE_GLOBAL_FIFO
+//-----------------------------------------------------------------------------
 #ifdef LOG_USE_FIFO
 #define LOG LOG_PUSH
 #elif defined(LOG_USE_GLOBAL_FIFO)
@@ -64,7 +71,7 @@ typedef struct log_handle * log_phandle_t;
 #define LOG_PUSH(_this, fmt, args...) do\
 {\
     char szMsg[100]={0};\
-    snprintf( szMg, LOG_MSG_LEN, "%s:%d -" fmt, __FUNCTION__, __LINE__ -2, ## args);\
+    snprintf( szMg, LOG_MSG_LEN, "%s:%d - " fmt, __FUNCTION__, __LINE__, ## args);\
     log_push(_this, szMg);\
  } while(0);
 
@@ -74,7 +81,7 @@ typedef struct log_handle * log_phandle_t;
 #define LOG_GLOBAL_PUSH(fmt, args...) do\
 {\
     char szMsg[100]={0};\
-    snprintf( szMsg, LOG_MSG_LEN, "%s:%d -" fmt, __FUNCTION__, __LINE__ -2, ## args);\
+    snprintf( szMsg, LOG_MSG_LEN, "%s:%d - " fmt, __FUNCTION__, __LINE__, ## args);\
     log_global_push(szMsg);\
  } while(0);
 
@@ -171,6 +178,13 @@ LIBCOMM_EXPORT int log_global_push(const char * szMsg);
  * @return return log_pop(), or empty message if no queue was created
  */
 LIBCOMM_EXPORT int log_global_pop(char * szMsg);
+
+/**
+ * @brief log_global_pop_msg, exactly the same as log_global_pop but using a encapsulated type
+ * @param pMsg output msg
+ * @return return log_pop(), or empty message if no queue was created
+ */
+LIBCOMM_EXPORT int log_global_pop_msg(msg_t * pMsg);
 
 /**
  * @brief log_global_getsize
