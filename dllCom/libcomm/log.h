@@ -38,7 +38,8 @@ extern "C" {
 /// TODO
 //#define LOG_USE_FIFO
 //#define LOG_USE_CONSOLE
-#define LOG_USE_GLOBAL_FIFO
+//#define LOG_USE_GLOBAL_FIFO
+
 #ifdef LOG_USE_FIFO
 #define LOG LOG_PUSH
 #elif defined(LOG_USE_GLOBAL_FIFO)
