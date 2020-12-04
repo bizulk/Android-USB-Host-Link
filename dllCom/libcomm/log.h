@@ -38,18 +38,16 @@ extern "C" {
 /// TODO
 //#define LOG_USE_FIFO
 //#define LOG_USE_CONSOLE
-//#define LOG_USE_GLOBAL_FIFO
+#define LOG_USE_GLOBAL_FIFO
 #ifdef LOG_USE_FIFO
-#define LOG(fmt, args...) LOG_PUSH(_this, fmt##args)
+#define LOG LOG_PUSH
 #elif defined(LOG_USE_GLOBAL_FIFO)
-#define LOG(fmt, args...) LOG_GLOBAL_PUSH(fmt##args)
+#define LOG LOG_GLOBAL_PUSH
 #elif defined(LOG_USE_CONSOLE)
 #define LOG(fmt, args...) printf(fmt,##args)
 #else
 #define LOG(fmt, args...)
 #endif
-
-#define CONCAT(x,y) x##y
 
 /// Instance de notre log
 typedef struct log_handle * log_phandle_t;
@@ -65,7 +63,7 @@ typedef struct log_handle * log_phandle_t;
 #define LOG_PUSH(_this, fmt, args...) do\
 {\
     char szMsg[100]={0};\
-    snprintf( szMg, LOG_MSG_LEN, CONCAT("%s:%d -", fmt), __FUNCTION__, __LINE__ -2, ## args);\
+    snprintf( szMg, LOG_MSG_LEN, "%s:%d -" fmt, __FUNCTION__, __LINE__ -2, ## args);\
     log_push(_this, szMg);\
  } while(0);
 
@@ -75,7 +73,7 @@ typedef struct log_handle * log_phandle_t;
 #define LOG_GLOBAL_PUSH(fmt, args...) do\
 {\
     char szMsg[100]={0};\
-    snprintf( szMsg, LOG_MSG_LEN, CONCAT("%s:%d -", fmt), __FUNCTION__, __LINE__ -2, ## args);\
+    snprintf( szMsg, LOG_MSG_LEN, "%s:%d -" fmt, __FUNCTION__, __LINE__ -2, ## args);\
     log_global_push(szMsg);\
  } while(0);
 
@@ -162,14 +160,14 @@ LIBCOMM_EXPORT int log_global_destroy(void);
 /**
  * @brief log_global_push
  * @param szMsg
- * @return
+ * @return return log_push(), or 0 if the queue was not created
  */
 LIBCOMM_EXPORT int log_global_push(const char * szMsg);
 
 /**
  * @brief log_global_pop
  * @param szMsg
- * @return
+ * @return return log_pop(), or empty message if no queue was created
  */
 LIBCOMM_EXPORT int log_global_pop(char * szMsg);
 

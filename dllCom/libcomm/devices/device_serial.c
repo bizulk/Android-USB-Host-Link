@@ -202,7 +202,6 @@ static int devserial_open(struct proto_IfaceIODevice* this, const char * szPath)
 {
     UNUSED(this);
     UNUSED(szPath);
-
     return -1;
 }
 
