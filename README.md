@@ -1,6 +1,6 @@
 # AndroidFilaire
 
-Le but du projet est de mettre en oeuvre une solution de communication entre une Interface développée avec Xamarin pour Android, et une cible ARM implémentant le Virtual COM Port sur un port USB.
+please consult the power point english presentation.
 
 Regroupe les projets sur cible, PC et tablette, et la documentation (retour d'expérience, compte-rendu de projet).
 
@@ -9,6 +9,14 @@ Regroupe les projets sur cible, PC et tablette, et la documentation (retour d'ex
 3. dllCom : le protocole de communication 
 
 
+# dllCom 
+
+Custom procotol implementation for slave/master R/W
+This is a simplement protocol for demonstration purpose.
+
+# doc 
+
+All documentation : tech & Project report, analyses.
 
 # TestUSBTerminal 
 
@@ -18,20 +26,23 @@ Sont embarqués dans le projet :
 - l'implémentation "slave" du protocole dllCom.
 Une interface est implémentée, et on sélectionne le projet à compiler avec des varaibles de compilation.
 
-# IHMTablette
+This is the device project implemented with STMCubeMX, STMCube, for a STM Nucleo F439ZI.
+The project is design to embbed and select several app : 
+- console test
+- "slave" implementation of the dllCom protocol for interfacing with the tablet.
 
-L'IHM met en oeuvre le protocole, elle cible la lecture écriture sur un device de deux registres.
-La dll est compilée pour Linux/Android et un wrapper est généré avec Swig
+# MobileApplication
 
-Pour le test et débogage, une tablette avec deux ports USB est recommandée.
-Aussi on embarque le device "emulslave" pour de l'auto-test.
+This is the mobile Android application developped with Xamarin.
+The app embbed the wrapped dllCom library.
+
+For test and debug purpose, a tablet with two USB port is recommended.
 
 # dllCom
 
-Le protocole de communication pour la lecture/écriture de registre.
-Codée sur deux couches : 
-La couche bas niveau qui envoie/reçoit les trames, avec un découplage sur l'interface de gestion des E/S.
-La couche haut niveau qui implémente les échanges nécessaire pour l'abstraction : on écrit ou lit un registre.
+All the dllCom related project : 
+- implementation
+- unit tests 
+- bindings.
 
 
-**Pour tout travaux il est recommandé d'utiliser des branches afin de gérer proprement leur intégration.**
