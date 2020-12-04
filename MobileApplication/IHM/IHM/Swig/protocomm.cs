@@ -226,6 +226,11 @@ public class protocomm {
     return ret;
   }
 
+  public static int log_global_pop_msg(msg_t pMsg) {
+    int ret = protocommPINVOKE.log_global_pop_msg(msg_t.getCPtr(pMsg));
+    return ret;
+  }
+
   public static uint log_global_getsize() {
     uint ret = protocommPINVOKE.log_global_getsize();
     return ret;

@@ -137,12 +137,19 @@ static int devserial_open(struct proto_IfaceIODevice* this, const char * szPath)
 
 static int devserial_read(struct proto_IfaceIODevice* this, void* buffer, uint8_t bufferSize, int16_t tout_ms)
 {
+	int ret = 0;
     assert(this && buffer);
     UNUSED(tout_ms);
 	proto_dev_serial_t* infos = this->user;
 	if (infos->fileDescriptor < 0)
 		return -1;
-    return read(infos->fileDescriptor, buffer, bufferSize);
+	ret = read(infos->fileDescriptor, buffer, bufferSize);
+	if (ret < 0)
+	{
+		LOG("error : %s", strerror(errno));
+		return -1;
+	}
+	return ret;
 }
 
 static int devserial_write(struct proto_IfaceIODevice* this, const void * buffer, uint8_t size)
@@ -155,7 +162,7 @@ static int devserial_write(struct proto_IfaceIODevice* this, const void * buffer
         int ret = write(infos->fileDescriptor, buffer, size);
 		if (ret < 0)
 		{
-			LOG("error : %s", strerror(ret));
+            LOG("error : %s (fd=%d)", strerror(errno ), infos->fileDescriptor);
 			return -1;
 		}
         else {

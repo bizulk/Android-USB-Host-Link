@@ -113,7 +113,7 @@ namespace IHM
         }
         void OnButtonReceiveClicked(object sender, EventArgs e)
         {
-            string msgReceive = "";
+            string msgReceive = new string('\0', 100);
             byte regVal = 0;
             proto_Status_t status;
 
@@ -128,14 +128,18 @@ namespace IHM
                     m_lRegsLbl[i].Text = regVal.ToString();
                 }
 
-                //Affichage du log de la dll
-                msgReceive = "";
-                while ( protocomm.log_global_pop(msgReceive) != 0 )
+                // After the operation we pop any message for dllCom library and add it to our log
+                // We use the encapsulated C string struc, so much easier to use for passing data
+                msg_t msgLog = new msg_t();              
+                while ( protocomm.log_global_pop_msg(msgLog) != 0 )
                 {
-                    if (string.Compare(msgReceive, "") != 0)
+                    // Se how easy to access the string : just take the member
+                    if (string.Compare(msgLog.szMsg, "") != 0)
                     {
-                        m_textLog.Insert(0, DateTime.Now.ToString(" HH:mm ") + " " + msgReceive);   //Pour l'affichage en temps réelle dans la dialogue
-                        logfile.Info(msgReceive, "");  // Pour le stockage dans le fichier
+                        // So we add to the dialog
+                        m_textLog.Insert(0, DateTime.Now.ToString(" HH:mm ") + " " + msgLog.szMsg); 
+                        // and then to the file
+                        logfile.Info(msgLog.szMsg);  // Pour le stockage dans le fichier
                     }
                 }
             }

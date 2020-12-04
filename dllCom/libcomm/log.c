@@ -159,6 +159,12 @@ int log_global_pop(char * szMsg)
 }
 
 //-----------------------------------------------------------------------------
+int log_global_pop_msg(msg_t * pMsg)
+{
+    return log_pop(_log_global_this, pMsg->szMsg);
+}
+
+//-----------------------------------------------------------------------------
 size_t log_global_getsize(void)
 {
     return log_getsize(_log_global_this);
