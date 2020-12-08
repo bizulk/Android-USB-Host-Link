@@ -42,31 +42,31 @@ typedef struct proto_dev_emulslave {
 ///
 /// \brief même chose que create, mais avec une instance alloué sur la pile
 /// \warning Ne pas appeler "destroy" pour ce cas
-/// \param this Instance pre-alloué
+/// \param _this Instance pre-alloué
 ///
-static void devemulslave_init(proto_Device_t this);
+static void devemulslave_init(proto_Device_t _this);
 
 ///
 /// \brief devemulslave_open fonction open pour le proto
-/// \param this
+/// \param _this
 /// \param szPath
 /// \return
 ///
-static int devemulslave_open(proto_Device_t this, const char * szPath);
-static int devemulslave_close(proto_Device_t this);
-static int devemulslave_read(proto_Device_t this, void* buf, uint8_t len, int16_t tout_ms);
-static int devemulslave_write(proto_Device_t this, const void * buf, uint8_t len);
-static void devemulslave_destroy(proto_Device_t this);
+static int devemulslave_open(proto_Device_t _this, const char * szPath);
+static int devemulslave_close(proto_Device_t _this);
+static int devemulslave_read(proto_Device_t _this, void* buf, uint8_t len, int16_t tout_ms);
+static int devemulslave_write(proto_Device_t _this, const void * buf, uint8_t len);
+static void devemulslave_destroy(proto_Device_t _this);
 
 /// Fonctions internes pour l'émulation du slave du slave
 static proto_Device_t devemulslave_fakeSlaveCreate(proto_Device_t masterthis);
-static int devemulslave_fake_open(proto_Device_t this, const char * szPath);
-static int devemulslave_fake_close(proto_Device_t this);
+static int devemulslave_fake_open(proto_Device_t _this, const char * szPath);
+static int devemulslave_fake_close(proto_Device_t _this);
 /// La fonction va dépiler les trames dans la stack master
-static int devemulslave_fake_read(proto_Device_t this, void* buf, uint8_t len, int16_t tout_ms);
+static int devemulslave_fake_read(proto_Device_t _this, void* buf, uint8_t len, int16_t tout_ms);
 /// La fonction va empiler les trames dans la stack slave
-static int devemulslave_fake_write(proto_Device_t this, const void * buf, uint8_t len);
-static void devemulslave_fake_destroy(proto_Device_t this);
+static int devemulslave_fake_write(proto_Device_t _this, const void * buf, uint8_t len);
+static void devemulslave_fake_destroy(proto_Device_t _this);
 
 ///
 /// \brief emulslave_callback Callback de réception d'une requete master
@@ -91,10 +91,10 @@ static int devemulslave_isFrame(proto_Frame_t *pFrame, uint8_t len);
  * FUNCTION
 ******************************************************************************/
 
-uint8_t * devemulslave_getRegisters(proto_Device_t this)
+uint8_t * devemulslave_getRegisters(proto_Device_t _this)
 {
-    assert(this && this->user);
-    proto_dev_emulslave_t* slave = this->user;
+    assert(_this && _this->user);
+    proto_dev_emulslave_t* slave = _this->user;
 
     return slave->registers;
 }
@@ -102,56 +102,56 @@ uint8_t * devemulslave_getRegisters(proto_Device_t this)
 proto_Device_t devemulslave_create(void)
 {
     /// allocation des structures et initialisation du pointeur
-    proto_Device_t this  = (proto_Device_t)malloc( sizeof(proto_IfaceIODevice_t) );
-    this->user = (proto_dev_emulslave_t*)malloc(sizeof(proto_dev_emulslave_t));
-    devemulslave_init(this);
+    proto_Device_t _this  = (proto_Device_t)malloc( sizeof(proto_IfaceIODevice_t) );
+    _this->user = (proto_dev_emulslave_t*)malloc(sizeof(proto_dev_emulslave_t));
+    devemulslave_init(_this);
 
-    return this;
+    return _this;
 }
 
-void devemulslave_destroy(proto_Device_t this)
+void devemulslave_destroy(proto_Device_t _this)
 {
-    assert(this && this->user);
-    proto_dev_emulslave_t* slave = this->user;
+    assert(_this && _this->user);
+    proto_dev_emulslave_t* slave = _this->user;
     proto_destroy(slave->slaveThis);
     // Liberation des structures sous jacentes
-    this->close(this);
-    free(this->user);
-    free(this);
+    _this->close(_this);
+    free(_this->user);
+    free(_this);
 }
 
-void devemulslave_init(proto_Device_t this)
+void devemulslave_init(proto_Device_t _this)
 {
-    assert(this);
-    DEVIO_INIT(devemulslave, this);
+    assert(_this);
+    DEVIO_INIT(devemulslave, _this);
 
-    proto_dev_emulslave_t* slave = (proto_dev_emulslave_t*)this->user;
+    proto_dev_emulslave_t* slave = (proto_dev_emulslave_t*)_this->user;
     memset(slave, 0, sizeof(proto_dev_emulslave_t));
     // Creation de l'instance de protocole slave
-    proto_Device_t slavedev = devemulslave_fakeSlaveCreate(this);
+    proto_Device_t slavedev = devemulslave_fakeSlaveCreate(_this);
     slave->slaveThis = proto_slave_create(slavedev, devemulslave_callback, slave);
 }
 
-static int  devemulslave_open(proto_Device_t this, const char * szPath)
+static int  devemulslave_open(proto_Device_t _this, const char * szPath)
 {
-    UNUSED(this);
+    UNUSED(_this);
     UNUSED(szPath);
     return 0;
 }
 
-static int devemulslave_close(proto_Device_t this)
+static int devemulslave_close(proto_Device_t _this)
 {
-    UNUSED(this);
+    UNUSED(_this);
     return 0;
 }
 
-static int devemulslave_read(proto_Device_t this, void* buf, uint8_t len, int16_t tout_ms)
+static int devemulslave_read(proto_Device_t _this, void* buf, uint8_t len, int16_t tout_ms)
 {
 
-    assert(this && buf);
+    assert(_this && buf);
     UNUSED(tout_ms);
 
-    proto_dev_emulslave_t* slave = this->user;
+    proto_dev_emulslave_t* slave = _this->user;
     uint16_t nbDelayedBytes = slave->priv_usSlaveStkSize;
 
     // On prend le minimum entre bufferSize et nbDelayedBytes
@@ -180,13 +180,13 @@ static int devemulslave_isFrame(proto_Frame_t *pFrame, uint8_t len)
     return 0;
 }
 
-static int devemulslave_write(proto_Device_t this, const void * buf, uint8_t len)
+static int devemulslave_write(proto_Device_t _this, const void * buf, uint8_t len)
 {
-    assert(this && this->user);
+    assert(_this && _this->user);
     assert(buf);
 
     // On push sur le buffer autant que possible
-    proto_dev_emulslave_t* slave = this->user;
+    proto_dev_emulslave_t* slave = _this->user;
     uint16_t sizeLeft = sizeof(slave->priv_masterStk) - slave->priv_usMasterStkSize;
 
     // D'après la spec d'interface on peut tout écrire ou pas.
@@ -215,18 +215,18 @@ static int devemulslave_write(proto_Device_t this, const void * buf, uint8_t len
 static int devemulslave_callback(void* userdata, proto_Command_t command, proto_frame_data_t* args) {
 
     int ret = 0;
-    proto_dev_emulslave_t* this = userdata;
+    proto_dev_emulslave_t* _this = userdata;
 	switch (command) {
     case proto_CMD_SET: // quand le MASTER demande de changer une valeur
         if (args->req.reg < EMULSLAVE_NB_REGS) {
-            this->registers[args->req.reg] = args->req.value;
+            _this->registers[args->req.reg] = args->req.value;
         } else
             ret = -1;
         break;
 		
     case proto_CMD_GET: // quand le MASTER demande d'accéder à une valeur
         if (args->req.reg < EMULSLAVE_NB_REGS)
-            args->reg_value = this->registers[args->req.reg];
+            args->reg_value = _this->registers[args->req.reg];
         else
             ret = -1;
         break;
@@ -238,25 +238,25 @@ static int devemulslave_callback(void* userdata, proto_Command_t command, proto_
     return ret;
 }
 
-static int devemulslave_fake_open(proto_Device_t this, const char * szPath)
+static int devemulslave_fake_open(proto_Device_t _this, const char * szPath)
 {
-    UNUSED(this);
+    UNUSED(_this);
     UNUSED(szPath);
     return 0;
 }
-static int devemulslave_fake_close(proto_Device_t this)
+static int devemulslave_fake_close(proto_Device_t _this)
 {
-    UNUSED(this);
+    UNUSED(_this);
     return 0;
 }
 
 
-static int devemulslave_fake_read(proto_Device_t this, void* buf, uint8_t len, int16_t tout_ms)
+static int devemulslave_fake_read(proto_Device_t _this, void* buf, uint8_t len, int16_t tout_ms)
 {
-    assert(this && buf);
+    assert(_this && buf);
     UNUSED(tout_ms);
 
-    proto_Device_t masterdev_base = (proto_Device_t)this->user;
+    proto_Device_t masterdev_base = (proto_Device_t)_this->user;
     proto_dev_emulslave_t * masterdev = (proto_dev_emulslave_t *)masterdev_base->user;
     uint16_t usStkSize = masterdev->priv_usMasterStkSize;
 
@@ -271,13 +271,13 @@ static int devemulslave_fake_read(proto_Device_t this, void* buf, uint8_t len, i
     return nbRead;
 }
 
-static int devemulslave_fake_write(proto_Device_t this, const void * buf, uint8_t len)
+static int devemulslave_fake_write(proto_Device_t _this, const void * buf, uint8_t len)
 {
-    assert(this && this->user);
+    assert(_this && _this->user);
     assert(buf);
 
     // On push sur le buffer autant que possible
-    proto_Device_t masterdev_base = (proto_Device_t)this->user;
+    proto_Device_t masterdev_base = (proto_Device_t)_this->user;
     proto_dev_emulslave_t * masterdev = (proto_dev_emulslave_t *)masterdev_base->user;
 
     uint16_t sizeLeft = sizeof(masterdev->priv_slaveStk) - masterdev->priv_usSlaveStkSize;
@@ -294,33 +294,33 @@ static int devemulslave_fake_write(proto_Device_t this, const void * buf, uint8_
     return 0;
 }
 
-static void devemulslave_fake_destroy(proto_Device_t this)
+static void devemulslave_fake_destroy(proto_Device_t _this)
 {
-    assert(this);
+    assert(_this);
     // On appelle l'effacement du device
     // Liberation des structures sous jacentes
-    this->close(this);
+    _this->close(_this);
     // Cette structure est imbriquée : user pointe vers la structure du master, qui se charge de sa propre destruction
-    //free(this->user);
-    free(this);
+    //free(_this->user);
+    free(_this);
 }
 proto_Device_t devemulslave_fakeSlaveCreate(proto_Device_t masterthis)
 {
-    proto_Device_t this = (proto_Device_t)malloc(sizeof(proto_IfaceIODevice_t));
-    DEVIO_INIT(devemulslave_fake, this);
-    this->user = masterthis;
-    return this;
+    proto_Device_t _this = (proto_Device_t)malloc(sizeof(proto_IfaceIODevice_t));
+    DEVIO_INIT(devemulslave_fake, _this);
+    _this->user = masterthis;
+    return _this;
 }
 
 
-void devemulslave_setFlags(proto_Device_t this, uint8_t FLAGS)
+void devemulslave_setFlags(proto_Device_t _this, uint8_t FLAGS)
 {
-    proto_dev_emulslave_t* slave = this->user;
+    proto_dev_emulslave_t* slave = _this->user;
     slave->flags = FLAGS;
 }
 
-void devemulslave_getFlags(proto_Device_t this, uint8_t *FLAGS)
+void devemulslave_getFlags(proto_Device_t _this, uint8_t *FLAGS)
 {
-    proto_dev_emulslave_t* slave = this->user;
+    proto_dev_emulslave_t* slave = _this->user;
     *FLAGS = slave->flags;
 }
