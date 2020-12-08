@@ -71,13 +71,13 @@ typedef struct proto_IfaceIODevice {
 
 
 /// Macro pour accelérer & uniformiser l'initialisation d'un custom device
-#define DEVIO_INIT(devname, this)\
+#define DEVIO_INIT(devname, _this)\
 {\
-    this->open = devname##_open;\
-    this->close = devname##_close;\
-    this->destroy = devname##_destroy;\
-    this->read = devname##_read;\
-    this->write = devname##_write;\
+    _this->open = devname##_open;\
+    _this->close = devname##_close;\
+    _this->destroy = devname##_destroy;\
+    _this->read = devname##_read;\
+    _this->write = devname##_write;\
 }
 
 #ifndef UNUSED
