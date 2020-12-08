@@ -13,7 +13,7 @@ namespace IHM
     {
         /// Handle du dll_if
         dll_if m_dll_if;
-
+        bool _bUseDllSerialDevice = false; // Select dll serial device or usbdev
         bool isConnected = false;
 
         // Nous permet d'associer nos Entry à des numéro de registre et d'iterer dessu
@@ -142,9 +142,7 @@ namespace IHM
                         logfile.Info(msgLog.szMsg);  // Pour le stockage dans le fichier
                     }
                 }
-            }
-
-            
+            }          
         }
         void OnButtonConnectClicked(object sender, EventArgs e)
         {
@@ -189,25 +187,37 @@ namespace IHM
             {
                 // Test
                 // Ouverture de la connexion
-                isConnected = (0 == m_dll_if.Open(m_dll_if.CreateEmulslave(), "")); 
+                isConnected = (m_dll_if.Open(m_dll_if.CreateEmulslave(), "") ==0); 
             }
-            else
+            else // everything else is a device
             {
-                int fd;
-                // La couche USB créé le driver et initialise son fd
+                // Call the system layer to create resource
                 IUsbManager iusbManager = Xamarin.Forms.DependencyService.Get<IUsbManager>();
                 iusbManager.selectDevice(name);
-                // On demande a la dll de s'initialiser sans essayer d'ouvrir un port, car on va s'en occuper
-                SWIGTYPE_p_proto_Device_t dev = m_dll_if.CreateDevSerial();
-                isConnected = (0 == m_dll_if.Open(dev, ""));
-                if (isConnected)
+
+                if (_bUseDllSerialDevice)
                 {
-                    // Récupére notre FD avec l'USBManager pour l'affecter à la lib
-                    fd = iusbManager.getDeviceConnection();
-                    int ret = m_dll_if.SerialSetFd(dev, fd);
-                    //if( ret < )
-                };
+                    // On demande a la dll de s'initialiser sans essayer d'ouvrir un port, car on va s'en occuper
+                    SWIGTYPE_p_proto_Device_t dev = m_dll_if.CreateDevSerial();
+                    isConnected = (0 == m_dll_if.Open(dev, ""));
+                    if (isConnected)
+                    {
+                        // Récupére notre FD avec l'USBManager pour l'affecter à la lib
+                        int ret = m_dll_if.SerialSetFd(dev, iusbManager.getDeviceConnection());
+                    };
+                }
+                else
+                {
+                    SWIGTYPE_p_proto_Device_t dev = m_dll_if.CreateDevUsbDev();
+                    isConnected = (0 == m_dll_if.Open(dev, ""));
+                    if (isConnected)
+                    {
+                        int ret = m_dll_if.UsbDevSetFd(dev, iusbManager.getDeviceConnection());
+                    }
+                }
+
             }
+
             // Gestion de l'affichage
             if (isConnected) 
             {

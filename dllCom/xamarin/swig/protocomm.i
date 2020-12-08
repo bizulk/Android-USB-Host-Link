@@ -5,6 +5,7 @@
 	#include "log.h"
 	#include "devices/device_emulslave.h"
 	#include "devices/device_serial.h"
+	#include "devices/device_usbdev.h"
  %}
 
  /* utiliser les fichiers d'interface pour les standard sinon on a des types opaques
@@ -25,4 +26,13 @@ https://stackoverflow.com/questions/10476483/how-to-generate-a-cross-platform-in
 %include "protocomm_ll.h"
 %include "device_emulslave.h"
 %include "device_serial.h"
+%include "device_usbdev.h"
 %include "log.h"
+
+
+/* Extra function for helping to interact with the dll 
+*/
+%pointer_cast(proto_Frame_t *, char *, proto_frame_t_p_to_string);
+
+%include "sizeof.i"
+%_sizeof(proto_Frame_t)

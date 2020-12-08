@@ -159,14 +159,31 @@ public class protocomm {
     return ret;
   }
 
-  public static int devserial_setFD(SWIGTYPE_p_proto_Device_t _this, int fileDescriptor) {
-    int ret = protocommPINVOKE.devserial_setFD(SWIGTYPE_p_proto_Device_t.getCPtr(_this), fileDescriptor);
+  public static int devserial_setFD(SWIGTYPE_p_proto_Device_t _this, int fd) {
+    int ret = protocommPINVOKE.devserial_setFD(SWIGTYPE_p_proto_Device_t.getCPtr(_this), fd);
     if (protocommPINVOKE.SWIGPendingException.Pending) throw protocommPINVOKE.SWIGPendingException.Retrieve();
     return ret;
   }
 
   public static int devserial_getFD(SWIGTYPE_p_proto_Device_t _this) {
     int ret = protocommPINVOKE.devserial_getFD(SWIGTYPE_p_proto_Device_t.getCPtr(_this));
+    if (protocommPINVOKE.SWIGPendingException.Pending) throw protocommPINVOKE.SWIGPendingException.Retrieve();
+    return ret;
+  }
+
+  public static SWIGTYPE_p_proto_Device_t devusbdev_create() {
+    SWIGTYPE_p_proto_Device_t ret = new SWIGTYPE_p_proto_Device_t(protocommPINVOKE.devusbdev_create(), true);
+    return ret;
+  }
+
+  public static int devusbdev_setDev(SWIGTYPE_p_proto_Device_t _this, int fd, int ep_in, int ep_out, int max_pkt_size) {
+    int ret = protocommPINVOKE.devusbdev_setDev(SWIGTYPE_p_proto_Device_t.getCPtr(_this), fd, ep_in, ep_out, max_pkt_size);
+    if (protocommPINVOKE.SWIGPendingException.Pending) throw protocommPINVOKE.SWIGPendingException.Retrieve();
+    return ret;
+  }
+
+  public static int devusbdev_getFD(SWIGTYPE_p_proto_Device_t _this) {
+    int ret = protocommPINVOKE.devusbdev_getFD(SWIGTYPE_p_proto_Device_t.getCPtr(_this));
     if (protocommPINVOKE.SWIGPendingException.Pending) throw protocommPINVOKE.SWIGPendingException.Retrieve();
     return ret;
   }
@@ -243,6 +260,11 @@ public class protocomm {
 
   public static void log_global_clear() {
     protocommPINVOKE.log_global_clear();
+  }
+
+  public static string proto_frame_data_t_p_to_charp(proto_Frame_t x) {
+    string ret = protocommPINVOKE.proto_frame_data_t_p_to_charp(proto_Frame_t.getCPtr(x));
+    return ret;
   }
 
   public static readonly int PROTO_FRAME_RECV_TOUT_MS = protocommPINVOKE.PROTO_FRAME_RECV_TOUT_MS_get();

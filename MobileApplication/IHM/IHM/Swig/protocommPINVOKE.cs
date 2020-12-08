@@ -412,6 +412,15 @@ class protocommPINVOKE {
   [global::System.Runtime.InteropServices.DllImport("protocomm", EntryPoint="CSharp_devserial_getFD")]
   public static extern int devserial_getFD(global::System.Runtime.InteropServices.HandleRef jarg1);
 
+  [global::System.Runtime.InteropServices.DllImport("protocomm", EntryPoint="CSharp_devusbdev_create")]
+  public static extern global::System.IntPtr devusbdev_create();
+
+  [global::System.Runtime.InteropServices.DllImport("protocomm", EntryPoint="CSharp_devusbdev_setDev")]
+  public static extern int devusbdev_setDev(global::System.Runtime.InteropServices.HandleRef jarg1, int jarg2, int jarg3, int jarg4, int jarg5);
+
+  [global::System.Runtime.InteropServices.DllImport("protocomm", EntryPoint="CSharp_devusbdev_getFD")]
+  public static extern int devusbdev_getFD(global::System.Runtime.InteropServices.HandleRef jarg1);
+
   [global::System.Runtime.InteropServices.DllImport("protocomm", EntryPoint="CSharp_LOG_MSG_LEN_get")]
   public static extern int LOG_MSG_LEN_get();
 
@@ -471,4 +480,7 @@ class protocommPINVOKE {
 
   [global::System.Runtime.InteropServices.DllImport("protocomm", EntryPoint="CSharp_log_global_clear")]
   public static extern void log_global_clear();
+
+  [global::System.Runtime.InteropServices.DllImport("protocomm", EntryPoint="CSharp_proto_frame_data_t_p_to_charp")]
+  public static extern string proto_frame_data_t_p_to_charp(global::System.Runtime.InteropServices.HandleRef jarg1);
 }

@@ -147,9 +147,22 @@ namespace IHM
             return dev;
         }
 
-        public int SerialSetFd(SWIGTYPE_p_proto_Device_t dev, int fd)
+        public int SerialSetFd(SWIGTYPE_p_proto_Device_t dev, DevHandle devh)
         {
-            int ret = protocomm.devserial_setFD(dev, fd);
+            int ret = protocomm.devserial_setFD(dev, devh.fd);
+            return ret;
+        }
+
+        public SWIGTYPE_p_proto_Device_t CreateDevUsbDev()
+        {
+            SWIGTYPE_p_proto_Device_t dev;
+            dev = protocomm.devusbdev_create();
+            return dev;
+        }
+
+        public int UsbDevSetFd(SWIGTYPE_p_proto_Device_t dev, DevHandle devh)
+        {
+            int ret = protocomm.devusbdev_setDev(dev, devh.fd, devh.ep_in, devh.ep_out, devh.max_pkt_size);
             return ret;
         }
 

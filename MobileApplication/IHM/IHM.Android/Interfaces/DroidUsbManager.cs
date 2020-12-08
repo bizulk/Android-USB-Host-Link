@@ -59,16 +59,31 @@ namespace IHM.Droid.Interfaces
             }
         }
 
-        public int getDeviceConnection()
+        public DevHandle getDeviceConnection()
         {
-            if (selectedDevice.Equals("null"))
-                return -1;
-            return usbManager_.OpenDevice(((Dictionary<string, UsbDevice>)usbManager_.DeviceList)[selectedDevice]).FileDescriptor;
+            DevHandle devHandle = new DevHandle();
+            if (!selectedDevice.Equals("null"))
+            {
+                devHandle.fd = usbManager_.OpenDevice(((Dictionary<string, UsbDevice>)usbManager_.DeviceList)[selectedDevice]).FileDescriptor;
+            }
+            return devHandle;
         }
 
         public int Close()
         {
             return 0;
+        }
+
+        public int ReadRegisterFromDevice(byte uiRegister, ref byte value)
+        {
+            // not implemented
+            return -1;
+        }
+
+        public int WriteRegisterToDevice(byte uiRegister, byte value)
+        {
+            // not implemented
+            return -1;
         }
     }
 }
