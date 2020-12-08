@@ -21,7 +21,7 @@ proto_Device_t LIBCOMM_EXPORT devserial_create(void);
 /// \param _this proto_Device_t qui utilisera ce file descriptor
 /// \return 0 si ok, -1 si pas possible de l'utiliser (au quel cas _this n'est pas modifié)
 ///
-int LIBCOMM_EXPORT devserial_setFD(proto_Device_t _this, int fileDescriptor);
+int LIBCOMM_EXPORT devserial_setFD(proto_Device_t _this, int fd);
 
 /// \brief Retourne le fileDescriptor, utile pour générer un pt slave correspondant à ptmx
 /// \return le file descriptor > 0 s'il existe, ou une valeur < 0 si non-applicable (ex: sous Windows)

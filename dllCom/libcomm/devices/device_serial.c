@@ -20,7 +20,7 @@
 /* Complément de données nécessaire à la structure */
 typedef struct
 {
-    int fileDescriptor; // Descripteur de fichier ouvert
+    int fd; // Descripteur de fichier ouvert
 } proto_dev_serial_t ;
 
 /******************************************************************************
@@ -30,24 +30,24 @@ typedef struct
 ///
 /// \brief devserial_init : même chose que create, mais avec une instance alloué sur la pile
 /// \warning Ne pas appeler "destroy" pour ce cas
-/// \param this Instance pre-alloué
+/// \param _this Instance pre-alloué
 ///
-static void devserial_init(proto_Device_t this);
+static void devserial_init(proto_Device_t _this);
 
 /******************************************************************************
  * FUNCTION
 ******************************************************************************/
 
-void devserial_destroy(proto_Device_t this)
+void devserial_destroy(proto_Device_t _this)
 {
-    assert(this && this->user);
+    assert(_this && _this->user);
 
     /// Fermeture des ports (todo).
     ///
     /// Liberation des structures
-    this->close(this);
-    free(this->user);
-    free(this);
+    _this->close(_this);
+    free(_this->user);
+    free(_this);
 }
 
 #ifdef __linux__
@@ -92,58 +92,57 @@ static int setFdMode(int fd, int vtime, int vmin) {
     return 0;
 }
 
-static int devserial_close(struct proto_IfaceIODevice* this)
+static int devserial_close(struct proto_IfaceIODevice* _this)
 {
-    assert(this);
+    assert(_this);
 	int ret = 0;
 
-    proto_dev_serial_t* infos = this->user;
+    proto_dev_serial_t* infos = _this->user;
 
-	if (infos->fileDescriptor >=0)
+	if (infos->fd >=0)
 	{
-		ret = close(infos->fileDescriptor);
-		// Invalider le descripteur de fichier pour éviter toute utilisation ultérieure
-		// Même si cela n'a pas marché on peut pas faire grand chose de plus ici
-		infos->fileDescriptor = -1;
+		ret = close(infos->fd);
+		// Invalidate the descriptor to block further use.
+		infos->fd = -1;
 	}
 
 	return ret;
 }
 
-static int devserial_open(struct proto_IfaceIODevice* this, const char * szPath)
+static int devserial_open(struct proto_IfaceIODevice* _this, const char * szPath)
 {
-    assert(this && szPath);
+    assert(_this && szPath);
 
-    proto_dev_serial_t* infos = this->user;
+    proto_dev_serial_t* infos = _this->user;
 
-    devserial_close(this);
+    devserial_close(_this);
 
-	/* On autorise un path vide pour la récupération */
+	/* allow empty path : that means that the fd will be provided */
 	if (strlen(szPath) > 0)
 	{
 		int fd = open(szPath, O_RDWR);
 		LOG("OPEN fd :%d", fd);
 		if (fd < 0)
 			return fd;
-		infos->fileDescriptor = fd;
+		infos->fd = fd;
 		// vtime = 0, vmin = 0 : les appels à "read" sont non-bloquants
 		// TODO SLI : c'était possible de les rendre bloquants, la fonction de haut niveau contrôlant le temps écoulé
-		return setFdMode(infos->fileDescriptor, 0, 0);
+		return setFdMode(infos->fd, 0, 0);
 	}
 	
 	return 0;
 }
 
 
-static int devserial_read(struct proto_IfaceIODevice* this, void* buffer, uint8_t bufferSize, int16_t tout_ms)
+static int devserial_read(struct proto_IfaceIODevice* _this, void* buffer, uint8_t bufferSize, int16_t tout_ms)
 {
 	int ret = 0;
-    assert(this && buffer);
+    assert(_this && buffer);
     UNUSED(tout_ms);
-	proto_dev_serial_t* infos = this->user;
-	if (infos->fileDescriptor < 0)
+	proto_dev_serial_t* infos = _this->user;
+	if (infos->fd < 0)
 		return -1;
-	ret = read(infos->fileDescriptor, buffer, bufferSize);
+	ret = read(infos->fd, buffer, bufferSize);
 	if (ret < 0)
 	{
 		LOG("error : %s", strerror(errno));
@@ -152,17 +151,22 @@ static int devserial_read(struct proto_IfaceIODevice* this, void* buffer, uint8_
 	return ret;
 }
 
-static int devserial_write(struct proto_IfaceIODevice* this, const void * buffer, uint8_t size)
+static int devserial_write(struct proto_IfaceIODevice* _this, const void * buffer, uint8_t size)
 {
-    assert(this && buffer);
-	proto_dev_serial_t* infos = this->user;
-	if (infos->fileDescriptor < 0)
+    assert(_this && buffer);
+	proto_dev_serial_t* infos = _this->user;
+	if (infos->fd < 0)
+	{
+		LOG("error : invalid descriptor");
 		return -1;
+	}
+	LOG("writing %d bytes to fd/%d", size, infos->fd);
+
     while (size > 0) {
-        int ret = write(infos->fileDescriptor, buffer, size);
+        int ret = write(infos->fd, buffer, size);
 		if (ret < 0)
 		{
-            LOG("error : %s (fd=%d)", strerror(errno ), infos->fileDescriptor);
+            LOG("error : %s (fd=%d)", strerror(errno ), infos->fd);
 			return -1;
 		}
         else {
@@ -170,74 +174,73 @@ static int devserial_write(struct proto_IfaceIODevice* this, const void * buffer
             size -= ret;
         }
     }
-	LOG("%d bytes sent", size);
     return 0;
 }
 
-int devserial_setFD(proto_Device_t this, int fileDescriptor) {
-    assert(this);
+int devserial_setFD(proto_Device_t _this, int fd) {
+    assert(_this);
 
-	if (fileDescriptor < 0)
+	if (fd < 0)
 		return -1;
 
 	// On ferme les ressources existantes
-	devserial_close(this);
+	devserial_close(_this);
 
-// 20200924 SLI - Sous android on n'a peut-être pas la possibilité 
-#ifdef SET_FD_MODE
-    int ret = setFdMode(fileDescriptor, 0, 0);
+// 20200924 SLI - Maybe not needed for android, in particular for USB layers. 
+#ifdef ENABLE_SET_FD_MODE
+    int ret = setFdMode(fd, 0, 0);
 	if (ret < 0)
 	{
 		LOG("setFdMode error : aborted");
 		return -1;
 	}
 #endif
-    proto_dev_serial_t* infos = this->user;
-    infos->fileDescriptor = fileDescriptor;
+    proto_dev_serial_t* infos = _this->user;
+    infos->fd = fd;
     return 0;
 }
 
-int devserial_getFD(proto_Device_t this) {
+int devserial_getFD(proto_Device_t _this) {
 
-    return ((proto_dev_serial_t*) this->user)->fileDescriptor;
+    return ((proto_dev_serial_t*) _this->user)->fd;
 
 }
 
 #else // if __linux__ not defined
 
-static int devserial_open(struct proto_IfaceIODevice* this, const char * szPath)
+static int devserial_open(struct proto_IfaceIODevice* _this, const char * szPath)
 {
-    UNUSED(this);
+    UNUSED(_this);
     UNUSED(szPath);
     return -1;
 }
 
-static int devserial_close(struct proto_IfaceIODevice* this)
+static int devserial_close(struct proto_IfaceIODevice* _this)
 {
-    UNUSED(this);
+    UNUSED(_this);
     return -1;
 }
 
-static int devserial_read(struct proto_IfaceIODevice* this, void* buffer, uint8_t bufferSize, int16_t tout_ms)
+static int devserial_read(struct proto_IfaceIODevice* _this, void* buffer, uint8_t bufferSize, int16_t tout_ms)
 {
-    UNUSED(this);
+    UNUSED(_this);
     UNUSED(buffer);
     UNUSED(bufferSize);
     UNUSED(tout_ms);
     return 0;
 }
 
-static int devserial_write(struct proto_IfaceIODevice* this, const void * buffer, uint8_t size)
+static int devserial_write(struct proto_IfaceIODevice* _this, const void * buffer, uint8_t size)
 {
-    UNUSED(this);
+    UNUSED(_this);
     UNUSED(buffer);
     UNUSED(size);
     return 0;
 }
 
-int devserial_openFD(proto_Device_t _this, int fileDescriptor) {
+int devserial_openFD(proto_Device_t _this, int fd) {
     UNUSED(_this);
-    UNUSED(fileDescriptor);
+    UNUSED(fd);
     return -1;
 }
 
@@ -247,23 +250,19 @@ int devserial_openFD(proto_Device_t _this, int fileDescriptor) {
 proto_Device_t devserial_create(void)
 {
     /// allocation des structures et initialisation du pointeur
-    proto_Device_t this  = (proto_Device_t)malloc( sizeof(proto_IfaceIODevice_t) );
-    this->user = (proto_dev_serial_t*)malloc(sizeof(proto_dev_serial_t));
-    devserial_init(this);
+    proto_Device_t _this  = (proto_Device_t)malloc( sizeof(proto_IfaceIODevice_t) );
+    _this->user = (proto_dev_serial_t*)malloc(sizeof(proto_dev_serial_t));
+    devserial_init(_this);
 
-    return this;
+    return _this;
 }
 
 
-void devserial_init(proto_Device_t this)
+void devserial_init(proto_Device_t _this)
 {
-    assert(this);
-    this->open = devserial_open;
-    this->close = devserial_close;
-    this->destroy = devserial_destroy;
-    this->read = devserial_read;
-    this->write = devserial_write;
+    assert(_this);
+	DEVIO_INIT(devserial, _this);
 
-    proto_dev_serial_t* infos = this->user;
-    infos->fileDescriptor = -1; // Initialisation à la valeur "invalide" retournée par l'open
+    proto_dev_serial_t* infos = _this->user;
+    infos->fd = -1; // Initialisation à la valeur "invalide" retournée par l'open
 }
