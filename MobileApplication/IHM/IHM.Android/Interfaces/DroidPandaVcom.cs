@@ -57,6 +57,8 @@ namespace IHM.Droid.Interfaces
         public const int iVendorId = 0x0483; // Id for the STM32Nucleo
         public const int iProductID = 0x5740; // Id for the STM32Nucleo
         private const bool bUseUsbManagerOnly = true; // Select méthod internaly
+        public const int BULK_XFER_TOUT_MS = 1000;
+
         /// <summary>
         /// We initialize all Android context
         /// </summary>
@@ -125,7 +127,7 @@ namespace IHM.Droid.Interfaces
         {
             int i;
             int ret;
-            for (i = 0, ret = 0; (i < usbIface.EndpointCount) && (ret< 2); i++)
+            for (i = 0, ret = 0; (i < usbIface.EndpointCount) && (ret < 2); i++)
             {
                 UsbEndpoint ep = usbIface.GetEndpoint(i);
                 if (ep.Type == UsbAddressing.XferBulk)
@@ -182,7 +184,7 @@ namespace IHM.Droid.Interfaces
                     }
                 }
             }
-                return ret;
+            return ret;
         }
 
         public void selectDevice(string name)
@@ -237,17 +239,17 @@ namespace IHM.Droid.Interfaces
             {
                 // TODO (mais le finder marche pas pour l'instant c'est bloqué)
                 CdcAcmSerialDriver cdcDriver = new CdcAcmSerialDriver(_currDriverIface.Device);
-                    UsbDeviceConnection connection = _devHandle.usbManager.OpenDevice(_currDriverIface.Device);
-                    if (connection != null)
-                    {
-                        _devHandle.fd = connection.FileDescriptor;
-                    }
-                    IList<IUsbSerialPort> ports = cdcDriver.Ports;
-                    if (ports.Count == 0)
-                        return;
-                    // L'appel ici est pour réclamer l'interface
-                    ports[0].Open(connection);
-                    // TODO....
+                UsbDeviceConnection connection = _devHandle.usbManager.OpenDevice(_currDriverIface.Device);
+                if (connection != null)
+                {
+                    _devHandle.fd = connection.FileDescriptor;
+                }
+                IList<IUsbSerialPort> ports = cdcDriver.Ports;
+                if (ports.Count == 0)
+                    return;
+                // L'appel ici est pour réclamer l'interface
+                ports[0].Open(connection);
+                // TODO....
             }
         }
 
@@ -258,25 +260,25 @@ namespace IHM.Droid.Interfaces
         /// <returns> v </returns>
         public DevHandle getDeviceConnection()
         {
-                int max_pkt_size = 0;
-                // TODO place this code when retreiving info
-                if ((_devHandle.ep_in == null) && (_devHandle.ep_out != null))
-                {
-                    max_pkt_size = _devHandle.ep_out.MaxPacketSize;
-                }
-                else if ((_devHandle.ep_in != null) && (_devHandle.ep_out == null))
-                {
-                    max_pkt_size = _devHandle.ep_in.MaxPacketSize;
-                }
-                else if ((_devHandle.ep_in != null) && (_devHandle.ep_out != null))
-                {
-                    Math.Min(_devHandle.ep_in.MaxPacketSize, _devHandle.ep_out.MaxPacketSize);
-                }
+            int max_pkt_size = 0;
+            // TODO place this code when retreiving info
+            if ((_devHandle.ep_in == null) && (_devHandle.ep_out != null))
+            {
+                max_pkt_size = _devHandle.ep_out.MaxPacketSize;
+            }
+            else if ((_devHandle.ep_in != null) && (_devHandle.ep_out == null))
+            {
+                max_pkt_size = _devHandle.ep_in.MaxPacketSize;
+            }
+            else if ((_devHandle.ep_in != null) && (_devHandle.ep_out != null))
+            {
+                Math.Min(_devHandle.ep_in.MaxPacketSize, _devHandle.ep_out.MaxPacketSize);
+            }
 
-                return new DevHandle( _devHandle.fd, 
-                                _devHandle.ep_in.EndpointNumber, 
-                                _devHandle.ep_out.EndpointNumber,
-                                max_pkt_size);
+            return new DevHandle(_devHandle.fd,
+                            _devHandle.ep_in.EndpointNumber,
+                            _devHandle.ep_out.EndpointNumber,
+                            max_pkt_size);
         }
 
 
@@ -285,37 +287,76 @@ namespace IHM.Droid.Interfaces
         /// </summary>
         /// <returns></returns>
         public int Close()
-        { 
-                /*TODO */return 0;
+        {
+            /*TODO */
+            return 0;
         }
 
+        /* TODO : put in common with the write register method */
         public int ReadRegisterFromDevice(byte uiRegister, ref byte value)
         {
             // Build the request frame using dllCom 
             proto_Frame_t frame = new proto_Frame_t();
             proto_Command_t cmd = proto_Command_t.proto_CMD_GET;
             proto_frame_data_t data = new proto_frame_data_t();
-            data.req.value = uiRegister;
-            data.reg_value = value;
+            data.req.reg = uiRegister;
+            data.req.value = 0;
             byte nbBytes = protocomm.proto_makeFrame(frame, cmd, data);
-            string szFrame = protocomm.proto_frame_data_t_p_to_charp(frame);
-            byte[] buffer = Encoding.ASCII.GetBytes(szFrame);
-          
+            byte[] buffer = new byte[protocomm.sizeof_proto_Frame_t()];
+            protocomm.protoframe_serialize(frame, buffer);
 
-            int ret = _devHandle.connection.BulkTransfer(_devHandle.ep_out, buffer, 0, buffer.Length, 1000);
+            // Create a protocole instance from frame decoding (device will not be used)
+            SWIGTYPE_p_proto_Device_t protodev = protocomm.devemulslave_create();
+            var protoHdle = protocomm.proto_master_create(protodev);
+
+            // Send request and receive reply
+            int ret = _devHandle.connection.BulkTransfer(_devHandle.ep_out, buffer, 0, buffer.Length, BULK_XFER_TOUT_MS);
             if (ret >= 0)
             {
-                Log.Debug("pandavcom", "test : successfully sent nb bytes : " + ret);
-                // Retreive the reply frame
-                // TODO
+                Log.Debug("pandavcom", "xfer : successfully sent nb bytes : " + ret);
+                // Receive the reply frame
+                // First version - take the answer with the max size possible
+                // TODO : Handle timeout as done by the library and returns its error.
+                // We reuse the buffer as R/W frame size are constant
+                ret = _devHandle.connection.BulkTransfer(_devHandle.ep_in, buffer, 0, protocomm.sizeof_proto_Frame_t(), BULK_XFER_TOUT_MS);
+                if (ret >= 0)
+                {
+                    ret = protocomm.proto_pushToFrame(protoHdle, buffer, (uint)ret);
+                    if (ret >= 0)
+                    {
+                        var pcmd = protocomm.new_proto_Command_t_p();
+                        switch (protocomm.proto_decodeFrame(protoHdle, pcmd, data))
+                        {
+                            case proto_DecodeStatus_t.proto_COMPLETED:
+                                if (protocomm.proto_Command_t_p_value(pcmd) == proto_Command_t.proto_CMD_REPLY)
+                                {
+                                    value = data.reg_value;
+                                    ret = 0;
+                                }
+                                else
+                                {
+                                    ret = -1;
+                                }
+                                break;
+                            case proto_DecodeStatus_t.proto_REFUSED:
+                                ret = -1;
+                                break;
+                            default:
+                                break;
+                        }
+                        protocomm.delete_proto_Command_t_p(pcmd);
+                    }
+                }
+                else
+                {
+                    Log.Debug("pandavcom", "read : failed to read nb bytes");
+                }
             }
             else
             {
-                Log.Debug("pandavcom", "test : failed to sent nb bytes");
+                Log.Debug("pandavcom", "write : failed to sent nb bytes");
             }
-
-
-            return -1;
+            return ret;
         }
 
         public int WriteRegisterToDevice(byte uiRegister, byte value)
@@ -323,25 +364,59 @@ namespace IHM.Droid.Interfaces
             proto_Frame_t frame = new proto_Frame_t();
             proto_Command_t cmd = proto_Command_t.proto_CMD_SET;
             proto_frame_data_t data = new proto_frame_data_t();
-            data.req.value = uiRegister;
-            data.reg_value = value;
+            data.req.reg = uiRegister;
+            data.req.value = value;
             byte nbBytes = protocomm.proto_makeFrame(frame, cmd, data);
-            string szFrame = protocomm.proto_frame_data_t_p_to_charp(frame);
-            byte[] buffer = Encoding.ASCII.GetBytes(szFrame);
+            byte[] buffer = new byte[protocomm.sizeof_proto_Frame_t()];
+            protocomm.protoframe_serialize(frame, buffer);
 
-            int ret = _devHandle.connection.BulkTransfer(_devHandle.ep_out, buffer, 0, buffer.Length, 1);
+            // Create a protocole instance from frame decoding (device will not be used)
+            SWIGTYPE_p_proto_Device_t protodev = protocomm.devemulslave_create();
+            var protoHdle = protocomm.proto_master_create(protodev);
+
+            int ret = _devHandle.connection.BulkTransfer(_devHandle.ep_out, buffer, 0, buffer.Length, BULK_XFER_TOUT_MS);
             if (ret >= 0)
             {
-                // TODO
-                Log.Debug("pandavcom", "test : successfully sent nb bytes : " + ret);
-            }
-            else
-            {
-                Log.Debug("pandavcom", "test : failed to sent nb bytes : ");
-            }
+                Log.Debug("pandavcom", "xfer : successfully sent nb bytes : " + ret);
+                // Receive the reply frame
+                // First version - take the answer with the max size possible
+                // TODO : Handle timeout as done by the library and returns its error.
+                // We reuse the buffer as R/W frame size are constant
+                ret = _devHandle.connection.BulkTransfer(_devHandle.ep_in, buffer, 0, protocomm.sizeof_proto_Frame_t(), BULK_XFER_TOUT_MS);
+                if (ret >= 0)
+                {
+                    ret = protocomm.proto_pushToFrame(protoHdle, buffer, (uint)ret);
+                    if (ret >= 0)
+                    {
+                        var pcmd = protocomm.new_proto_Command_t_p();
+                        switch (protocomm.proto_decodeFrame(protoHdle, pcmd, data))
+                        {
+                            case proto_DecodeStatus_t.proto_COMPLETED:
+                                if (protocomm.proto_Command_t_p_value(pcmd) == proto_Command_t.proto_CMD_REPLY)
+                                {
+                                    ret = 0;
+                                }
+                                else
+                                {
+                                    ret = -1;
+                                }
+                                break;
+                            case proto_DecodeStatus_t.proto_REFUSED:
+                                ret = -1;
+                                break;
+                            default:
+                                break;
+                        }
 
-            return 0;
+                        protocomm.delete_proto_Command_t_p(pcmd);
+                    }
+                }
+                else
+                {
+                    Log.Debug("pandavcom", "test : failed to sent nb bytes : ");
+                }
+            }
+            return ret;
         }
     }
-
 }

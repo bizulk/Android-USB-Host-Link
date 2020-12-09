@@ -14,6 +14,7 @@ namespace IHM
         /// Handle du dll_if
         dll_if m_dll_if;
         bool _bUseDllSerialDevice = false; // Select dll serial device or usbdev
+        bool _bUseDllforIOaccess = false; // select dll for R/W Operation OR the android usb hardware API 
         bool isConnected = false;
 
         // Nous permet d'associer nos Entry à des numéro de registre et d'iterer dessu
@@ -30,7 +31,7 @@ namespace IHM
         ObservableCollection<string> m_textLog = new ObservableCollection<string>();
 
 
-        IUsbManager usbManager_;
+        IUsbManager _iusbManager;
 
         public MainPage()
         {
@@ -51,7 +52,7 @@ namespace IHM
                 peerReg2
             };
 
-            usbManager_ = Xamarin.Forms.DependencyService.Get<IUsbManager>();
+            _iusbManager = Xamarin.Forms.DependencyService.Get<IUsbManager>();
 
             // Pour le log
             m_filename = "FileLog.log";
@@ -66,7 +67,7 @@ namespace IHM
 
         void OnButtonSendClicked(object sender, EventArgs e)
         {
-            string msgSend = "";
+            string szLog = "";
             byte regVal;
             proto_Status_t status;
 
@@ -77,35 +78,56 @@ namespace IHM
                     try
                     {
                         regVal = byte.Parse(m_lRegsEntry[i].Text); // Lève une exception si la valeur n'est pas entre 0 et 255
-                        status = m_dll_if.WriteRegister((byte)i, regVal);
-                        msgSend = "reg" + i.ToString() + "val " + regVal.ToString() + ": " + dll_if.ProtoStatusGetString(status);
-                        m_textLog.Insert(0, DateTime.Now.ToString(" HH:mm ") + " " + msgSend);   //Pour l'affichage en temps réelle dans la dialogue
-                        logfile.Info(msgSend, "");  // Pour le stockage dans le fichier
-
-                        //Affichage du log de la dll
-                        msgSend = "";
-                        while (protocomm.log_global_pop(msgSend) != 0)
+                        if (_bUseDllforIOaccess)
                         {
-                            if( string.Compare(msgSend,"") != 0 )
+                            /* FIXME : operation will always fail */
+                            status = m_dll_if.WriteRegister((byte)i, regVal);
+                        }
+                        else
+                        {
+                            // We fill the proto status as the Interface APi does not handle it
+                            // TODO : modify the API to return same code as dll
+                            if (_iusbManager.WriteRegisterToDevice((byte)i, regVal) == 0)
                             {
-                                m_textLog.Insert(0, DateTime.Now.ToString(" HH:mm ") + " " + msgSend);   //Pour l'affichage en temps réelle dans la dialogue
-                                logfile.Info(msgSend, "");  // Pour le stockage dans le fichier
+                                status = proto_Status_t.proto_NO_ERROR;
+                            }
+                            else
+                            {
+                                status = proto_Status_t.proto_ERR_SYS;
                             }
                         }
-                            
+                        szLog = "reg" + i.ToString() + "write : " + dll_if.ProtoStatusGetString(status) + ", if success refresh values";
+                        logfile.Info(szLog, ""); // Pour le stockage dans le fichier
+                        m_textLog.Insert(0, DateTime.Now.ToString(" HH:mm ") + " " + szLog);   //Pour l'affichage en temps réelle dans la dialogue
+
+                        // After the operation we pop any message for dllCom library and add it to our log
+                        // We use the encapsulated C string struc, so much easier to use for passing data
+                        // TODO : clean code : wrapp it in dll_if
+                        msg_t msgLog = new msg_t();
+                        while (protocomm.log_global_pop_msg(msgLog) != 0)
+                        {
+                            // Se how easy to access the string : just take the member
+                            if (string.Compare(msgLog.szMsg, "") != 0)
+                            {
+                                // So we add to the dialog
+                                m_textLog.Insert(0, DateTime.Now.ToString(" HH:mm ") + " " + msgLog.szMsg);
+                                // and then to the file
+                                logfile.Info(msgLog.szMsg);  // Pour le stockage dans le fichier
+                            }
+                        }
                     }
                     catch (Exception ex)
                     {
-                        msgSend = "reg" + i.ToString() + " value must be between 0 and 255";
-                        m_textLog.Insert(0, DateTime.Now.ToString(" HH:mm ") + " " + msgSend);   //Pour l'affichage en temps réelle dans la dialogue
-                        logfile.Error(msgSend, ""); // Pour le stockage dans le fichier
+                        szLog = "reg" + i.ToString() + " value must be between 0 and 255";
+                        m_textLog.Insert(0, DateTime.Now.ToString(" HH:mm ") + " " + szLog);   //Pour l'affichage en temps réelle dans la dialogue
+                        logfile.Error(szLog, ""); // Pour le stockage dans le fichier
                     }
                 }
                 else
                 {
-                    msgSend = "reg" + i.ToString() + "not set (empty user)";
-                    m_textLog.Insert(0, DateTime.Now.ToString(" HH:mm ") + " " + msgSend);   //Pour l'affichage en temps réelle dans la dialogue
-                    logfile.Error(msgSend, ""); // Pour le stockage dans le fichier
+                    szLog = "reg" + i.ToString() + "not set (empty user)";
+                    m_textLog.Insert(0, DateTime.Now.ToString(" HH:mm ") + " " + szLog);   //Pour l'affichage en temps réelle dans la dialogue
+                    logfile.Error(szLog, ""); // Pour le stockage dans le fichier
                 }
             }
 
@@ -113,23 +135,40 @@ namespace IHM
         }
         void OnButtonReceiveClicked(object sender, EventArgs e)
         {
-            string msgReceive = new string('\0', 100);
+            string szLog = "";
             byte regVal = 0;
             proto_Status_t status;
 
             for (int i = 0; i < m_lRegsLbl.Count; i++)
             {
-                status = m_dll_if.ReadRegister((byte)i, ref regVal);
-                msgReceive = "reg" + i.ToString() + "read : " + dll_if.ProtoStatusGetString(status);
-                logfile.Info(msgReceive, ""); // Pour le stockage dans le fichier
-                m_textLog.Insert(0, DateTime.Now.ToString(" HH:mm ") + " " + msgReceive);   //Pour l'affichage en temps réelle dans la dialogue
+                if (_bUseDllforIOaccess)
+                {
+                    /* FIXME : operation will always fail */
+                    status = m_dll_if.ReadRegister((byte)i, ref regVal);
+                }
+                else
+                {
+                    // We fill the proto status as the Interface APi does not handle it
+                    // TODO : modify the API to return same code as dll
+                    if (_iusbManager.ReadRegisterFromDevice((byte)i, ref regVal) == 0)
+                    {
+                        status = proto_Status_t.proto_NO_ERROR;
+                    }
+                    else
+                    {
+                        status = proto_Status_t.proto_ERR_SYS;
+                    }
+                }
+                szLog = "reg" + i.ToString() + "read : " + dll_if.ProtoStatusGetString(status);
+                logfile.Info(szLog, ""); // Pour le stockage dans le fichier
+                m_textLog.Insert(0, DateTime.Now.ToString(" HH:mm ") + " " + szLog);   //Pour l'affichage en temps réelle dans la dialogue
                 if (status == proto_Status_t.proto_NO_ERROR)
                 {
                     m_lRegsLbl[i].Text = regVal.ToString();
-                }
-
+                }           
                 // After the operation we pop any message for dllCom library and add it to our log
                 // We use the encapsulated C string struc, so much easier to use for passing data
+                // TODO : clean code : wrapp it in dll_if
                 msg_t msgLog = new msg_t();              
                 while ( protocomm.log_global_pop_msg(msgLog) != 0 )
                 {
@@ -150,7 +189,7 @@ namespace IHM
             ObservableCollection<string> usbNames = new ObservableCollection<string>();
             popupView.IsVisible = true;
             usbNames.Add("EmulSlave");
-            ICollection<string> allNames = usbManager_.getListOfConnections();
+            ICollection<string> allNames = _iusbManager.getListOfConnections();
             foreach (string name in allNames)
             {
                 usbNames.Add(name);
@@ -191,9 +230,8 @@ namespace IHM
             }
             else // everything else is a device
             {
-                // Call the system layer to create resource
-                IUsbManager iusbManager = Xamarin.Forms.DependencyService.Get<IUsbManager>();
-                iusbManager.selectDevice(name);
+
+                _iusbManager.selectDevice(name);
 
                 if (_bUseDllSerialDevice)
                 {
@@ -203,7 +241,7 @@ namespace IHM
                     if (isConnected)
                     {
                         // Récupére notre FD avec l'USBManager pour l'affecter à la lib
-                        int ret = m_dll_if.SerialSetFd(dev, iusbManager.getDeviceConnection());
+                        int ret = m_dll_if.SerialSetFd(dev, _iusbManager.getDeviceConnection());
                     };
                 }
                 else
@@ -212,7 +250,7 @@ namespace IHM
                     isConnected = (0 == m_dll_if.Open(dev, ""));
                     if (isConnected)
                     {
-                        int ret = m_dll_if.UsbDevSetFd(dev, iusbManager.getDeviceConnection());
+                        int ret = m_dll_if.UsbDevSetFd(dev, _iusbManager.getDeviceConnection());
                     }
                 }
 
@@ -230,7 +268,7 @@ namespace IHM
                 disconnectButton.IsEnabled = true;
                 
             }
-            if (isConnected == false)
+            else
             {
                 string msgFailCo = "Fail to connect";
                 logfile.Error(msgFailCo, ""); // Pour le stockage dans le fichier
