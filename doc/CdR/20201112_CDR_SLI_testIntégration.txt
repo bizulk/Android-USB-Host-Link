@@ -1,3 +1,6 @@
+-------------------------------------------------------------------------------
+July 2020
+
 Test du projet UsbSerialForAndroid porté sur Xamarin.
 Téléchargement du zip
 mise au point pour la génération : 
@@ -13,7 +16,7 @@ Installation du paquetage Nuget dans le projet Android Filaire.
 J'ai essayé "dépioter le code de démo" pour l'intégrer dans l'interface de l'IHM de test mais c'est impossible : le driver est fortement ancré dans la notion de tâche et la notion d'activité android, et basé sur la notification.
 Il faut réaliser une intégration de plus haut niveau ou indépendamment de l'application
 
-note : attention la connexion des câbles ne supporte qu'un sens : l'adaptateur mâle-femelle doit être du côté de la tablette.
+note : attention la connexion des câbles uUSB et adaptateur ne supporte qu'un sens : l'adaptateur mâle-femelle doit être du côté de la tablette.
 
 -------------------------------------------------------------------------------
 Jeudi 30/07
@@ -52,5 +55,22 @@ https://developer.android.com/guide/topics/connectivity/usb/host
 
 On est normalement dans le second cas il faut utiliser la fonction openDevice et non OPen accessory
 
-Je test si le setfd dans la dll pose problème.
+Je test si le setfd dans la dll pose problème ==> Sans changement.
+
+
+-------------------------------------------------------------------------------
+Mercredi 09/12/2020
+
+	Reprise de code de connexion DroidPandaVCom : on récupère les endpoints pour les passer à la dll, on utiliser la méthode "bulk" de transfer
+	Reprise de la dll : on ajoute un device usbdev pour utiliser l'API linux de transfer USB "userspace"
+	Reprise du code d'interface IUSBManager : on ajoute des fonctions R/W registre utilisant l'API Android pour les IO.
+	Correction du système de log dans dllCom (bug de macro, impossible de popper la fifo...)
+	Nettoyage de code.
+	Reprise du code de la page : selection de la méthode d'accès au périphérique (android/native)
+	Résultat : 
+		- l'utilisation du device usbdev n'a pas eu le résultat espéré : on a toujours un problème de ressources non trouvée.
+		- l'API android USB fonctionne : les échanges avec le device sont validés.
+		
+	Aujourd'hui on peut dire que les opérations réalisées côtée android sont valides : on arrive bien à ouvrir une interface vers le device, mais impossible pour la dll de la récupérer.
+
 
