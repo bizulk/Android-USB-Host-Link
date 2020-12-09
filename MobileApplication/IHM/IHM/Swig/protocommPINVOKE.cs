@@ -202,6 +202,21 @@ class protocommPINVOKE {
   [global::System.Runtime.InteropServices.DllImport("protocomm", EntryPoint="CSharp_uint8_t_p_value")]
   public static extern byte uint8_t_p_value(global::System.Runtime.InteropServices.HandleRef jarg1);
 
+  [global::System.Runtime.InteropServices.DllImport("protocomm", EntryPoint="CSharp_new_proto_Command_t_p")]
+  public static extern global::System.IntPtr new_proto_Command_t_p();
+
+  [global::System.Runtime.InteropServices.DllImport("protocomm", EntryPoint="CSharp_copy_proto_Command_t_p")]
+  public static extern global::System.IntPtr copy_proto_Command_t_p(int jarg1);
+
+  [global::System.Runtime.InteropServices.DllImport("protocomm", EntryPoint="CSharp_delete_proto_Command_t_p")]
+  public static extern void delete_proto_Command_t_p(global::System.Runtime.InteropServices.HandleRef jarg1);
+
+  [global::System.Runtime.InteropServices.DllImport("protocomm", EntryPoint="CSharp_proto_Command_t_p_assign")]
+  public static extern void proto_Command_t_p_assign(global::System.Runtime.InteropServices.HandleRef jarg1, int jarg2);
+
+  [global::System.Runtime.InteropServices.DllImport("protocomm", EntryPoint="CSharp_proto_Command_t_p_value")]
+  public static extern int proto_Command_t_p_value(global::System.Runtime.InteropServices.HandleRef jarg1);
+
   [global::System.Runtime.InteropServices.DllImport("protocomm", EntryPoint="CSharp_PROTO_FRAME_RECV_TOUT_MS_get")]
   public static extern int PROTO_FRAME_RECV_TOUT_MS_get();
 
@@ -383,7 +398,7 @@ class protocommPINVOKE {
   public static extern void proto_setReceiver(global::System.Runtime.InteropServices.HandleRef jarg1, global::System.Runtime.InteropServices.HandleRef jarg2, global::System.Runtime.InteropServices.HandleRef jarg3);
 
   [global::System.Runtime.InteropServices.DllImport("protocomm", EntryPoint="CSharp_proto_pushToFrame")]
-  public static extern int proto_pushToFrame(global::System.Runtime.InteropServices.HandleRef jarg1, global::System.Runtime.InteropServices.HandleRef jarg2, uint jarg3);
+  public static extern int proto_pushToFrame(global::System.Runtime.InteropServices.HandleRef jarg1, [global::System.Runtime.InteropServices.In, global::System.Runtime.InteropServices.MarshalAs(global::System.Runtime.InteropServices.UnmanagedType.LPArray)]byte[] jarg2, uint jarg3);
 
   [global::System.Runtime.InteropServices.DllImport("protocomm", EntryPoint="CSharp_proto_makeFrame")]
   public static extern byte proto_makeFrame(global::System.Runtime.InteropServices.HandleRef jarg1, int jarg2, global::System.Runtime.InteropServices.HandleRef jarg3);
@@ -481,6 +496,9 @@ class protocommPINVOKE {
   [global::System.Runtime.InteropServices.DllImport("protocomm", EntryPoint="CSharp_log_global_clear")]
   public static extern void log_global_clear();
 
-  [global::System.Runtime.InteropServices.DllImport("protocomm", EntryPoint="CSharp_proto_frame_data_t_p_to_charp")]
-  public static extern string proto_frame_data_t_p_to_charp(global::System.Runtime.InteropServices.HandleRef jarg1);
+  [global::System.Runtime.InteropServices.DllImport("protocomm", EntryPoint="CSharp_protoframe_serialize")]
+  public static extern void protoframe_serialize(global::System.Runtime.InteropServices.HandleRef jarg1, [global::System.Runtime.InteropServices.Out, global::System.Runtime.InteropServices.MarshalAs(global::System.Runtime.InteropServices.UnmanagedType.LPArray)]byte[] jarg2);
+
+  [global::System.Runtime.InteropServices.DllImport("protocomm", EntryPoint="CSharp_sizeof_proto_Frame_t")]
+  public static extern int sizeof_proto_Frame_t();
 }

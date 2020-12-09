@@ -35,6 +35,31 @@ public class protocomm {
     return ret;
   }
 
+  public static SWIGTYPE_p_proto_Command new_proto_Command_t_p() {
+    global::System.IntPtr cPtr = protocommPINVOKE.new_proto_Command_t_p();
+    SWIGTYPE_p_proto_Command ret = (cPtr == global::System.IntPtr.Zero) ? null : new SWIGTYPE_p_proto_Command(cPtr, false);
+    return ret;
+  }
+
+  public static SWIGTYPE_p_proto_Command copy_proto_Command_t_p(proto_Command_t value) {
+    global::System.IntPtr cPtr = protocommPINVOKE.copy_proto_Command_t_p((int)value);
+    SWIGTYPE_p_proto_Command ret = (cPtr == global::System.IntPtr.Zero) ? null : new SWIGTYPE_p_proto_Command(cPtr, false);
+    return ret;
+  }
+
+  public static void delete_proto_Command_t_p(SWIGTYPE_p_proto_Command obj) {
+    protocommPINVOKE.delete_proto_Command_t_p(SWIGTYPE_p_proto_Command.getCPtr(obj));
+  }
+
+  public static void proto_Command_t_p_assign(SWIGTYPE_p_proto_Command obj, proto_Command_t value) {
+    protocommPINVOKE.proto_Command_t_p_assign(SWIGTYPE_p_proto_Command.getCPtr(obj), (int)value);
+  }
+
+  public static proto_Command_t proto_Command_t_p_value(SWIGTYPE_p_proto_Command obj) {
+    proto_Command_t ret = (proto_Command_t)protocommPINVOKE.proto_Command_t_p_value(SWIGTYPE_p_proto_Command.getCPtr(obj));
+    return ret;
+  }
+
   public static proto_hdle_t proto_cio_open(string szDev) {
     global::System.IntPtr cPtr = protocommPINVOKE.proto_cio_open(szDev);
     proto_hdle_t ret = (cPtr == global::System.IntPtr.Zero) ? null : new proto_hdle_t(cPtr, false);
@@ -122,8 +147,8 @@ public class protocomm {
     protocommPINVOKE.proto_setReceiver(proto_hdle_t.getCPtr(_this), SWIGTYPE_p_f_p_void_enum_proto_Command_p_union_proto_frame_data__int.getCPtr(callback), SWIGTYPE_p_void.getCPtr(userdata));
   }
 
-  public static int proto_pushToFrame(proto_hdle_t _this, SWIGTYPE_p_unsigned_char buf, uint len) {
-    int ret = protocommPINVOKE.proto_pushToFrame(proto_hdle_t.getCPtr(_this), SWIGTYPE_p_unsigned_char.getCPtr(buf), len);
+  public static int proto_pushToFrame(proto_hdle_t _this, byte[] buf, uint len) {
+    int ret = protocommPINVOKE.proto_pushToFrame(proto_hdle_t.getCPtr(_this), buf, len);
     return ret;
   }
 
@@ -262,8 +287,12 @@ public class protocomm {
     protocommPINVOKE.log_global_clear();
   }
 
-  public static string proto_frame_data_t_p_to_charp(proto_Frame_t x) {
-    string ret = protocommPINVOKE.proto_frame_data_t_p_to_charp(proto_Frame_t.getCPtr(x));
+  public static void protoframe_serialize(proto_Frame_t pframe, byte[] buf) {
+    protocommPINVOKE.protoframe_serialize(proto_Frame_t.getCPtr(pframe), buf);
+  }
+
+  public static int sizeof_proto_Frame_t() {
+    int ret = protocommPINVOKE.sizeof_proto_Frame_t();
     return ret;
   }
 
