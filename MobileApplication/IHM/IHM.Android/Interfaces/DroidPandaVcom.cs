@@ -47,10 +47,14 @@ namespace IHM.Droid.Interfaces
                 // everything else is set to null 
             }
         }
+        ////////////////////////////
+        // CONFIG SECTION
+        private const bool bConfUseUsbManagerOnly = true; // Select method to install interface (usbserial package, or android API only)
+        public const int BULK_XFER_TOUT_MS = 1000;
+        // END
         public static String ACTION_USB_PERMISSION = "com.android.example.USB_PERMISSION";
         public const int iVendorId = 0x0483; // Id for the STM32Nucleo
         public const int iProductID = 0x5740; // Id for the STM32Nucleo
-        private const bool bUseUsbManagerOnly = true; // Select methode to install interface (usbserial package, or android API only)
 
         // usb-to-serial stuff
         private IList<IUsbSerialDriver> _availableDrivers; // Manage all available driver from package
@@ -58,7 +62,6 @@ namespace IHM.Droid.Interfaces
         // android.hardware.usb stuff
         Object _context; // Android activity context
         DroidDevHandle _devHandle = new DroidDevHandle(); // System file descriptor we will pass to dllCom library.
-        public const int BULK_XFER_TOUT_MS = 1000;
 
         /// <summary>
         /// We initialize all Android context
@@ -76,7 +79,7 @@ namespace IHM.Droid.Interfaces
             // Two ways : 
             // - Use the usbserial to retreive names
             // - Use the UsbManager (but we get system path, not pretty)
-            if (bUseUsbManagerOnly)
+            if (bConfUseUsbManagerOnly)
             {
                 return _devHandle.usbManager.DeviceList.Keys;
             }
@@ -190,7 +193,7 @@ namespace IHM.Droid.Interfaces
 
         public void selectDevice(string name)
         {
-            if (bUseUsbManagerOnly)
+            if (bConfUseUsbManagerOnly)
             {
 
                 _devHandle.usbdev = _devHandle.usbManager.DeviceList[name];
@@ -208,9 +211,7 @@ namespace IHM.Droid.Interfaces
                         return;
                     }
                 }
-                // Now open the port, two ways :
-                // - Use the USB Manager : we get the fd/enpoints and pass it to library, no more
-                // Use the UsbManager to retreive the native file descriptor
+                // Now open the port, with  the USB Manager : we get the fd/enpoints and pass it to library, no more
                 _devHandle.connection = _devHandle.usbManager.OpenDevice(_devHandle.usbdev);
                 if (_devHandle.connection != null)
                 {
@@ -223,9 +224,6 @@ namespace IHM.Droid.Interfaces
                     {
                         Log.Debug("pandavcom", "FAILED : open device endpoint" + _devHandle.usbdev.DeviceName);
                     }
-
-                    // Juste note the following : UsbDeviceConnection wrapps the usbfs API.
-                    // connection.BulkTransfer( endpoint...).
                 }
             }
             else

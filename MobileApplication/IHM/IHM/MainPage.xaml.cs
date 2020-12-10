@@ -11,10 +11,14 @@ namespace IHM
 {
     public partial class MainPage : ContentPage
     {
+
+        ////////////////////////////
+        // CONFIG SECTION
+        bool _bConfUseDllSerialDevice = false; // Select dll serial device or usbdev
+        bool _bConfUseDllforIOaccess = false; // select dll for R/W Operation OR the android usb hardware API 
+        ////////////////////////////
         /// Handle du dll_if
         dll_if m_dll_if;
-        bool _bUseDllSerialDevice = false; // Select dll serial device or usbdev
-        bool _bUseDllforIOaccess = false; // select dll for R/W Operation OR the android usb hardware API 
         bool isConnected = false;
 
         // Nous permet d'associer nos Entry à des numéro de registre et d'iterer dessu
@@ -78,7 +82,7 @@ namespace IHM
                     try
                     {
                         regVal = byte.Parse(m_lRegsEntry[i].Text); // Lève une exception si la valeur n'est pas entre 0 et 255
-                        if (_bUseDllforIOaccess)
+                        if (_bConfUseDllforIOaccess)
                         {
                             /* FIXME : operation will always fail */
                             status = m_dll_if.WriteRegister((byte)i, regVal);
@@ -141,7 +145,7 @@ namespace IHM
 
             for (int i = 0; i < m_lRegsLbl.Count; i++)
             {
-                if (_bUseDllforIOaccess)
+                if (_bConfUseDllforIOaccess)
                 {
                     /* FIXME : operation will always fail */
                     status = m_dll_if.ReadRegister((byte)i, ref regVal);
@@ -233,7 +237,7 @@ namespace IHM
 
                 _iusbManager.selectDevice(name);
 
-                if (_bUseDllSerialDevice)
+                if (_bConfUseDllSerialDevice)
                 {
                     // On demande a la dll de s'initialiser sans essayer d'ouvrir un port, car on va s'en occuper
                     SWIGTYPE_p_proto_Device_t dev = m_dll_if.CreateDevSerial();
