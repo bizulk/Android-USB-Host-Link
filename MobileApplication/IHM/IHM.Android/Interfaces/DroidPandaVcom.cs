@@ -48,15 +48,16 @@ namespace IHM.Droid.Interfaces
             }
         }
         public static String ACTION_USB_PERMISSION = "com.android.example.USB_PERMISSION";
+        public const int iVendorId = 0x0483; // Id for the STM32Nucleo
+        public const int iProductID = 0x5740; // Id for the STM32Nucleo
+        private const bool bUseUsbManagerOnly = true; // Select methode to install interface (usbserial package, or android API only)
+
         // usb-to-serial stuff
         private IList<IUsbSerialDriver> _availableDrivers; // Manage all available driver from package
-        IUsbSerialDriver _currDriverIface; // Currently applied driver
+        private IUsbSerialDriver _currDriverIface; // Currently applied driver
         // android.hardware.usb stuff
         Object _context; // Android activity context
         DroidDevHandle _devHandle = new DroidDevHandle(); // System file descriptor we will pass to dllCom library.
-        public const int iVendorId = 0x0483; // Id for the STM32Nucleo
-        public const int iProductID = 0x5740; // Id for the STM32Nucleo
-        private const bool bUseUsbManagerOnly = true; // Select méthod internaly
         public const int BULK_XFER_TOUT_MS = 1000;
 
         /// <summary>
