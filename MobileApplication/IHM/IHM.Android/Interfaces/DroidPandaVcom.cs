@@ -69,7 +69,7 @@ namespace IHM.Droid.Interfaces
             _devHandle.usbManager = (UsbManager)((ContextWrapper)context).GetSystemService(Context.UsbService);
         }
 
-        // Retreive the connected device.
+        // Retreive the physically connected devices.
         public ICollection<string> getListOfConnections()
         {
             // Two ways : 
@@ -191,24 +191,16 @@ namespace IHM.Droid.Interfaces
         {
             if (bUseUsbManagerOnly)
             {
-                // Because we did not use the UsbSerial to probe the device we do theses steps here 
-                // Steps are : 
-                //  - Probe device
-                //  ==> put out this UbSerial code
-                // Probing a unique  driver  CDC Acm for the St Eval Board
-                var table = new ProbeTable();
-                table.AddProduct(iVendorId, iProductID, Java.Lang.Class.FromType(typeof(CdcAcmSerialDriver)));
-                var prober = new UsbSerialProber(table);
-                _currDriverIface = prober.ProbeDevice(_devHandle.usbManager.DeviceList[name]);
-                _devHandle.usbdev = _currDriverIface.Device;
+
+                _devHandle.usbdev = _devHandle.usbManager.DeviceList[name];
                 // Ask for permission to access the created device
-                if (!_devHandle.usbManager.HasPermission(_currDriverIface.Device))
+                if (!_devHandle.usbManager.HasPermission(_devHandle.usbdev))
                 {
                     PendingIntent pi = PendingIntent.GetBroadcast((ContextWrapper)_context, 0, new Intent(ACTION_USB_PERMISSION), 0);
-                    _devHandle.usbManager.RequestPermission(_currDriverIface.Device, pi);
+                    _devHandle.usbManager.RequestPermission(_devHandle.usbdev, pi);
                     /* We check the permission was given
                      */
-                    if (!_devHandle.usbManager.HasPermission(_currDriverIface.Device))
+                    if (!_devHandle.usbManager.HasPermission(_devHandle.usbdev))
                     {
                         // Loose !
                         Log.Debug("pandavcom", "FAILED : did not have persmission to open device" + _devHandle.usbdev.DeviceName);
@@ -224,11 +216,11 @@ namespace IHM.Droid.Interfaces
                     if (OpenInterface(_devHandle.usbdev, _devHandle.connection, ref _devHandle.usbIface, ref _devHandle.ep_in, ref _devHandle.ep_out) == 0)
                     {
                         _devHandle.fd = _devHandle.connection.FileDescriptor;
-                        Log.Debug("pandavcom", "opened device endpoint" + _currDriverIface.Device.DeviceName + "with descriptor: " + _devHandle.fd);
+                        Log.Debug("pandavcom", "opened device endpoint" + _devHandle.usbdev.DeviceName + "with descriptor: " + _devHandle.fd);
                     }
                     else
                     {
-                        Log.Debug("pandavcom", "FAILED : open device endpoint" + _currDriverIface.Device.DeviceName);
+                        Log.Debug("pandavcom", "FAILED : open device endpoint" + _devHandle.usbdev.DeviceName);
                     }
 
                     // Juste note the following : UsbDeviceConnection wrapps the usbfs API.
@@ -237,6 +229,18 @@ namespace IHM.Droid.Interfaces
             }
             else
             {
+                // THIS IS WIP CODE THAT USES USBSERIAL.
+                // Because we did not use the UsbSerial to probe the device we do theses steps here 
+                // Steps are : 
+                //  - Probe device
+                //  ==> put out this UbSerial code
+                // Probing a unique  driver  CDC Acm for the St Eval Board
+                var table = new ProbeTable();
+                table.AddProduct(iVendorId, iProductID, Java.Lang.Class.FromType(typeof(CdcAcmSerialDriver)));
+                var prober = new UsbSerialProber(table);
+                _currDriverIface = prober.ProbeDevice(_devHandle.usbManager.DeviceList[name]);
+                _devHandle.usbdev = _currDriverIface.Device;
+
                 // TODO (mais le finder marche pas pour l'instant c'est bloqué)
                 CdcAcmSerialDriver cdcDriver = new CdcAcmSerialDriver(_currDriverIface.Device);
                 UsbDeviceConnection connection = _devHandle.usbManager.OpenDevice(_currDriverIface.Device);
