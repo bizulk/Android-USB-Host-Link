@@ -74,3 +74,17 @@ Mercredi 09/12/2020
 	Aujourd'hui on peut dire que les opérations réalisées côtée android sont valides : on arrive bien à ouvrir une interface vers le device, mais impossible pour la dll de la récupérer.
 
 
+-------------------------------------------------------------------------------	
+Jeudi 10/12/2020
+
+	Nettoyage de code.
+	Il est possible d'ouvrir un shell distant sur la plateforme (invite de commande android adb).
+	Cela m'a permis de vérifier que le fd crée existe bien : 
+		shell@i15-TCL:/proc/29121 $ ls -la fd
+		lrwx------ u0_a81   u0_a81            2020-12-10 16:03 34 -> /dev/bus/usb/001/034
+	il est possible que la lib s'exécute dans un autre contexte et que par conséquent nous n'ayons pas les droits d'accéder au fichier.
+	
+	
+	
+
+
