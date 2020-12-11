@@ -2,8 +2,10 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <ClCompile Include="protocomm.Android.cpp" />
+    <ClCompile Include="..\..\..\..\libcomm\devices\device_usbdev.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h" />
+    <ClInclude Include="..\..\..\..\libcomm\devices\device_usbdev.h" />
   </ItemGroup>
 </Project>
