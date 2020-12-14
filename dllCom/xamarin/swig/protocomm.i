@@ -6,6 +6,7 @@
 	#include "devices/device_emulslave.h"
 	#include "devices/device_serial.h"
 	#include "devices/device_usbdev.h"
+	#include "devices/device_libusb.h"
 	
 	void protoframe_serialize(proto_Frame_t * pframe, uint8_t * buf )
 	{ 
@@ -40,11 +41,12 @@ CSHARP_ARRAYS(char, byte)
 %include "device_emulslave.h"
 %include "device_serial.h"
 %include "device_usbdev.h"
+%include "device_libusb.h"
 %include "log.h"
 
 
 /* Extra function for helping to interact with the dll 
-	pointer_cast does not work it converts char to string, not handled then
+	pointer_cast does not work it converts char to string, not handled then. We make a specific data copy to byte buffer
 */
 %apply char OUTPUT[]  { uint8_t * buf }
 void protoframe_serialize(proto_Frame_t * pframe, uint8_t * buf );

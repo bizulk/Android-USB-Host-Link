@@ -23,9 +23,6 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)..\..\..\..\libcomm\log.c">
       <Filter>dll</Filter>
     </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\..\..\libcomm\devices\device_usbdev.c">
-      <Filter>dll</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="$(MSBuildThisFileDirectory)protocomm.h" />
@@ -51,9 +48,6 @@
       <Filter>dll</Filter>
     </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)..\..\..\..\libcomm\log.h">
-      <Filter>dll</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\..\..\libcomm\devices\device_usbdev.h">
       <Filter>dll</Filter>
     </ClInclude>
   </ItemGroup>

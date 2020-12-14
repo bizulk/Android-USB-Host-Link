@@ -160,9 +160,22 @@ namespace IHM
             return dev;
         }
 
+        public SWIGTYPE_p_proto_Device_t CreateDevLibUsb()
+        {
+            SWIGTYPE_p_proto_Device_t dev;
+            dev = protocomm.devlibusb_create();
+            return dev;
+        }
+
         public int UsbDevSetFd(SWIGTYPE_p_proto_Device_t dev, DevHandle devh)
         {
             int ret = protocomm.devusbdev_setDev(dev, devh.fd, devh.ep_in, devh.ep_out, devh.max_pkt_size);
+            return ret;
+        }
+
+        public int LibUsbSetFd(SWIGTYPE_p_proto_Device_t dev, DevHandle devh)
+        {
+            int ret = protocomm.devlibusb_setFD(dev, devh.fd, devh.ep_in, devh.ep_out, devh.max_pkt_size);
             return ret;
         }
 

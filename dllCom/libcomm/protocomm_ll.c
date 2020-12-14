@@ -67,8 +67,6 @@ int proto_writeFrame(proto_hdle_t* this, proto_Command_t command, proto_frame_da
     int ret = 0;
 	uint8_t nbBytes = proto_makeFrame(&this->priv_frame, command, args);
     ret = this->priv_iodevice->write(this->priv_iodevice, &this->priv_frame, nbBytes);
-
-    LOG("error : proto_writeFrame nbBytes : %d", nbBytes);
     return ret;
 }
 
@@ -103,13 +101,13 @@ proto_Status_t proto_readFrame(proto_hdle_t* this, int16_t tout_ms) {
         }
         else // On n'a pas réussi à tout lire dans le délai
         {
+			LOG("error : timeout, nb read %d", nbRead);
             ret = proto_TIMEOUT;
         }
     }
     else if( nbRead < 0)
     {
         ret = proto_ERR_SYS;
-        LOG("error : nbRead est inférieur à O (protocomm_ll.c) len :%d nbRead : %d", len, nbRead);
     }
     else if( nbRead == 0)
     {

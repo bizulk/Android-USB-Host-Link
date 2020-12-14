@@ -18,8 +18,8 @@ proto_Device_t LIBCOMM_EXPORT devusbdev_create(void);
 
 /// \brief Retrieve externally installed interface to device
 /// \param _this proto_Device_t qui utilisera ce file descriptor
-/// \param ep_in endpoint number device to host
-/// \param ep_out endpoint host to device
+/// \param ep_in endpoint address device to host
+/// \param ep_out endpoint address host to device
 /// \param max_pkt_size max packet size, so the transfert can split data. If <=0 no limitation is set 
 /// \return 0 si ok, -1 if not validated (for now just check those number are > 0)
 ///	TODO : Handle max packet size

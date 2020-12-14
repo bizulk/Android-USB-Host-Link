@@ -14,19 +14,26 @@ namespace IHM
 
         ////////////////////////////
         // CONFIG SECTION
-        bool _bConfUseDllSerialDevice = false; // Select dll serial device or usbdev
-        bool _bConfUseDllforIOaccess = false; // select dll for R/W Operation OR the android usb hardware API 
+        public enum DllDeviceType
+        {
+            devtype_serial,
+            devtype_usbdev,
+            devtype_libusb
+        };
+        DllDeviceType _eConfDllSerialDevice = DllDeviceType.devtype_libusb; // Select dll device
+        bool _bConfUseAndroidforIOaccess = false; // select dll for R/W Operation OR the android usb hardware API 
+
         ////////////////////////////
         /// Handle du dll_if
         dll_if m_dll_if;
         bool isConnected = false;
 
-        // Nous permet d'associer nos Entry à des numéro de registre et d'iterer dessu
+        // creates a list of our entries in order to process them by iterating
         List<Entry> m_lRegsEntry;
         // Liste des valeurs lues
         List<Label> m_lRegsLbl;
 
-        // Pour le fichier de log
+        // Or log file content
         public List<string> textLogList;
         LogFile logfile = LogFile.Instance();
         //Nom complet du fichier (chemin + nom)
@@ -34,7 +41,7 @@ namespace IHM
         //Texte à afficher log
         ObservableCollection<string> m_textLog = new ObservableCollection<string>();
 
-
+        public const string szDllDevEmulSlaveName = "EmulSlave";
         IUsbManager _iusbManager;
 
         public MainPage()
@@ -43,7 +50,6 @@ namespace IHM
             //On récupère l'instance de dll_if pour appeler les fonctions de la DLL
             m_dll_if = dll_if.GetInstance;
 
-            // on liste nos registres
             m_lRegsEntry = new List<Entry>
             {
                 userReg1,
@@ -62,11 +68,11 @@ namespace IHM
             m_filename = "FileLog.log";
             string path = logfile.GetLocalStoragePath();
             m_filename = Path.Combine(path, m_filename);
-
+            // fill log view with the log file contact
             fillLog();
-
-            //On remplit la listview
             listLog.ItemsSource = m_textLog;
+
+            switchUseApiAndroidXfer.IsToggled = _bConfUseAndroidforIOaccess;
         }
 
         void OnButtonSendClicked(object sender, EventArgs e)
@@ -82,9 +88,8 @@ namespace IHM
                     try
                     {
                         regVal = byte.Parse(m_lRegsEntry[i].Text); // Lève une exception si la valeur n'est pas entre 0 et 255
-                        if (_bConfUseDllforIOaccess)
+                        if (! _bConfUseAndroidforIOaccess)
                         {
-                            /* FIXME : operation will always fail */
                             status = m_dll_if.WriteRegister((byte)i, regVal);
                         }
                         else
@@ -122,7 +127,7 @@ namespace IHM
                     }
                     catch (Exception ex)
                     {
-                        szLog = "reg" + i.ToString() + " value must be between 0 and 255";
+                        szLog = "reg" + i.ToString() + " value must be between 0 and 255, " + ex.Message;
                         m_textLog.Insert(0, DateTime.Now.ToString(" HH:mm ") + " " + szLog);   //Pour l'affichage en temps réelle dans la dialogue
                         logfile.Error(szLog, ""); // Pour le stockage dans le fichier
                     }
@@ -145,7 +150,7 @@ namespace IHM
 
             for (int i = 0; i < m_lRegsLbl.Count; i++)
             {
-                if (_bConfUseDllforIOaccess)
+                if (! _bConfUseAndroidforIOaccess)
                 {
                     /* FIXME : operation will always fail */
                     status = m_dll_if.ReadRegister((byte)i, ref regVal);
@@ -189,10 +194,11 @@ namespace IHM
         }
         void OnButtonConnectClicked(object sender, EventArgs e)
         {
-            //To do : call method to connect
+            // We display the list of device name for user selection.
             ObservableCollection<string> usbNames = new ObservableCollection<string>();
             popupView.IsVisible = true;
-            usbNames.Add("EmulSlave");
+            // We add the emulslave as it is a pseudo device
+            usbNames.Add(szDllDevEmulSlaveName);
             ICollection<string> allNames = _iusbManager.getListOfConnections();
             foreach (string name in allNames)
             {
@@ -226,38 +232,45 @@ namespace IHM
         }
         void connect(string name)
         {         
-            if (name == "EmulSlave") 
+            if (name == szDllDevEmulSlaveName) 
             {
-                // Test
-                // Ouverture de la connexion
                 isConnected = (m_dll_if.Open(m_dll_if.CreateEmulslave(), "") ==0); 
             }
-            else // everything else is a device
+            else // everything else is a true device
             {
-
                 _iusbManager.selectDevice(name);
-
-                if (_bConfUseDllSerialDevice)
+                SWIGTYPE_p_proto_Device_t dev;
+                switch (_eConfDllSerialDevice)
                 {
-                    // On demande a la dll de s'initialiser sans essayer d'ouvrir un port, car on va s'en occuper
-                    SWIGTYPE_p_proto_Device_t dev = m_dll_if.CreateDevSerial();
-                    isConnected = (0 == m_dll_if.Open(dev, ""));
-                    if (isConnected)
-                    {
-                        // Récupére notre FD avec l'USBManager pour l'affecter à la lib
-                        int ret = m_dll_if.SerialSetFd(dev, _iusbManager.getDeviceConnection());
-                    };
-                }
-                else
-                {
-                    SWIGTYPE_p_proto_Device_t dev = m_dll_if.CreateDevUsbDev();
-                    isConnected = (0 == m_dll_if.Open(dev, ""));
-                    if (isConnected)
-                    {
-                        int ret = m_dll_if.UsbDevSetFd(dev, _iusbManager.getDeviceConnection());
-                    }
-                }
+                    /* May be we shall just passe the device type we wish to the dll so that it creates the device it self */
+                    case DllDeviceType.devtype_serial:
+                        // On demande a la dll de s'initialiser sans essayer d'ouvrir un port, car on va s'en occuper
+                        dev = m_dll_if.CreateDevSerial();
+                        isConnected = (0 == m_dll_if.Open(dev, ""));
+                        if (isConnected)
+                        {
+                            // Récupére notre FD avec l'USBManager pour l'affecter à la lib
+                            int ret = m_dll_if.SerialSetFd(dev, _iusbManager.getDeviceConnection());
+                        };
+                        break;
+                    case DllDeviceType.devtype_usbdev:
+                        dev = m_dll_if.CreateDevUsbDev();
+                        isConnected = (0 == m_dll_if.Open(dev, ""));
+                        if (isConnected)
+                        {
+                            int ret = m_dll_if.UsbDevSetFd(dev, _iusbManager.getDeviceConnection());
+                        }
+                        break;
+                    case DllDeviceType.devtype_libusb:
+                        dev = m_dll_if.CreateDevLibUsb();
+                        isConnected = (0 == m_dll_if.Open(dev, name));
+                        if (isConnected)
+                        {
+                            int ret = m_dll_if.LibUsbSetFd(dev, _iusbManager.getDeviceConnection());
+                        }
+                        break;
 
+                }
             }
 
             // Gestion de l'affichage
@@ -278,6 +291,16 @@ namespace IHM
                 logfile.Error(msgFailCo, ""); // Pour le stockage dans le fichier
                 m_textLog.Insert(0, DateTime.Now.ToString(" HH:mm ") + " " + msgFailCo);   //Pour l'affichage en temps réelle dans la dialogue
             }
+        }
+
+        void OnToggled(object sender, ToggledEventArgs e)
+        {
+            // Perform an action after examining e.Value
+            //sender.Equals
+            if( sender.Equals(switchUseApiAndroidXfer))
+            {
+                _bConfUseAndroidforIOaccess = switchUseApiAndroidXfer.IsToggled;
+            }     
         }
 
         // ******************* Pour le log ***************************

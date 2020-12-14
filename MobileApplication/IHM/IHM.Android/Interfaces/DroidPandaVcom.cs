@@ -202,6 +202,8 @@ namespace IHM.Droid.Interfaces
                 {
                     PendingIntent pi = PendingIntent.GetBroadcast((ContextWrapper)_context, 0, new Intent(ACTION_USB_PERMISSION), 0);
                     _devHandle.usbManager.RequestPermission(_devHandle.usbdev, pi);
+                    
+                    // FIXME : The wapp don't wait for user input and crash when asking permission 1st time, we must move this code to an event receiver
                     /* We check the permission was given
                      */
                     if (!_devHandle.usbManager.HasPermission(_devHandle.usbdev))
@@ -279,8 +281,8 @@ namespace IHM.Droid.Interfaces
             }
 
             return new DevHandle(_devHandle.fd,
-                            _devHandle.ep_in.EndpointNumber,
-                            _devHandle.ep_out.EndpointNumber,
+                            (int)_devHandle.ep_in.Address,
+                            (int)_devHandle.ep_out.Address,
                             max_pkt_size);
         }
 
