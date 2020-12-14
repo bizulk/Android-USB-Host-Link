@@ -91,28 +91,36 @@
   <ImportGroup Label="PropertySheets" />
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">
-    <IncludePath>$(SolutionDir)\..\..\libComm;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)\..\..\libComm;$(SolutionDir)\..\..\..\libusb-android\libusb\os;$(SolutionDir)\..\..\..\libusb-android\libusb;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)\..\..\..\libusb-android\android\libs\$(TargetArchAbi);$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">
-    <IncludePath>$(SolutionDir)\..\..\libComm;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)\..\..\libComm;$(SolutionDir)\..\..\..\libusb-android\libusb\os;$(SolutionDir)\..\..\..\libusb-android\libusb;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)\..\..\..\libusb-android\android\libs\$(TargetArchAbi);$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'">
-    <IncludePath>$(SolutionDir)\..\..\libComm;$(LLVMToolchainPrebuiltRoot)\lib64\clang\$(LLVMVersion)\include;</IncludePath>
+    <IncludePath>$(SolutionDir)\..\..\libComm;$(SolutionDir)\..\..\..\libusb-android\libusb\os;$(SolutionDir)\..\..\..\libusb-android\libusb;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)\..\..\..\libusb-android\android\libs\$(TargetArchAbi);$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'">
-    <IncludePath>$(SolutionDir)\..\..\libComm;$(LLVMToolchainPrebuiltRoot)\lib64\clang\$(LLVMVersion)\include;</IncludePath>
+    <IncludePath>$(SolutionDir)\..\..\libComm;$(SolutionDir)\..\..\..\libusb-android\libusb\os;$(SolutionDir)\..\..\..\libusb-android\libusb;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)\..\..\..\libusb-android\android\libs\$(TargetArchAbi);$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>$(SolutionDir)\..\..\libComm;$(LLVMToolchainPrebuiltRoot)\lib64\clang\$(LLVMVersion)\include;</IncludePath>
+    <IncludePath>$(SolutionDir)\..\..\libComm;$(SolutionDir)\..\..\..\libusb-android\libusb\os;$(SolutionDir)\..\..\..\libusb-android\libusb;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)\..\..\..\libusb-android\android\libs\$(TargetArchAbi);$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <IncludePath>$(SolutionDir)\..\..\libComm;$(LLVMToolchainPrebuiltRoot)\lib64\clang\$(LLVMVersion)\include;</IncludePath>
+    <IncludePath>$(SolutionDir)\..\..\libComm;$(SolutionDir)\..\..\..\libusb-android\libusb\os;$(SolutionDir)\..\..\..\libusb-android\libusb;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)\..\..\..\libusb-android\android\libs\$(TargetArchAbi);$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">
-    <IncludePath>$(SolutionDir)\..\..\libComm;$(LLVMToolchainPrebuiltRoot)\lib64\clang\$(LLVMVersion)\include;</IncludePath>
+    <IncludePath>$(SolutionDir)\..\..\libComm;$(SolutionDir)\..\..\..\libusb-android\libusb\os;$(SolutionDir)\..\..\..\libusb-android\libusb;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)\..\..\..\libusb-android\android\libs\$(TargetArchAbi);$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x86'">
-    <IncludePath>$(SolutionDir)\..\..\libComm;$(LLVMToolchainPrebuiltRoot)\lib64\clang\$(LLVMVersion)\include;</IncludePath>
+    <IncludePath>$(SolutionDir)\..\..\libComm;$(SolutionDir)\..\..\..\libusb-android\libusb\os;$(SolutionDir)\..\..\..\libusb-android\libusb;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)\..\..\..\libusb-android\android\libs\$(TargetArchAbi);$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'">
     <ClCompile>
@@ -120,6 +128,13 @@
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <AdditionalOptions>-D PLATFORM=0 %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
+    <Link>
+      <LibraryDependencies>usb-1.0;%(LibraryDependencies)</LibraryDependencies>
+      <VerboseOutput>false</VerboseOutput>
+      <ShowProgress>false</ShowProgress>
+      <SharedLibrarySearchPath>%(SharedLibrarySearchPath)</SharedLibrarySearchPath>
+      <AdditionalLibraryDirectories>$(SolutionDir)\..\..\..\libusb-android\android\libs\$(TargetArchAbi);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+    </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'">
     <ClCompile>
@@ -127,6 +142,13 @@
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <AdditionalOptions>-D PLATFORM=0 %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
+    <Link>
+      <LibraryDependencies>usb-1.0;%(LibraryDependencies)</LibraryDependencies>
+      <VerboseOutput>false</VerboseOutput>
+      <ShowProgress>false</ShowProgress>
+      <SharedLibrarySearchPath>%(SharedLibrarySearchPath)</SharedLibrarySearchPath>
+      <AdditionalLibraryDirectories>$(SolutionDir)\..\..\..\libusb-android\android\libs\$(TargetArchAbi);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+    </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">
     <ClCompile>
@@ -134,6 +156,13 @@
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <AdditionalOptions>-D PLATFORM=0 %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
+    <Link>
+      <LibraryDependencies>usb-1.0;%(LibraryDependencies)</LibraryDependencies>
+      <VerboseOutput>false</VerboseOutput>
+      <ShowProgress>false</ShowProgress>
+      <SharedLibrarySearchPath>%(SharedLibrarySearchPath)</SharedLibrarySearchPath>
+      <AdditionalLibraryDirectories>$(SolutionDir)\..\..\..\libusb-android\android\libs\$(TargetArchAbi);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+    </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">
     <ClCompile>
@@ -141,6 +170,13 @@
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <AdditionalOptions>-D PLATFORM=0 %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
+    <Link>
+      <LibraryDependencies>usb-1.0;%(LibraryDependencies)</LibraryDependencies>
+      <VerboseOutput>false</VerboseOutput>
+      <ShowProgress>false</ShowProgress>
+      <SharedLibrarySearchPath>%(SharedLibrarySearchPath)</SharedLibrarySearchPath>
+      <AdditionalLibraryDirectories>$(SolutionDir)\..\..\..\libusb-android\android\libs\$(TargetArchAbi);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+    </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -148,6 +184,13 @@
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <AdditionalOptions>-D PLATFORM=0 %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
+    <Link>
+      <LibraryDependencies>usb-1.0;%(LibraryDependencies)</LibraryDependencies>
+      <VerboseOutput>false</VerboseOutput>
+      <ShowProgress>false</ShowProgress>
+      <SharedLibrarySearchPath>%(SharedLibrarySearchPath)</SharedLibrarySearchPath>
+      <AdditionalLibraryDirectories>$(SolutionDir)\..\..\..\libusb-android\android\libs\$(TargetArchAbi);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+    </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -155,6 +198,13 @@
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <AdditionalOptions>-D PLATFORM=0 %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
+    <Link>
+      <LibraryDependencies>usb-1.0;%(LibraryDependencies)</LibraryDependencies>
+      <VerboseOutput>false</VerboseOutput>
+      <ShowProgress>false</ShowProgress>
+      <SharedLibrarySearchPath>%(SharedLibrarySearchPath)</SharedLibrarySearchPath>
+      <AdditionalLibraryDirectories>$(SolutionDir)\..\..\..\libusb-android\android\libs\$(TargetArchAbi);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+    </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">
     <ClCompile>
@@ -162,6 +212,13 @@
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <AdditionalOptions>-D PLATFORM=0 %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
+    <Link>
+      <LibraryDependencies>usb-1.0;%(LibraryDependencies)</LibraryDependencies>
+      <VerboseOutput>false</VerboseOutput>
+      <ShowProgress>false</ShowProgress>
+      <SharedLibrarySearchPath>%(SharedLibrarySearchPath)</SharedLibrarySearchPath>
+      <AdditionalLibraryDirectories>$(SolutionDir)\..\..\..\libusb-android\android\libs\$(TargetArchAbi);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+    </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x86'">
     <ClCompile>
@@ -169,12 +226,21 @@
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <AdditionalOptions>-D PLATFORM=0 %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
+    <Link>
+      <LibraryDependencies>usb-1.0;%(LibraryDependencies)</LibraryDependencies>
+      <VerboseOutput>false</VerboseOutput>
+      <ShowProgress>false</ShowProgress>
+      <SharedLibrarySearchPath>%(SharedLibrarySearchPath)</SharedLibrarySearchPath>
+      <AdditionalLibraryDirectories>$(SolutionDir)\..\..\..\libusb-android\android\libs\$(TargetArchAbi);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+    </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\..\..\libcomm\devices\device_libusb.h" />
     <ClInclude Include="..\..\..\..\libcomm\devices\device_usbdev.h" />
     <ClInclude Include="pch.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\..\..\libcomm\devices\device_libusb.c" />
     <ClCompile Include="..\..\..\..\libcomm\devices\device_usbdev.c" />
     <ClCompile Include="protocomm.Android.cpp" />
   </ItemGroup>

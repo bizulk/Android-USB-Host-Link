@@ -3,9 +3,11 @@
   <ItemGroup>
     <ClCompile Include="protocomm.Android.cpp" />
     <ClCompile Include="..\..\..\..\libcomm\devices\device_usbdev.c" />
+    <ClCompile Include="..\..\..\..\libcomm\devices\device_libusb.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h" />
     <ClInclude Include="..\..\..\..\libcomm\devices\device_usbdev.h" />
+    <ClInclude Include="..\..\..\..\libcomm\devices\device_libusb.h" />
   </ItemGroup>
 </Project>

@@ -436,6 +436,15 @@ class protocommPINVOKE {
   [global::System.Runtime.InteropServices.DllImport("protocomm", EntryPoint="CSharp_devusbdev_getFD")]
   public static extern int devusbdev_getFD(global::System.Runtime.InteropServices.HandleRef jarg1);
 
+  [global::System.Runtime.InteropServices.DllImport("protocomm", EntryPoint="CSharp_devlibusb_create")]
+  public static extern global::System.IntPtr devlibusb_create();
+
+  [global::System.Runtime.InteropServices.DllImport("protocomm", EntryPoint="CSharp_devlibusb_setFD")]
+  public static extern int devlibusb_setFD(global::System.Runtime.InteropServices.HandleRef jarg1, int jarg2, int jarg3, int jarg4, int jarg5);
+
+  [global::System.Runtime.InteropServices.DllImport("protocomm", EntryPoint="CSharp_devlibusb_getFD")]
+  public static extern int devlibusb_getFD(global::System.Runtime.InteropServices.HandleRef jarg1);
+
   [global::System.Runtime.InteropServices.DllImport("protocomm", EntryPoint="CSharp_LOG_MSG_LEN_get")]
   public static extern int LOG_MSG_LEN_get();
 

@@ -213,6 +213,23 @@ public class protocomm {
     return ret;
   }
 
+  public static SWIGTYPE_p_proto_Device_t devlibusb_create() {
+    SWIGTYPE_p_proto_Device_t ret = new SWIGTYPE_p_proto_Device_t(protocommPINVOKE.devlibusb_create(), true);
+    return ret;
+  }
+
+  public static int devlibusb_setFD(SWIGTYPE_p_proto_Device_t _this, int fd, int ep_in, int ep_out, int max_pkt_size) {
+    int ret = protocommPINVOKE.devlibusb_setFD(SWIGTYPE_p_proto_Device_t.getCPtr(_this), fd, ep_in, ep_out, max_pkt_size);
+    if (protocommPINVOKE.SWIGPendingException.Pending) throw protocommPINVOKE.SWIGPendingException.Retrieve();
+    return ret;
+  }
+
+  public static int devlibusb_getFD(SWIGTYPE_p_proto_Device_t _this) {
+    int ret = protocommPINVOKE.devlibusb_getFD(SWIGTYPE_p_proto_Device_t.getCPtr(_this));
+    if (protocommPINVOKE.SWIGPendingException.Pending) throw protocommPINVOKE.SWIGPendingException.Retrieve();
+    return ret;
+  }
+
   public static SWIGTYPE_p_log_handle log_create(uint nbMsg) {
     global::System.IntPtr cPtr = protocommPINVOKE.log_create(nbMsg);
     SWIGTYPE_p_log_handle ret = (cPtr == global::System.IntPtr.Zero) ? null : new SWIGTYPE_p_log_handle(cPtr, false);
