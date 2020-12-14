@@ -60,6 +60,11 @@
                         Grid.Column="2"
                         Grid.ColumnSpan="2"
                        x:Name="userReg2"/>
+                <Label Grid.Row="4" Grid.Column="0" 
+                       Text="Use API Android Xfer"/>
+                <Switch  Grid.Row="4" Grid.Column="1"
+                        Toggled="OnToggled"                      
+                         x:Name="switchUseApiAndroidXfer" />
                 <Button Grid.Row="6"
                         Grid.Column="0"
                         Grid.ColumnSpan="2"
