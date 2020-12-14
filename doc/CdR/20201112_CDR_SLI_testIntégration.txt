@@ -79,12 +79,55 @@ Jeudi 10/12/2020
 
 	Nettoyage de code.
 	Il est possible d'ouvrir un shell distant sur la plateforme (invite de commande android adb).
-	Cela m'a permis de vérifier que le fd crée existe bien : 
+	Cela m'a permis de vérifier que le fd crée existe bien :
+	```
+		adb shell
+		runs-as com.companyname
+		cd /proc/29121
 		shell@i15-TCL:/proc/29121 $ ls -la fd
 		lrwx------ u0_a81   u0_a81            2020-12-10 16:03 34 -> /dev/bus/usb/001/034
+	```
 	il est possible que la lib s'exécute dans un autre contexte et que par conséquent nous n'ayons pas les droits d'accéder au fichier.
+	Ajouter des droits sur le fichier /dev/bus/usb n'a pas résolu le problème.
 	
+-------------------------------------------------------------------------------	
+Jeudi 10/12/2020
 	
-	
+	Tentative d'embarquer la libusb modifiée pour android.
+	Les projets VS déjà présents sont pour compiler pour windows.
+	Je crée un projet VS type "makefile externe" dans le répertoire libusb/android : ajout du répertoire msvc2017
+	Et alors que je chercher à installer et lancer un shell android NDK j'ai cliqué par erreur sur générer et ça s'est lancé tout seul ??!!
+	````
+		1>------ Début de la régénération globale : Projet : msvc2017, Configuration : Debug x86 ------
+		1>Android NDK: APP_PLATFORM not set. Defaulting to minimum supported version android-14.
+		1>[arm64-v8a] Compile        : usb-1.0 <= core.c
+		1>[arm64-v8a] Compile        : usb-1.0 <= descriptor.c
+		1>[arm64-v8a] Compile        : usb-1.0 <= hotplug.c
+		1>[arm64-v8a] Compile        : usb-1.0 <= io.c
+		1>[arm64-v8a] Compile        : usb-1.0 <= sync.c
+		1>[arm64-v8a] Compile        : usb-1.0 <= strerror.c
+		1>[arm64-v8a] Compile        : usb-1.0 <= linux_usbfs.c
+		1>[arm64-v8a] Compile        : usb-1.0 <= poll_posix.c
+		1>[arm64-v8a] Compile        : usb-1.0 <= threads_posix.c
+		1>[arm64-v8a] Compile        : usb-1.0 <= linux_netlink.c
+		1>[arm64-v8a] SharedLibrary  : libusb-1.0.so
+		1>[arm64-v8a] Install        : libusb-1.0.so => libs/arm64-v8a/libusb-1.0.so
+	````
+	Cela l'a fait pour toutes les architectures supportées en plus!
 
+	Intégrer dans protocomm a été classique : 
+		- ajouter le répertoire d'include
+		- il faut ajouter le path de recherche de lib au **bon endroit**
+		- ajouter la dependance (usb-1.0)
+		- le faire pour toutes les architectures
+		- TODO utiliser des chemins relatifs
+		
+	TODO : le faire aussi dans l'application Xamarin.
 
+-------------------------------------------------------------------------------	
+Vendredi 11/12/2020
+
+	J'ai intégré dans l'IHM la libusb (de la même façon que protocomm) pour qu'elle fasse partie de l'APK.
+	Test : 	les émissions Host->device fonctionnent MAIS les lectures échouent avec un timeout.
+	J'ai vérifié le paramétrage il est bon.
+	
