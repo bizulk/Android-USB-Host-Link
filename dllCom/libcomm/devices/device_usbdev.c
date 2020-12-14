@@ -23,8 +23,8 @@
 typedef struct
 {
     int fd; //!<  file descriptor
-	int ep_in; //!< endpoint number for device to host communication
-	int ep_out;  //!< endpoint number for host to device communication
+	int ep_in; //!< endpoint address for device to host communication
+	int ep_out;  //!< endpoint address for host to device communication
 	int max_pkt_size;
 } proto_dev_usbdev_t ;
 
@@ -108,7 +108,7 @@ static int devusbdev_read(struct proto_IfaceIODevice* _this, void* buffer, uint8
 		LOG("error : %s (fd=%d)", strerror(errno), infos->fd);
 		return -1;
 	}
-	return 0;
+	return len;
 }
 
 
