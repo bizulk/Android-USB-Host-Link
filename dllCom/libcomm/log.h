@@ -32,7 +32,7 @@ extern "C" {
 /// Message size max
 /// \sa log_push
 ///  Vous pouvez modifier ce paramètre, il faudrat recompiler la lib
-#define LOG_MSG_LEN 100
+#define LOG_MSG_LEN 150
 
 /// We define a message type for helping bindings, it's is difficult for these tool to handle C output string
 typedef struct
@@ -70,7 +70,7 @@ typedef struct log_handle * log_phandle_t;
 */
 #define LOG_PUSH(_this, fmt, args...) do\
 {\
-    char szMsg[100]={0};\
+    char szMsg[LOG_MSG_LEN]={0};\
     snprintf( szMg, LOG_MSG_LEN, "%s:%d - " fmt, __FUNCTION__, __LINE__, ## args);\
     log_push(_this, szMg);\
  } while(0);
@@ -80,7 +80,7 @@ typedef struct log_handle * log_phandle_t;
 */
 #define LOG_GLOBAL_PUSH(fmt, args...) do\
 {\
-    char szMsg[100]={0};\
+    char szMsg[LOG_MSG_LEN]={0};\
     snprintf( szMsg, LOG_MSG_LEN, "%s:%d - " fmt, __FUNCTION__, __LINE__, ## args);\
     log_global_push(szMsg);\
  } while(0);
