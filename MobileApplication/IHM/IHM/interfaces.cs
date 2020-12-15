@@ -7,13 +7,13 @@ using System.Threading.Tasks;
 namespace IHM
 {
     /// <summary>
-    /// Structure to passe to the native code
+    /// Structure that passes OS independant USB informations
     /// </summary>
     public struct DevHandle
     {
         public int fd; /// device file descriptor
-        public int ep_in; /// endpoint number for input (device to host)
-        public int ep_out; /// endpoint number for output (device to host)
+        public int ep_in; /// endpoint address for input (device to host)
+        public int ep_out; /// endpoint address for output (host to device)
         public int max_pkt_size;
 
         public DevHandle(int fd, int ep_in, int ep_out, int max_pkt_size)
@@ -69,8 +69,9 @@ namespace IHM
         int Close();
 
         /// <summary>
-        /// OS specific implementation that is not using our dllComm fo I/O access
+        /// OS specific implementation for the device protocol com that is not using our dllComm fo I/O access
         /// Written for comparison test purpose
+        /// We still the dll Com 
         /// </summary>
         /// <param name="uiRegister"></param>
         /// <param name="value"></param>
@@ -78,13 +79,27 @@ namespace IHM
         int ReadRegisterFromDevice(byte uiRegister, ref byte value);
 
         /// <summary>
-        /// OS specific implementation that is not using our dllComm fo I/O access
+        /// OS specific implementation for the device protocol com that is not using our dllComm fo I/O access
         /// </summary>
         /// <param name="uiRegister"></param>
         /// <param name="value"></param>
         /// <returns></returns>
         int WriteRegisterToDevice(byte uiRegister, byte value);
 
+        /// <summary>
+        /// Performs a write to the connected device
+        /// </summary>
+        /// <param name="data"></param>
+        /// <returns> completed, or -1 if error (including timeout to write them completely)</returns>
+        int WriteToDevice(byte[] data);
+
+        /// <summary>
+        /// Performs a write to the connected device
+        /// </summary>
+        /// <param name="data"></param>
+        /// <param name="len"></param>
+        /// <returns> completed, or -1 if error (including timeout to read them completely) </returns>
+        int ReadFromDevice(ref byte[] data, int len);
     }
 
     /// <summary>

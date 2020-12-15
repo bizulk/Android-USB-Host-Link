@@ -418,10 +418,42 @@ namespace IHM.Droid.Interfaces
                 }
                 else
                 {
-                    Log.Debug("pandavcom", "test : failed to sent nb bytes : ");
+                    Log.Debug("pandavcom", "xfer : failed to sent bytes");
                 }
             }
             return ret;
+        }
+
+        public int WriteToDevice(byte[] data)
+        {
+            // TODO we must check the ret for the actual data len Xfered
+            int ret = _devHandle.connection.BulkTransfer(_devHandle.ep_out, data, 0, data.Length, BULK_XFER_TOUT_MS);
+            if (ret >= 0)
+            {
+                Log.Debug("pandavcom", "xfer : successfully sent nb bytes : " + ret);
+            }
+            else
+            {
+                Log.Debug("pandavcom", "xfer : failed to sent bytes retcode : " + ret);
+            }
+            return (ret == data.Length) ? 0 : -1;
+        }
+
+        public int ReadFromDevice(ref byte[] data, int len)
+        {
+            if (data.Length < len)
+                return -1;
+            // TODO we must check the ret for the actual data len Xfered
+            int ret = _devHandle.connection.BulkTransfer(_devHandle.ep_in, data, 0, len, BULK_XFER_TOUT_MS);
+            if (ret >= 0)
+            {
+                Log.Debug("pandavcom", "xfer : successfully sent nb bytes : ");
+            }
+            else
+            {
+                Log.Debug("pandavcom", "xfer : failed to sent bytes retcode : " + ret);
+            }
+            return (ret == len) ? 0 : -1 ;
         }
     }
 }
