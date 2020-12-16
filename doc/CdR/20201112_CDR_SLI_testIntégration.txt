@@ -129,5 +129,20 @@ Vendredi 11/12/2020
 
 	J'ai intégré dans l'IHM la libusb (de la même façon que protocomm) pour qu'elle fasse partie de l'APK.
 	Test : 	les émissions Host->device fonctionnent MAIS les lectures échouent avec un timeout.
-	J'ai vérifié le paramétrage il est bon.
+
+-------------------------------------------------------------------------------	
+Lundi 14/12/2020
+
+	Je n'ai pas réussi à faire fonctionner les réceptions avec la libusb, j'abandonne la résolution de ce problème.
+	La lecture du livre "unboxing android usb" m'indique une demo qui montre comment faire avec une libusb non modifiée (driver cordon cypress), mais il faut rooter l'appareil.
+	Je passe donc à la mise en place d'un proxy socket sur la tablette, pour gérer côté android les échanges, avec un minimum de modification côté dll.
+	
+-------------------------------------------------------------------------------	
+Mercredi 16/12/2020
+
+	J'ai mis en place le proxy socket sur TCP. Cela fonctionne.
+	Je n'ai pas encore cherché à fiabiliser la connexion/déconnexion de l'appareil (ça plante pour l'instant), ni celle des échanges (ie pas de reprise de communication).
+	Au moins j'ai un code de base pour le serveur socket C#, et le protocole basé sur des transactions.
+	A noter qu'il y aura en terme de données un overhead d'une dizaine d'octets pour chaque transaction.
+	J'ai reçu un mail de la communauté libusb, qui me propose de reprendre le test avec la version officielle => Je fais ça demain.
 	
