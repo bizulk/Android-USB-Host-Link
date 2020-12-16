@@ -97,8 +97,8 @@ namespace IHM
         /// Performs a read from the connected device
         /// </summary>
         /// <param name="data"></param>
-        /// <param name="len"></param>
-        /// <returns> 0 if completed, or -1 if error (including timeout to read them completely) </returns>
+        /// <param name="len"> Max len data to read</param>
+        /// <returns> the read len size,  or -1 if error (no data read) </returns>
         int ReadFromDevice(byte[] data, int len);
     }
 
@@ -131,5 +131,10 @@ namespace IHM
         void SetIUsbManager(ref IUsbManager iusbManager);
         bool Start(ushort usPort);
         bool Stop();
+        /// <summary>
+        /// Get the IP addr to pass to the peer 
+        /// </summary>
+        /// <returns> IP v4 string XXX.XXX.XXX.XXX </returns>
+        string GetListenIpAddr();
     }
 }

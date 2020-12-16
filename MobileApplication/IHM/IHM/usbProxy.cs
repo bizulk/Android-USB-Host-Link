@@ -68,7 +68,8 @@ namespace IHM
         public bool Stop()
         {
             _bRunTask = false;
-            _srvTskHdle.Wait();
+            // FIXME - the task maybe blocking waiting for a client connexion
+            _srvTskHdle.Wait(1000);
             return true;
         }
 
@@ -108,10 +109,10 @@ namespace IHM
                     {
                         case devproxy_opcode_t.PROXY_CMD_READ:
                             ret = _iusbManager.ReadFromDevice(data, data.Length);
-                            if (ret == 0)
+                            if (ret > 0)
                             {
                                 headerReply.code = devproxy_opcode_t.PROXY_REP_DONE;
-                                headerReply.datalen = (uint)data.Length;
+                                headerReply.datalen = (uint)ret;
                             }
                             else
                             {
@@ -120,8 +121,8 @@ namespace IHM
                             break;
                         case devproxy_opcode_t.PROXY_CMD_WRITE:
                             // read the data to pass to device
-                            ret = stream.Read(data, 0, arrHeaderReq.Length);
-                            if (ret == arrHeaderReq.Length)
+                            ret = stream.Read(data, 0, data.Length);
+                            if (ret == data.Length)
                             {
                                 // now pass it to the device
                                 ret = _iusbManager.WriteToDevice(data);
@@ -147,10 +148,12 @@ namespace IHM
                     }
                     // Return execution to peer
                     stream.Write(arrHeaderReply, 0, arrHeaderReply.Length);
-                    // in case of a read we must also write data
-                    if (headerReq.code == devproxy_opcode_t.PROXY_CMD_READ)
+                    // in case of a successful read we must also return data
+                    if( (headerReq.code == devproxy_opcode_t.PROXY_CMD_READ) && 
+                        (headerReply.code == devproxy_opcode_t.PROXY_REP_DONE))
                     {
-                        stream.Write(data, 0, data.Length);
+                        // We must not sent all data size, as we allocated the max size expected
+                        stream.Write(data, 0, (int)headerReply.datalen);
                     }
                 }      
             }
@@ -162,7 +165,7 @@ namespace IHM
         private bool IsHeaderValid(ref devproxy_header_t header)
         {
             bool ret = true;
-            if (header.SOF != protocomm.DEVPROXY_HEADER_MAGIC)
+            if (header.SOF != (uint)protocomm.DEVPROXY_HEADER_MAGIC)
             {
                 return false;
             }
@@ -178,6 +181,11 @@ namespace IHM
             ret = header.datalen > 0;
 
             return ret;
+        }
+
+        public string GetListenIpAddr()
+        {
+            return _szIpAddr;
         }
     }
 }

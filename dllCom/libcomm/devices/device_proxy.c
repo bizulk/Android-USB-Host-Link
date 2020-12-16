@@ -53,14 +53,20 @@ static void devproxy_init(proto_Device_t _this);
 /// \return 0 on success (all data) otherwise error
 static int devproxy_send(int fd, const void * buffer, int len, int flags);
 
-
+///
+/// \brief wrapper on the sys call recv to complete all data
+/// \param fd file descriptor
+/// \param buffer data to recv
+/// \param len buffer len
+/// \param flags flags to pass to recv function
+/// \return 0 on success (all data) otherwise error
 static int devproxy_recv(int fd, void * buffer, int len, int flags);
 
 /// \brief Validate function use commonly for read/write function
 /// \param pHeader message to validate
-/// \param len field datalen value expected
+/// \param maxlen field datalen value expected (maximum)
 ///	\return 0 message if valid, otherwise -1
-static int devproxy_headerValidate(devproxy_header_t * pHeader, int len);
+static int devproxy_headerValidate(devproxy_header_t * pHeader, int maxlen);
 
 /******************************************************************************
  * FUNCTION
@@ -113,24 +119,23 @@ static int devproxy_open(struct proto_IfaceIODevice* _this, const char * szPath)
 		return 1;
 	}
 
-	strncpy(szFields, szPath, sizeof(szIp));
+	strncpy(szFields, szPath, sizeof(szFields));
+	LOG("opening url : %s", szFields);
 	szIp = strtok(szFields, PROXY_URL_SEP); // has modified the ':' to null char
 	szPort = strtok(NULL, PROXY_URL_SEP);
 	if (szPort != NULL)
 	{
 		// TODO (lazy conversion) better use strtol
-		usPort = atoi(szPort);
-		LOG("info - opening port %d", usPort);
+		usPort = atoi(szPort);		
 	}
+	LOG("info - opening port %d", usPort);
 
 	memset(&serv_addr, '0', sizeof(serv_addr));
 	serv_addr.sin_family = AF_INET;
 	serv_addr.sin_port = htons(usPort);
-
-	
 	if (inet_pton(AF_INET, szIp, &serv_addr.sin_addr) <= 0)
 	{
-		LOG("error with IP addr");
+		LOG("error with IP addr : %s", szIp);
 		return -1;
 	}
 
@@ -160,7 +165,7 @@ static int devproxy_read(struct proto_IfaceIODevice* _this, void* buffer, uint8_
 	
 	if (infos->fd == DEVPROXY_FD_INVALID)
 	{
-		LOG("cannot write, socket is invalide");
+		LOG("cannot write, socket is invalid");
 		return -1;
 	}
 	// Write the header then write the data
@@ -175,7 +180,7 @@ static int devproxy_read(struct proto_IfaceIODevice* _this, void* buffer, uint8_
 		LOG("send error");
 	}
 
-	// Now wait the proxy to reply
+	// Now wait the proxy to reply and analyse his request to see if we'll receive data
 	memset(&header, 0, sizeof(header));
 	if (devproxy_recv(infos->fd, &header, sizeof(header), 0) != 0)
 	{
@@ -183,19 +188,22 @@ static int devproxy_read(struct proto_IfaceIODevice* _this, void* buffer, uint8_
 		return -1;
 	}
 
-	// We expect the proxy to send us all the data, as himself apply a timeout on device
 	if (devproxy_headerValidate(&header, len) != 0)
 	{
+		// FIXME - if the peer has more data than expected we'll lose sync
 		return -1;
 	}
 
-	if (devproxy_recv(infos->fd, buffer, len, 0) != 0)
+	// We cannot expect the proxy to send us all the data we expected from the protocol
+	// According to the protocol the reply size may vary
+	// Actually the lowlevel protocol try to receive the maxe frame data, and then decode it, but we're not aware of that here
+	if (devproxy_recv(infos->fd, buffer, header.datalen, 0) != 0)
 	{
 		LOG("rcv error");
 		return -1;
 	}
 
-	return len;
+	return header.datalen;
 }
 
 static int devproxy_write(struct proto_IfaceIODevice* _this, const void * buffer, uint8_t len)
@@ -220,6 +228,7 @@ static int devproxy_write(struct proto_IfaceIODevice* _this, const void * buffer
 	{
 		LOG("send error");
 	}
+	// FIXME : in case of frame error the host will send us a message, and we'll lose sync
 	if (devproxy_send(infos->fd, buffer, len, 0) != 0)
 	{
 		LOG("send error");
@@ -234,6 +243,7 @@ static int devproxy_write(struct proto_IfaceIODevice* _this, const void * buffer
 	}
 	if (devproxy_headerValidate(&header, 0) != 0)
 	{
+		// FIXME - if the header as some data to send we'll lose sync
 		return -1;
 	}
 	return 0;
@@ -301,12 +311,12 @@ static int devproxy_recv(int fd, void * buffer, int len, int flags)
 	return (read == len) ? 0 : -1;
 }
 
-static int devproxy_headerValidate(devproxy_header_t * pHeader, int len)
+static int devproxy_headerValidate(devproxy_header_t * pHeader, int maxlen)
 {
-	assert(pHeader && (len >= 0));
+	assert(pHeader && (minlen >= 0) && (maxlen >= 0));
 
 	// Validate message
-	if ((pHeader->SOF != DEVPROXY_HEADER_MAGIC) || (pHeader->datalen != len))
+	if ((pHeader->SOF != DEVPROXY_HEADER_MAGIC) || (pHeader->datalen > maxlen) )
 	{
 		LOG("error - proxy sent unexpected reply (SOF =%X, len=%lu)", (unsigned int)pHeader->SOF, pHeader->datalen);
 		return -1;
