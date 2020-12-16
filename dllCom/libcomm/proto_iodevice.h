@@ -24,6 +24,16 @@ extern "C" {
 #include <stdint.h>
 #include <stddef.h>
 
+/// Enumerate all supported device
+/// Some of them are available only for some platforms
+typedef enum
+{
+	PROTO_DEV_EMULSLAVE,
+	PROTO_DEV_SERIAL,
+	PROTO_DEV_USBDEV,
+	PROTO_DEV_LIBUSB,
+	PROTO_DEV_PROXY
+} proto_iodev_devices_t;
 
 typedef struct proto_IfaceIODevice * proto_Device_t;
 
@@ -56,6 +66,8 @@ typedef struct proto_IfaceIODevice {
     /// \param buf les octets lus seront écrits ici
     /// \param len nombre max d'octets à lire
     /// \return >=0 nombre d'octets lus qui a été lu dans le délai imparti, < 0 erreur
+	/// \note : cette fonction ne doit pas générer une erreur si des données ont été lues, 
+	///			il s'agit d'un délai imparti pour recevoir des données
     int (*read)(proto_Device_t _this, void* buf, uint8_t len, int16_t tout_ms);
 
     /// Ecrit N caractères.
