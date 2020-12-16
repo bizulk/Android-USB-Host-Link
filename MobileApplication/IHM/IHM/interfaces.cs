@@ -90,16 +90,16 @@ namespace IHM
         /// Performs a write to the connected device
         /// </summary>
         /// <param name="data"></param>
-        /// <returns> completed, or -1 if error (including timeout to write them completely)</returns>
+        /// <returns> 0 if completed, or -1 if error (including timeout to write them completely)</returns>
         int WriteToDevice(byte[] data);
 
         /// <summary>
-        /// Performs a write to the connected device
+        /// Performs a read from the connected device
         /// </summary>
         /// <param name="data"></param>
         /// <param name="len"></param>
-        /// <returns> completed, or -1 if error (including timeout to read them completely) </returns>
-        int ReadFromDevice(ref byte[] data, int len);
+        /// <returns> 0 if completed, or -1 if error (including timeout to read them completely) </returns>
+        int ReadFromDevice(byte[] data, int len);
     }
 
     /// <summary>
@@ -118,4 +118,18 @@ namespace IHM
         bool Share(string filename, string title);
     }
 
+    /// <summary>
+    /// This is a Proxy Server for manager USB Io access.
+    /// It handle the dllCom / devproxy protocol
+    /// </summary>
+    public interface IUsbProxys
+    {
+        /// <summary>
+        /// Set the IUSbManager, it depends on it for USB transferts
+        /// </summary>
+        /// <param name="iusbManager"></param>
+        void SetIUsbManager(ref IUsbManager iusbManager);
+        bool Start(ushort usPort);
+        bool Stop();
+    }
 }

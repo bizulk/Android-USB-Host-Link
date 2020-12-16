@@ -230,6 +230,11 @@ public class protocomm {
     return ret;
   }
 
+  public static SWIGTYPE_p_proto_Device_t devproxy_create() {
+    SWIGTYPE_p_proto_Device_t ret = new SWIGTYPE_p_proto_Device_t(protocommPINVOKE.devproxy_create(), true);
+    return ret;
+  }
+
   public static SWIGTYPE_p_log_handle log_create(uint nbMsg) {
     global::System.IntPtr cPtr = protocommPINVOKE.log_create(nbMsg);
     SWIGTYPE_p_log_handle ret = (cPtr == global::System.IntPtr.Zero) ? null : new SWIGTYPE_p_log_handle(cPtr, false);
@@ -308,8 +313,19 @@ public class protocomm {
     protocommPINVOKE.protoframe_serialize(proto_Frame_t.getCPtr(pframe), buf);
   }
 
+  public static devproxy_header_t devproxy_cast(byte[] pcHeader) {
+    global::System.IntPtr cPtr = protocommPINVOKE.devproxy_cast(pcHeader);
+    devproxy_header_t ret = (cPtr == global::System.IntPtr.Zero) ? null : new devproxy_header_t(cPtr, false);
+    return ret;
+  }
+
   public static int sizeof_proto_Frame_t() {
     int ret = protocommPINVOKE.sizeof_proto_Frame_t();
+    return ret;
+  }
+
+  public static int sizeof_devproxy_header_t() {
+    int ret = protocommPINVOKE.sizeof_devproxy_header_t();
     return ret;
   }
 
@@ -321,5 +337,10 @@ public class protocomm {
 
   public static readonly int PROTO_WAIT_FOREVER = protocommPINVOKE.PROTO_WAIT_FOREVER_get();
   public static readonly int EMULSLAVE_NB_REGS = protocommPINVOKE.EMULSLAVE_NB_REGS_get();
+  public static readonly int DEVPROXY_HEADER_MAGIC = protocommPINVOKE.DEVPROXY_HEADER_MAGIC_get();
+  public static readonly int PROXY_SOCKET_XFER_TOUT_MS = protocommPINVOKE.PROXY_SOCKET_XFER_TOUT_MS_get();
+  public static readonly int PROXY_SOCKET_OPT_NODLY = protocommPINVOKE.PROXY_SOCKET_OPT_NODLY_get();
+  public static readonly int PROXY_DEFAULT_PORT = protocommPINVOKE.PROXY_DEFAULT_PORT_get();
+  public static readonly string PROXY_URL_SEP = protocommPINVOKE.PROXY_URL_SEP_get();
   public static readonly int LOG_MSG_LEN = protocommPINVOKE.LOG_MSG_LEN_get();
 }

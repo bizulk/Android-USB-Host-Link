@@ -445,6 +445,48 @@ class protocommPINVOKE {
   [global::System.Runtime.InteropServices.DllImport("protocomm", EntryPoint="CSharp_devlibusb_getFD")]
   public static extern int devlibusb_getFD(global::System.Runtime.InteropServices.HandleRef jarg1);
 
+  [global::System.Runtime.InteropServices.DllImport("protocomm", EntryPoint="CSharp_devproxy_create")]
+  public static extern global::System.IntPtr devproxy_create();
+
+  [global::System.Runtime.InteropServices.DllImport("protocomm", EntryPoint="CSharp_DEVPROXY_HEADER_MAGIC_get")]
+  public static extern int DEVPROXY_HEADER_MAGIC_get();
+
+  [global::System.Runtime.InteropServices.DllImport("protocomm", EntryPoint="CSharp_PROXY_SOCKET_XFER_TOUT_MS_get")]
+  public static extern int PROXY_SOCKET_XFER_TOUT_MS_get();
+
+  [global::System.Runtime.InteropServices.DllImport("protocomm", EntryPoint="CSharp_PROXY_SOCKET_OPT_NODLY_get")]
+  public static extern int PROXY_SOCKET_OPT_NODLY_get();
+
+  [global::System.Runtime.InteropServices.DllImport("protocomm", EntryPoint="CSharp_PROXY_DEFAULT_PORT_get")]
+  public static extern int PROXY_DEFAULT_PORT_get();
+
+  [global::System.Runtime.InteropServices.DllImport("protocomm", EntryPoint="CSharp_PROXY_URL_SEP_get")]
+  public static extern string PROXY_URL_SEP_get();
+
+  [global::System.Runtime.InteropServices.DllImport("protocomm", EntryPoint="CSharp_devproxy_header_t_SOF_set")]
+  public static extern void devproxy_header_t_SOF_set(global::System.Runtime.InteropServices.HandleRef jarg1, uint jarg2);
+
+  [global::System.Runtime.InteropServices.DllImport("protocomm", EntryPoint="CSharp_devproxy_header_t_SOF_get")]
+  public static extern uint devproxy_header_t_SOF_get(global::System.Runtime.InteropServices.HandleRef jarg1);
+
+  [global::System.Runtime.InteropServices.DllImport("protocomm", EntryPoint="CSharp_devproxy_header_t_code_set")]
+  public static extern void devproxy_header_t_code_set(global::System.Runtime.InteropServices.HandleRef jarg1, int jarg2);
+
+  [global::System.Runtime.InteropServices.DllImport("protocomm", EntryPoint="CSharp_devproxy_header_t_code_get")]
+  public static extern int devproxy_header_t_code_get(global::System.Runtime.InteropServices.HandleRef jarg1);
+
+  [global::System.Runtime.InteropServices.DllImport("protocomm", EntryPoint="CSharp_devproxy_header_t_datalen_set")]
+  public static extern void devproxy_header_t_datalen_set(global::System.Runtime.InteropServices.HandleRef jarg1, uint jarg2);
+
+  [global::System.Runtime.InteropServices.DllImport("protocomm", EntryPoint="CSharp_devproxy_header_t_datalen_get")]
+  public static extern uint devproxy_header_t_datalen_get(global::System.Runtime.InteropServices.HandleRef jarg1);
+
+  [global::System.Runtime.InteropServices.DllImport("protocomm", EntryPoint="CSharp_new_devproxy_header_t")]
+  public static extern global::System.IntPtr new_devproxy_header_t();
+
+  [global::System.Runtime.InteropServices.DllImport("protocomm", EntryPoint="CSharp_delete_devproxy_header_t")]
+  public static extern void delete_devproxy_header_t(global::System.Runtime.InteropServices.HandleRef jarg1);
+
   [global::System.Runtime.InteropServices.DllImport("protocomm", EntryPoint="CSharp_LOG_MSG_LEN_get")]
   public static extern int LOG_MSG_LEN_get();
 
@@ -508,6 +550,12 @@ class protocommPINVOKE {
   [global::System.Runtime.InteropServices.DllImport("protocomm", EntryPoint="CSharp_protoframe_serialize")]
   public static extern void protoframe_serialize(global::System.Runtime.InteropServices.HandleRef jarg1, [global::System.Runtime.InteropServices.Out, global::System.Runtime.InteropServices.MarshalAs(global::System.Runtime.InteropServices.UnmanagedType.LPArray)]byte[] jarg2);
 
+  [global::System.Runtime.InteropServices.DllImport("protocomm", EntryPoint="CSharp_devproxy_cast")]
+  public static extern global::System.IntPtr devproxy_cast([global::System.Runtime.InteropServices.In, global::System.Runtime.InteropServices.MarshalAs(global::System.Runtime.InteropServices.UnmanagedType.LPArray)]byte[] jarg1);
+
   [global::System.Runtime.InteropServices.DllImport("protocomm", EntryPoint="CSharp_sizeof_proto_Frame_t")]
   public static extern int sizeof_proto_Frame_t();
+
+  [global::System.Runtime.InteropServices.DllImport("protocomm", EntryPoint="CSharp_sizeof_devproxy_header_t")]
+  public static extern int sizeof_devproxy_header_t();
 }

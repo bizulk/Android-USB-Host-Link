@@ -29,3 +29,5 @@ dllCom/stm32/.settings/com.atollic.truestudio.debug.hardware_device.prefs
 /TestUSBTerminal/Release
 /dllCom/stm32/.settings/language.settings.xml
 libs
+
+doc/DeveloppementAndroid/~$veloppHostToUsbDeviceTransfersOnAndroidDevice.docx

@@ -439,7 +439,7 @@ namespace IHM.Droid.Interfaces
             return (ret == data.Length) ? 0 : -1;
         }
 
-        public int ReadFromDevice(ref byte[] data, int len)
+        public int ReadFromDevice(byte[] data, int len)
         {
             if (data.Length < len)
                 return -1;

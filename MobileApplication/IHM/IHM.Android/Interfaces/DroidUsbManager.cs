@@ -91,7 +91,7 @@ namespace IHM.Droid.Interfaces
             // not implemented
             return -1;
         }
-        public int ReadFromDevice(ref byte[] data, int len)
+        public int ReadFromDevice(byte[] data, int len)
         {
             // not implemented
             return -1;
