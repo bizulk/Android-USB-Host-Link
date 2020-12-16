@@ -85,5 +85,16 @@ namespace IHM.Droid.Interfaces
             // not implemented
             return -1;
         }
-    }
+
+        public int WriteToDevice(byte[] data)
+        {
+            // not implemented
+            return -1;
+        }
+        public int ReadFromDevice(byte[] data, int len)
+        {
+            // not implemented
+            return -1;
+        }
+}
 }

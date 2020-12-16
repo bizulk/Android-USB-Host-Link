@@ -18,7 +18,7 @@ namespace IHM
         private static readonly object Instancelock = new object();
         // Handle vers le panda
         private proto_hdle_t m_handle;
-
+        public const int _iLogGlobalNbMsg = 30;
         //Device (exception si on initialise à NULL)
         SWIGTYPE_p_proto_Device_t m_device;
 
@@ -53,6 +53,13 @@ namespace IHM
 
             m_device = device;
 
+            // First create the dll log system
+            ret = protocomm.log_global_create(_iLogGlobalNbMsg);
+            if (ret != 0)
+            {
+                return -1;
+            }
+
             // On cree l'instance de protocole
             m_handle = protocomm.proto_master_create(m_device); //5s de timeout TODO a moditifer plus tard pour le rendre paramètrable
             //On vérifie qu'il n'y a pas eu de problème lors de la connexion
@@ -66,11 +73,6 @@ namespace IHM
                 return -1;
             }
 
-            ret = protocomm.log_global_create(10);
-            if (ret != 0)
-            {
-                return -1;
-            }
             return ret;
         }
 
@@ -160,17 +162,17 @@ namespace IHM
             return dev;
         }
 
+        public int UsbDevSetFd(SWIGTYPE_p_proto_Device_t dev, DevHandle devh)
+        {
+            int ret = protocomm.devusbdev_setDev(dev, devh.fd, devh.ep_in, devh.ep_out, devh.max_pkt_size);
+            return ret;
+        }
+
         public SWIGTYPE_p_proto_Device_t CreateDevLibUsb()
         {
             SWIGTYPE_p_proto_Device_t dev;
             dev = protocomm.devlibusb_create();
             return dev;
-        }
-
-        public int UsbDevSetFd(SWIGTYPE_p_proto_Device_t dev, DevHandle devh)
-        {
-            int ret = protocomm.devusbdev_setDev(dev, devh.fd, devh.ep_in, devh.ep_out, devh.max_pkt_size);
-            return ret;
         }
 
         public int LibUsbSetFd(SWIGTYPE_p_proto_Device_t dev, DevHandle devh)
@@ -179,6 +181,12 @@ namespace IHM
             return ret;
         }
 
+        public SWIGTYPE_p_proto_Device_t CreateDevProxy()
+        {
+            SWIGTYPE_p_proto_Device_t dev;
+            dev = protocomm.devproxy_create();
+            return dev;
+        }
         /// <summary>
         /// Fournit une string de description du status
         /// </summary>

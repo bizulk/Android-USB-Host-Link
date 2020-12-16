@@ -84,13 +84,11 @@ uint8_t proto_makeFrame(proto_Frame_t* frame, proto_Command_t command, proto_fra
 }
 
 proto_Status_t proto_readFrame(proto_hdle_t* this, int16_t tout_ms) {
-    /* on ne peut utiliser la trame privée de this : la réception peut être externalisé
-    */
     uint8_t buf[sizeof(proto_Frame_t)] = {0};
     uint8_t len = 0;
     int nbRead = 0;
     int ret = 0;
-
+	// We try to read a frame max size, but we must remember that the reply size may vary according  
     len = (sizeof(this->priv_frame)) - this->priv_nbBytes;
     nbRead = this->priv_iodevice->read(this->priv_iodevice, buf, len, tout_ms);
     if (nbRead > 0)

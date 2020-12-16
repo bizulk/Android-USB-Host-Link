@@ -378,14 +378,14 @@ namespace IHM.Droid.Interfaces
             // Create a protocole instance from frame decoding (device will not be used)
             SWIGTYPE_p_proto_Device_t protodev = protocomm.devemulslave_create();
             var protoHdle = protocomm.proto_master_create(protodev);
-
+           
             int ret = _devHandle.connection.BulkTransfer(_devHandle.ep_out, buffer, 0, buffer.Length, BULK_XFER_TOUT_MS);
             if (ret >= 0)
             {
                 Log.Debug("pandavcom", "xfer : successfully sent nb bytes : " + ret);
                 // Receive the reply frame
                 // First version - take the answer with the max size possible
-                // TODO : Handle timeout as done by the library and returns its error.
+                // Remember that the protocol expect the peer to seed **at most** the max frame size.
                 // We reuse the buffer as R/W frame size are constant
                 ret = _devHandle.connection.BulkTransfer(_devHandle.ep_in, buffer, 0, protocomm.sizeof_proto_Frame_t(), BULK_XFER_TOUT_MS);
                 if (ret >= 0)
@@ -397,14 +397,7 @@ namespace IHM.Droid.Interfaces
                         switch (protocomm.proto_decodeFrame(protoHdle, pcmd, data))
                         {
                             case proto_DecodeStatus_t.proto_COMPLETED:
-                                if (protocomm.proto_Command_t_p_value(pcmd) == proto_Command_t.proto_CMD_REPLY)
-                                {
-                                    ret = 0;
-                                }
-                                else
-                                {
-                                    ret = -1;
-                                }
+                                ret = (protocomm.proto_Command_t_p_value(pcmd) == proto_Command_t.proto_CMD_REPLY) ? 0 : 1;
                                 break;
                             case proto_DecodeStatus_t.proto_REFUSED:
                                 ret = -1;
@@ -418,10 +411,43 @@ namespace IHM.Droid.Interfaces
                 }
                 else
                 {
-                    Log.Debug("pandavcom", "test : failed to sent nb bytes : ");
+                    Log.Debug("pandavcom", "xfer : failed to sent bytes");
                 }
             }
             return ret;
+        }
+
+        public int WriteToDevice(byte[] data)
+        {
+            // FIXME - do the call chuncks data accordingly to max size or not ? I don't think so
+            // TODO we must check the ret for the actual data len Xfered
+            int ret = _devHandle.connection.BulkTransfer(_devHandle.ep_out, data, 0, data.Length, BULK_XFER_TOUT_MS);
+            if (ret >= 0)
+            {
+                Log.Debug("pandavcom", "xfer : successfully sent nb bytes : " + ret);
+            }
+            else
+            {
+                Log.Debug("pandavcom", "xfer : failed to sent bytes retcode : " + ret);
+            }
+            return (ret == data.Length) ? 0 : -1;
+        }
+
+        public int ReadFromDevice(byte[] data, int len)
+        {
+            if (data.Length < len)
+                return -1;
+            // TODO we must check the ret for the actual data len Xfered
+            int ret = _devHandle.connection.BulkTransfer(_devHandle.ep_in, data, 0, len, BULK_XFER_TOUT_MS);
+            if (ret >= 0)
+            {
+                Log.Debug("pandavcom", "xfer : successfully read nb bytes : ", +ret);
+            }
+            else
+            {
+                Log.Debug("pandavcom", "xfer : failed to read bytes retcode : " + ret);
+            }
+            return ret ;
         }
     }
 }

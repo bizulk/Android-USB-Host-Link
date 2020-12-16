@@ -16,12 +16,15 @@ namespace IHM
         // CONFIG SECTION
         public enum DllDeviceType
         {
+            devtype_emulslave,
             devtype_serial,
             devtype_usbdev,
-            devtype_libusb
+            devtype_libusb,
+            devtype_proxy,
         };
-        DllDeviceType _eConfDllSerialDevice = DllDeviceType.devtype_libusb; // Select dll device
+        DllDeviceType _eConfDllDevice = DllDeviceType.devtype_proxy; // Select dll device
         bool _bConfUseAndroidforIOaccess = false; // select dll for R/W Operation OR the android usb hardware API 
+        ushort usConfProxyPort = 5000;
 
         ////////////////////////////
         /// Handle du dll_if
@@ -43,6 +46,7 @@ namespace IHM
 
         public const string szDllDevEmulSlaveName = "EmulSlave";
         IUsbManager _iusbManager;
+        IUsbProxys _iusbProxy;
 
         public MainPage()
         {
@@ -174,24 +178,30 @@ namespace IHM
                 if (status == proto_Status_t.proto_NO_ERROR)
                 {
                     m_lRegsLbl[i].Text = regVal.ToString();
-                }           
-                // After the operation we pop any message for dllCom library and add it to our log
-                // We use the encapsulated C string struc, so much easier to use for passing data
-                // TODO : clean code : wrapp it in dll_if
-                msg_t msgLog = new msg_t();              
-                while ( protocomm.log_global_pop_msg(msgLog) != 0 )
-                {
-                    // Se how easy to access the string : just take the member
-                    if (string.Compare(msgLog.szMsg, "") != 0)
-                    {
-                        // So we add to the dialog
-                        m_textLog.Insert(0, DateTime.Now.ToString(" HH:mm ") + " " + msgLog.szMsg); 
-                        // and then to the file
-                        logfile.Info(msgLog.szMsg);  // Pour le stockage dans le fichier
-                    }
                 }
+                PopDllLogs();
             }          
         }
+
+        void PopDllLogs()
+        {
+            // After some  operation we pop any message for dllCom library and add it to our log
+            // We use the encapsulated C string struct, so much easier to use for passing data
+            // TODO : clean code : wrapp it in dll_if
+            msg_t msgLog = new msg_t();
+            while (protocomm.log_global_pop_msg(msgLog) != 0)
+            {
+                // Se how easy to access the string : just take the member
+                if (string.Compare(msgLog.szMsg, "") != 0)
+                {
+                    // So we add to the dialog
+                    m_textLog.Insert(0, DateTime.Now.ToString(" HH:mm ") + " " + msgLog.szMsg);
+                    // and then to the file
+                    logfile.Info(msgLog.szMsg);  // Pour le stockage dans le fichier
+                }
+            }
+        }
+
         void OnButtonConnectClicked(object sender, EventArgs e)
         {
             // We display the list of device name for user selection.
@@ -232,45 +242,68 @@ namespace IHM
         }
         void connect(string name)
         {         
+            /* For now the DLL dev type is statically selected, TODO add a device selector on the GUI */
             if (name == szDllDevEmulSlaveName) 
             {
+                _eConfDllDevice = DllDeviceType.devtype_emulslave;
                 isConnected = (m_dll_if.Open(m_dll_if.CreateEmulslave(), "") ==0); 
             }
-            else // everything else is a true device
+            else
             {
+                // everything else is a true USB device
                 _iusbManager.selectDevice(name);
-                SWIGTYPE_p_proto_Device_t dev;
-                switch (_eConfDllSerialDevice)
-                {
-                    /* May be we shall just passe the device type we wish to the dll so that it creates the device it self */
-                    case DllDeviceType.devtype_serial:
-                        // On demande a la dll de s'initialiser sans essayer d'ouvrir un port, car on va s'en occuper
-                        dev = m_dll_if.CreateDevSerial();
-                        isConnected = (0 == m_dll_if.Open(dev, ""));
-                        if (isConnected)
+            }
+            SWIGTYPE_p_proto_Device_t dev;
+            switch (_eConfDllDevice)
+            {
+                case DllDeviceType.devtype_emulslave:
+                    dev = m_dll_if.CreateEmulslave();
+                    isConnected = (m_dll_if.Open(dev, "") == 0);
+                    break;
+                /* May be we shall just passe the device type we wish to the dll so that it creates the device it self */
+                case DllDeviceType.devtype_serial:
+                    // On demande a la dll de s'initialiser sans essayer d'ouvrir un port, car on va s'en occuper
+                    dev = m_dll_if.CreateDevSerial();
+                    isConnected = (0 == m_dll_if.Open(dev, ""));
+                    if (isConnected)
+                    {
+                        // Récupére notre FD avec l'USBManager pour l'affecter à la lib
+                        int ret = m_dll_if.SerialSetFd(dev, _iusbManager.getDeviceConnection());
+                    };
+                    break;
+                case DllDeviceType.devtype_usbdev:
+                    dev = m_dll_if.CreateDevUsbDev();
+                    isConnected = (0 == m_dll_if.Open(dev, ""));
+                    if (isConnected)
+                    {
+                        int ret = m_dll_if.UsbDevSetFd(dev, _iusbManager.getDeviceConnection());
+                    }
+                    break;
+                case DllDeviceType.devtype_libusb:
+                    dev = m_dll_if.CreateDevLibUsb();
+                    isConnected = (0 == m_dll_if.Open(dev, name));
+                    if (isConnected)
+                    {
+                        int ret = m_dll_if.LibUsbSetFd(dev, _iusbManager.getDeviceConnection());
+                    }
+                    break;
+                case DllDeviceType.devtype_proxy:
+                    dev = m_dll_if.CreateDevProxy();
+                    _iusbProxy = new UsbProxy();
+                    _iusbProxy.SetIUsbManager(ref _iusbManager);
+                    if (_iusbProxy.Start(usConfProxyPort))
+                    {
+                        string szProxyUrl = _iusbProxy.GetListenIpAddr() + protocomm.PROXY_URL_SEP + usConfProxyPort.ToString();
+                        isConnected = (0 == m_dll_if.Open(dev, szProxyUrl));
+                        if (!isConnected)
                         {
-                            // Récupére notre FD avec l'USBManager pour l'affecter à la lib
-                            int ret = m_dll_if.SerialSetFd(dev, _iusbManager.getDeviceConnection());
-                        };
-                        break;
-                    case DllDeviceType.devtype_usbdev:
-                        dev = m_dll_if.CreateDevUsbDev();
-                        isConnected = (0 == m_dll_if.Open(dev, ""));
-                        if (isConnected)
-                        {
-                            int ret = m_dll_if.UsbDevSetFd(dev, _iusbManager.getDeviceConnection());
+                            _iusbProxy.Stop();
                         }
-                        break;
-                    case DllDeviceType.devtype_libusb:
-                        dev = m_dll_if.CreateDevLibUsb();
-                        isConnected = (0 == m_dll_if.Open(dev, name));
-                        if (isConnected)
-                        {
-                            int ret = m_dll_if.LibUsbSetFd(dev, _iusbManager.getDeviceConnection());
-                        }
-                        break;
-
-                }
+                        PopDllLogs();
+                    }                    
+                    break;
+                default:
+                    break;
             }
 
             // Gestion de l'affichage
