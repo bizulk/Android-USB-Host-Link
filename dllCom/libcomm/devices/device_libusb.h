@@ -7,8 +7,9 @@ extern "C" {
 
 
 /// We created _this device specifically for android.
-/// Implementation using Linux libusb **modified for android**
-/// https://gitlab.com/madresistor/libusb/-/blob/android/README
+/// 17/12/2020 - Using the official libusb implementation 1.0.24 
+/// archived - Implementation using Linux libusb **modified for android**
+///		https://gitlab.com/madresistor/libusb/-/blob/android/README
 
 #include "proto_iodevice.h"
 #include "libcomm_global.h"

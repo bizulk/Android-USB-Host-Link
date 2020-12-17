@@ -1,6 +1,5 @@
 # Android build config for libusb, examples and tests
 # Copyright © 2012-2013 RealVNC Ltd. <toby.gray@realvnc.com>
-# Copyright © 2015 Kuldeep Singh Dhaka <kuldeepdhaka9@gmail.com>
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -17,39 +16,8 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 #
 
-LOCAL_PATH:= $(call my-dir)
-LIBUSB_ROOT_REL:= ../..
-LIBUSB_ROOT_ABS:= $(LOCAL_PATH)/../..
+LOCAL_PATH := $(call my-dir)
 
-# libusb
-
-include $(CLEAR_VARS)
-
-LIBUSB_ROOT_REL:= ../..
-LIBUSB_ROOT_ABS:= $(LOCAL_PATH)/../..
-
-LOCAL_SRC_FILES := \
-  $(LIBUSB_ROOT_REL)/libusb/core.c \
-  $(LIBUSB_ROOT_REL)/libusb/descriptor.c \
-  $(LIBUSB_ROOT_REL)/libusb/hotplug.c \
-  $(LIBUSB_ROOT_REL)/libusb/io.c \
-  $(LIBUSB_ROOT_REL)/libusb/sync.c \
-  $(LIBUSB_ROOT_REL)/libusb/strerror.c \
-  $(LIBUSB_ROOT_REL)/libusb/os/linux_usbfs.c \
-  $(LIBUSB_ROOT_REL)/libusb/os/poll_posix.c \
-  $(LIBUSB_ROOT_REL)/libusb/os/threads_posix.c \
-  $(LIBUSB_ROOT_REL)/libusb/os/linux_netlink.c
-
-LOCAL_C_INCLUDES += \
-  $(LOCAL_PATH)/.. \
-  $(LIBUSB_ROOT_ABS)/libusb \
-  $(LIBUSB_ROOT_ABS)/libusb/os
-
-LOCAL_EXPORT_C_INCLUDES := \
-  $(LIBUSB_ROOT_ABS)/libusb
-
-LOCAL_LDLIBS := -llog
-
-LOCAL_MODULE := libusb-1.0
-
-include $(BUILD_SHARED_LIBRARY)
+include $(LOCAL_PATH)/libusb.mk
+include $(LOCAL_PATH)/examples.mk
+include $(LOCAL_PATH)/tests.mk
