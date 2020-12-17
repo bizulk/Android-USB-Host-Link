@@ -35,7 +35,7 @@ namespace IHM
                 "Dev type libusb",
                 "Dev type proxy"
             };
-        DllDeviceType   _eConfDllDevice = DllDeviceType.devtype_proxy; // Select dll device
+        DllDeviceType   _eConfDllDevice = DllDeviceType.devtype_libusb; // Select dll device
         bool            _bConfUseAndroidforIOaccess = false; // select dll for R/W Operation OR the android usb hardware API 
         ushort          _usConfProxyPort = 5000;
 
@@ -284,6 +284,7 @@ namespace IHM
                 _lisLogs.Insert(0, DateTime.Now.ToString(" HH:mm ") + " " + msgFailCo);   //Pour l'affichage en temps réelle dans la dialogue
             }
 
+            PopDllLogs();
         }
 
         /// <summary>
@@ -305,6 +306,7 @@ namespace IHM
                 _iusbManager.selectDevice(szUsbDevName);
             }
             SWIGTYPE_p_proto_Device_t dev;
+            int ret = 0;
             switch (_eConfDllDevice)
             {
                 case DllDeviceType.devtype_emulslave:
@@ -319,7 +321,7 @@ namespace IHM
                     if (_IsConnected)
                     {
                         // Récupére notre FD avec l'USBManager pour l'affecter à la lib
-                        int ret = _dll_if.SerialSetFd(dev, _iusbManager.getDeviceConnection());
+                        ret = _dll_if.SerialSetFd(dev, _iusbManager.getDeviceConnection());
                     };
                     break;
                 case DllDeviceType.devtype_usbdev:
@@ -327,15 +329,15 @@ namespace IHM
                     _IsConnected = (0 == _dll_if.Open(dev, ""));
                     if (_IsConnected)
                     {
-                        int ret = _dll_if.UsbDevSetFd(dev, _iusbManager.getDeviceConnection());
+                        ret = _dll_if.UsbDevSetFd(dev, _iusbManager.getDeviceConnection());
                     }
                     break;
                 case DllDeviceType.devtype_libusb:
                     dev = _dll_if.CreateDevLibUsb();
-                    _IsConnected = (0 == _dll_if.Open(dev, szUsbDevName));
-                    if (_IsConnected)
+                    ret = _dll_if.LibUsbSetFd(dev, _iusbManager.getDeviceConnection());
+                    if (ret==0)
                     {
-                        int ret = _dll_if.LibUsbSetFd(dev, _iusbManager.getDeviceConnection());
+                        _IsConnected = (0 == _dll_if.Open(dev, szUsbDevName));
                     }
                     break;
                 case DllDeviceType.devtype_proxy:
@@ -350,7 +352,6 @@ namespace IHM
                         {
                             _iusbProxy.Stop();
                         }
-                        PopDllLogs();
                     }                    
                     break;
                 default:

@@ -77,10 +77,10 @@
     <AndroidNativeLibrary Include="libs\armeabi-v7a\libprotocomm.so" />
     <AndroidNativeLibrary Include="libs\x86\libprotocomm.so" />
     <AndroidNativeLibrary Include="libs\x86_64\libprotocomm.so" />
-    <AndroidNativeLibrary Include="libs\arm64-v8a\libusb-1.0.so" />
-    <AndroidNativeLibrary Include="libs\armeabi-v7a\libusb-1.0.so" />
-    <AndroidNativeLibrary Include="libs\x86\libusb-1.0.so" />
-    <AndroidNativeLibrary Include="libs\x86_64\libusb-1.0.so" />
+    <AndroidNativeLibrary Include="libs\arm64-v8a\libusb1.0.so" />
+    <AndroidNativeLibrary Include="libs\armeabi-v7a\libusb1.0.so" />
+    <AndroidNativeLibrary Include="libs\x86\libusb1.0.so" />
+    <None Include="libs\x86_64\libusb1.0.so" />
     <None Include="Resources\AboutResources.txt" />
     <None Include="Assets\AboutAssets.txt" />
     <None Include="Properties\AndroidManifest.xml">
