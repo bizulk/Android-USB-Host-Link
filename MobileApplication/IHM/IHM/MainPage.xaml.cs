@@ -22,45 +22,62 @@ namespace IHM
             devtype_libusb,
             devtype_proxy,
         };
-        DllDeviceType _eConfDllDevice = DllDeviceType.devtype_proxy; // Select dll device
-        bool _bConfUseAndroidforIOaccess = false; // select dll for R/W Operation OR the android usb hardware API 
-        ushort usConfProxyPort = 5000;
+
+        /// <summary>
+        /// List used to display the supported protocol devices
+        /// the list is indexed by enum DllDeviceType
+        /// </summary>
+        private readonly IList<string> _ilist_dllDev = new List<string>
+            {
+                "Dev type EmulSlave",
+                "Dev type serial",
+                "Dev type usbdev",
+                "Dev type libusb",
+                "Dev type proxy"
+            };
+        DllDeviceType   _eConfDllDevice = DllDeviceType.devtype_proxy; // Select dll device
+        bool            _bConfUseAndroidforIOaccess = false; // select dll for R/W Operation OR the android usb hardware API 
+        ushort          _usConfProxyPort = 5000;
 
         ////////////////////////////
         /// Handle du dll_if
-        dll_if m_dll_if;
-        bool isConnected = false;
+        dll_if  _dll_if;
+        bool    _IsConnected = false;
 
         // creates a list of our entries in order to process them by iterating
-        List<Entry> m_lRegsEntry;
+        List<Entry> _lRegsEntry;
         // Liste des valeurs lues
-        List<Label> m_lRegsLbl;
+        List<Label> _lRegsLbl;
 
-        // Or log file content
-        public List<string> textLogList;
-        LogFile logfile = LogFile.Instance();
+        // Or log file content : TODO log code may be refactorized
+        public List<string> _lszLogs;
+        private LogFile _logfile = LogFile.Instance();
         //Nom complet du fichier (chemin + nom)
-        private string m_filename = "";
+        private string _Logfilename = "";
         //Texte à afficher log
-        ObservableCollection<string> m_textLog = new ObservableCollection<string>();
+        ObservableCollection<string> _lisLogs = new ObservableCollection<string>();
 
-        public const string szDllDevEmulSlaveName = "EmulSlave";
+        /// <summary>
+        /// System USM manager interface
+        /// </summary>
         IUsbManager _iusbManager;
+        /// <summary>
+        /// USB Proxy, used in case of a device Proxy type
+        /// </summary>
         IUsbProxys _iusbProxy;
 
         public MainPage()
         {
-            InitializeComponent();
-            //On récupère l'instance de dll_if pour appeler les fonctions de la DLL
-            m_dll_if = dll_if.GetInstance;
+            InitializeComponent();         
+            _dll_if = dll_if.GetInstance;
 
-            m_lRegsEntry = new List<Entry>
+            _lRegsEntry = new List<Entry>
             {
                 userReg1,
                 userReg2
             };
 
-            m_lRegsLbl = new List<Label>
+            _lRegsLbl = new List<Label>
             {
                 peerReg1,
                 peerReg2
@@ -69,14 +86,16 @@ namespace IHM
             _iusbManager = Xamarin.Forms.DependencyService.Get<IUsbManager>();
 
             // Pour le log
-            m_filename = "FileLog.log";
-            string path = logfile.GetLocalStoragePath();
-            m_filename = Path.Combine(path, m_filename);
+            _Logfilename = "FileLog.log";
+            string path = _logfile.GetLocalStoragePath();
+            _Logfilename = Path.Combine(path, _Logfilename);
             // fill log view with the log file contact
             fillLog();
-            listLog.ItemsSource = m_textLog;
+            listLog.ItemsSource = _lisLogs;
 
             switchUseApiAndroidXfer.IsToggled = _bConfUseAndroidforIOaccess;
+            PickerDllDevice.ItemsSource = new List<string>(_ilist_dllDev);
+            PickerDllDevice.SelectedIndex = (int)_eConfDllDevice;
         }
 
         void OnButtonSendClicked(object sender, EventArgs e)
@@ -85,16 +104,16 @@ namespace IHM
             byte regVal;
             proto_Status_t status;
 
-            for (int i = 0; i < m_lRegsEntry.Count; i++)
+            for (int i = 0; i < _lRegsEntry.Count; i++)
             {
-                if (m_lRegsEntry[i].Text != null && m_lRegsEntry[i].Text.Length > 0)
+                if (_lRegsEntry[i].Text != null && _lRegsEntry[i].Text.Length > 0)
                 {
                     try
                     {
-                        regVal = byte.Parse(m_lRegsEntry[i].Text); // Lève une exception si la valeur n'est pas entre 0 et 255
+                        regVal = byte.Parse(_lRegsEntry[i].Text); // Lève une exception si la valeur n'est pas entre 0 et 255
                         if (! _bConfUseAndroidforIOaccess)
                         {
-                            status = m_dll_if.WriteRegister((byte)i, regVal);
+                            status = _dll_if.WriteRegister((byte)i, regVal);
                         }
                         else
                         {
@@ -110,8 +129,8 @@ namespace IHM
                             }
                         }
                         szLog = "reg" + i.ToString() + "write : " + dll_if.ProtoStatusGetString(status) + ", if success refresh values";
-                        logfile.Info(szLog, ""); // Pour le stockage dans le fichier
-                        m_textLog.Insert(0, DateTime.Now.ToString(" HH:mm ") + " " + szLog);   //Pour l'affichage en temps réelle dans la dialogue
+                        _logfile.Info(szLog, ""); // Pour le stockage dans le fichier
+                        _lisLogs.Insert(0, DateTime.Now.ToString(" HH:mm ") + " " + szLog);   //Pour l'affichage en temps réelle dans la dialogue
 
                         // After the operation we pop any message for dllCom library and add it to our log
                         // We use the encapsulated C string struc, so much easier to use for passing data
@@ -123,24 +142,24 @@ namespace IHM
                             if (string.Compare(msgLog.szMsg, "") != 0)
                             {
                                 // So we add to the dialog
-                                m_textLog.Insert(0, DateTime.Now.ToString(" HH:mm ") + " " + msgLog.szMsg);
+                                _lisLogs.Insert(0, DateTime.Now.ToString(" HH:mm ") + " " + msgLog.szMsg);
                                 // and then to the file
-                                logfile.Info(msgLog.szMsg);  // Pour le stockage dans le fichier
+                                _logfile.Info(msgLog.szMsg);  // Pour le stockage dans le fichier
                             }
                         }
                     }
                     catch (Exception ex)
                     {
                         szLog = "reg" + i.ToString() + " value must be between 0 and 255, " + ex.Message;
-                        m_textLog.Insert(0, DateTime.Now.ToString(" HH:mm ") + " " + szLog);   //Pour l'affichage en temps réelle dans la dialogue
-                        logfile.Error(szLog, ""); // Pour le stockage dans le fichier
+                        _lisLogs.Insert(0, DateTime.Now.ToString(" HH:mm ") + " " + szLog);   //Pour l'affichage en temps réelle dans la dialogue
+                        _logfile.Error(szLog, ""); // Pour le stockage dans le fichier
                     }
                 }
                 else
                 {
                     szLog = "reg" + i.ToString() + "not set (empty user)";
-                    m_textLog.Insert(0, DateTime.Now.ToString(" HH:mm ") + " " + szLog);   //Pour l'affichage en temps réelle dans la dialogue
-                    logfile.Error(szLog, ""); // Pour le stockage dans le fichier
+                    _lisLogs.Insert(0, DateTime.Now.ToString(" HH:mm ") + " " + szLog);   //Pour l'affichage en temps réelle dans la dialogue
+                    _logfile.Error(szLog, ""); // Pour le stockage dans le fichier
                 }
             }
 
@@ -152,12 +171,12 @@ namespace IHM
             byte regVal = 0;
             proto_Status_t status;
 
-            for (int i = 0; i < m_lRegsLbl.Count; i++)
+            for (int i = 0; i < _lRegsLbl.Count; i++)
             {
                 if (! _bConfUseAndroidforIOaccess)
                 {
                     /* FIXME : operation will always fail */
-                    status = m_dll_if.ReadRegister((byte)i, ref regVal);
+                    status = _dll_if.ReadRegister((byte)i, ref regVal);
                 }
                 else
                 {
@@ -173,16 +192,21 @@ namespace IHM
                     }
                 }
                 szLog = "reg" + i.ToString() + "read : " + dll_if.ProtoStatusGetString(status);
-                logfile.Info(szLog, ""); // Pour le stockage dans le fichier
-                m_textLog.Insert(0, DateTime.Now.ToString(" HH:mm ") + " " + szLog);   //Pour l'affichage en temps réelle dans la dialogue
+                _logfile.Info(szLog, ""); // Pour le stockage dans le fichier
+                _lisLogs.Insert(0, DateTime.Now.ToString(" HH:mm ") + " " + szLog);   //Pour l'affichage en temps réelle dans la dialogue
                 if (status == proto_Status_t.proto_NO_ERROR)
                 {
-                    m_lRegsLbl[i].Text = regVal.ToString();
+                    _lRegsLbl[i].Text = regVal.ToString();
                 }
                 PopDllLogs();
             }          
         }
 
+        /// <summary>
+        /// This retreive the Log from the Dll and add them to our view
+        /// TODO this could be done in a separate thread to we would not need to call this each time we interact with it
+        /// And in cas of blocking code the thread can retreive the logs
+        /// </summary>
         void PopDllLogs()
         {
             // After some  operation we pop any message for dllCom library and add it to our log
@@ -195,9 +219,9 @@ namespace IHM
                 if (string.Compare(msgLog.szMsg, "") != 0)
                 {
                     // So we add to the dialog
-                    m_textLog.Insert(0, DateTime.Now.ToString(" HH:mm ") + " " + msgLog.szMsg);
+                    _lisLogs.Insert(0, DateTime.Now.ToString(" HH:mm ") + " " + msgLog.szMsg);
                     // and then to the file
-                    logfile.Info(msgLog.szMsg);  // Pour le stockage dans le fichier
+                    _logfile.Info(msgLog.szMsg);  // Pour le stockage dans le fichier
                 }
             }
         }
@@ -208,13 +232,12 @@ namespace IHM
             ObservableCollection<string> usbNames = new ObservableCollection<string>();
             popupView.IsVisible = true;
             // We add the emulslave as it is a pseudo device
-            usbNames.Add(szDllDevEmulSlaveName);
+            usbNames.Add(_ilist_dllDev[(int)DllDeviceType.devtype_emulslave]);
             ICollection<string> allNames = _iusbManager.getListOfConnections();
             foreach (string name in allNames)
             {
                 usbNames.Add(name);
             }
-
             usbList.ItemsSource = usbNames;
         }
         void OnButtonDisconnectClicked(object sender, EventArgs e)
@@ -222,14 +245,15 @@ namespace IHM
             string msgDeco = "Disconnected";
 
             // Fermeture de la connexion
-            m_dll_if.Close();
-            isConnected = false;
-            logfile.Info(msgDeco, ""); // Pour le stockage dans le fichier
-            m_textLog.Insert(0, DateTime.Now.ToString(" HH:mm ") + " " + msgDeco);   //Pour l'affichage en temps réelle dans la dialogue
+            _dll_if.Close();
+            _IsConnected = false;
+            _logfile.Info(msgDeco, ""); // Pour le stockage dans le fichier
+            _lisLogs.Insert(0, DateTime.Now.ToString(" HH:mm ") + " " + msgDeco);   //Pour l'affichage en temps réelle dans la dialogue
             connectButton.IsEnabled = true;
             receiveButton.IsEnabled = false;
             sendButton.IsEnabled = false;
             disconnectButton.IsEnabled = false;
+            PickerDllDevice.IsEnabled = true;
         }
         void OnButtonCancelClicked(object sender, EventArgs e) // Annuler la selection de device
         {
@@ -239,63 +263,90 @@ namespace IHM
         {
             popupView.IsVisible = false;
             connect((string)usbList.SelectedItem);
-        }
-        void connect(string name)
-        {         
-            /* For now the DLL dev type is statically selected, TODO add a device selector on the GUI */
-            if (name == szDllDevEmulSlaveName) 
+
+            // Gestion de l'affichage
+            if (_IsConnected)
             {
+                string msgCo = "Connected";
+                _logfile.Info(msgCo, ""); // Pour le stockage dans le fichier
+                _lisLogs.Insert(0, DateTime.Now.ToString(" HH:mm ") + " " + msgCo);   //Pour l'affichage en temps réelle dans la dialogue
+                connectButton.IsEnabled = false;
+                receiveButton.IsEnabled = true;
+                sendButton.IsEnabled = true;
+                disconnectButton.IsEnabled = true;
+                PickerDllDevice.IsEnabled = false;
+
+            }
+            else
+            {
+                string msgFailCo = "Fail to connect";
+                _logfile.Error(msgFailCo, ""); // Pour le stockage dans le fichier
+                _lisLogs.Insert(0, DateTime.Now.ToString(" HH:mm ") + " " + msgFailCo);   //Pour l'affichage en temps réelle dans la dialogue
+            }
+
+        }
+
+        /// <summary>
+        /// Performs de the connecion : open the protocol and set parameters if needed
+        /// </summary>
+        /// <param name="szUsbDevName"></param>
+        void connect(string szUsbDevName)
+        {         
+            /* We call the underlying USB connection expect for emulsave*/
+            if (szUsbDevName == _ilist_dllDev[(int)DllDeviceType.devtype_emulslave]) 
+            {
+                // So if we did not selected with the USB type selector we force it now
                 _eConfDllDevice = DllDeviceType.devtype_emulslave;
-                isConnected = (m_dll_if.Open(m_dll_if.CreateEmulslave(), "") ==0); 
+                _IsConnected = (_dll_if.Open(_dll_if.CreateEmulslave(), "") ==0); 
             }
             else
             {
                 // everything else is a true USB device
-                _iusbManager.selectDevice(name);
+                _iusbManager.selectDevice(szUsbDevName);
             }
             SWIGTYPE_p_proto_Device_t dev;
             switch (_eConfDllDevice)
             {
                 case DllDeviceType.devtype_emulslave:
-                    dev = m_dll_if.CreateEmulslave();
-                    isConnected = (m_dll_if.Open(dev, "") == 0);
+                    dev = _dll_if.CreateEmulslave();
+                    _IsConnected = (_dll_if.Open(dev, "") == 0);
                     break;
                 /* May be we shall just passe the device type we wish to the dll so that it creates the device it self */
                 case DllDeviceType.devtype_serial:
                     // On demande a la dll de s'initialiser sans essayer d'ouvrir un port, car on va s'en occuper
-                    dev = m_dll_if.CreateDevSerial();
-                    isConnected = (0 == m_dll_if.Open(dev, ""));
-                    if (isConnected)
+                    dev = _dll_if.CreateDevSerial();
+                    _IsConnected = (0 == _dll_if.Open(dev, ""));
+                    if (_IsConnected)
                     {
                         // Récupére notre FD avec l'USBManager pour l'affecter à la lib
-                        int ret = m_dll_if.SerialSetFd(dev, _iusbManager.getDeviceConnection());
+                        int ret = _dll_if.SerialSetFd(dev, _iusbManager.getDeviceConnection());
                     };
                     break;
                 case DllDeviceType.devtype_usbdev:
-                    dev = m_dll_if.CreateDevUsbDev();
-                    isConnected = (0 == m_dll_if.Open(dev, ""));
-                    if (isConnected)
+                    dev = _dll_if.CreateDevUsbDev();
+                    _IsConnected = (0 == _dll_if.Open(dev, ""));
+                    if (_IsConnected)
                     {
-                        int ret = m_dll_if.UsbDevSetFd(dev, _iusbManager.getDeviceConnection());
+                        int ret = _dll_if.UsbDevSetFd(dev, _iusbManager.getDeviceConnection());
                     }
                     break;
                 case DllDeviceType.devtype_libusb:
-                    dev = m_dll_if.CreateDevLibUsb();
-                    isConnected = (0 == m_dll_if.Open(dev, name));
-                    if (isConnected)
+                    dev = _dll_if.CreateDevLibUsb();
+                    _IsConnected = (0 == _dll_if.Open(dev, szUsbDevName));
+                    if (_IsConnected)
                     {
-                        int ret = m_dll_if.LibUsbSetFd(dev, _iusbManager.getDeviceConnection());
+                        int ret = _dll_if.LibUsbSetFd(dev, _iusbManager.getDeviceConnection());
                     }
                     break;
                 case DllDeviceType.devtype_proxy:
-                    dev = m_dll_if.CreateDevProxy();
+                    dev = _dll_if.CreateDevProxy();
                     _iusbProxy = new UsbProxy();
                     _iusbProxy.SetIUsbManager(ref _iusbManager);
-                    if (_iusbProxy.Start(usConfProxyPort))
+                    if (_iusbProxy.Start(_usConfProxyPort))
                     {
-                        string szProxyUrl = _iusbProxy.GetListenIpAddr() + protocomm.PROXY_URL_SEP + usConfProxyPort.ToString();
-                        isConnected = (0 == m_dll_if.Open(dev, szProxyUrl));
-                        if (!isConnected)
+                        string szProxyUrl = _iusbProxy.GetListenIpAddr() + protocomm.PROXY_URL_SEP + _usConfProxyPort.ToString();
+                        _IsConnected = (0 == _dll_if.Open(dev, szProxyUrl));
+                        if (!_IsConnected)
                         {
                             _iusbProxy.Stop();
                         }
@@ -304,25 +355,6 @@ namespace IHM
                     break;
                 default:
                     break;
-            }
-
-            // Gestion de l'affichage
-            if (isConnected) 
-            {
-                string msgCo = "Connected";
-                logfile.Info(msgCo, ""); // Pour le stockage dans le fichier
-                m_textLog.Insert(0, DateTime.Now.ToString(" HH:mm ") + " " + msgCo);   //Pour l'affichage en temps réelle dans la dialogue
-                connectButton.IsEnabled = false;
-                receiveButton.IsEnabled = true;
-                sendButton.IsEnabled = true;
-                disconnectButton.IsEnabled = true;
-                
-            }
-            else
-            {
-                string msgFailCo = "Fail to connect";
-                logfile.Error(msgFailCo, ""); // Pour le stockage dans le fichier
-                m_textLog.Insert(0, DateTime.Now.ToString(" HH:mm ") + " " + msgFailCo);   //Pour l'affichage en temps réelle dans la dialogue
             }
         }
 
@@ -341,33 +373,41 @@ namespace IHM
         {
             var shareService = Xamarin.Forms.DependencyService.Get<IShareService>();
 
-            shareService.Share(m_filename, "Log");
+            shareService.Share(_Logfilename, "Log");
         }
 
         private void fillLog()
         {
             FileStream fileLog;
-            m_textLog.Clear();
+            _lisLogs.Clear();
 
             //Création du fichier
-            if (!File.Exists(m_filename))
+            if (!File.Exists(_Logfilename))
             {
-                fileLog = File.Create(m_filename);
+                fileLog = File.Create(_Logfilename);
                 fileLog.Close();
             }
 
-            foreach (string line in File.ReadAllLines(m_filename))
+            foreach (string line in File.ReadAllLines(_Logfilename))
             {
-                m_textLog.Insert(0, line);
+                _lisLogs.Insert(0, line);
             }
         }
 
         private void onClickedresetLog(object sender, EventArgs e)
         {
-            m_textLog.Clear();
-            logfile.Clear();
+            _lisLogs.Clear();
+            _logfile.Clear();
 
-            File.WriteAllText(m_filename, "");
+            File.WriteAllText(_Logfilename, "");
+        }
+
+        private void Picker_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (sender == PickerDllDevice)
+            {
+                _eConfDllDevice = (DllDeviceType) PickerDllDevice.SelectedIndex;
+            }
         }
         // *************************************************************
     }

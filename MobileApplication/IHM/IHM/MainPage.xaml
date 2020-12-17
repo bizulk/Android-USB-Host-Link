@@ -18,7 +18,7 @@
                     <RowDefinition Height="38" />
                     <RowDefinition Height="38" />
                     <RowDefinition Height="38" />
-                    <RowDefinition Height="38" />
+                    <RowDefinition Height="AUTO" />
                     <RowDefinition Height="38" />
                     <RowDefinition Height="38" />
                     <RowDefinition Height="38" />
@@ -61,10 +61,16 @@
                         Grid.ColumnSpan="2"
                        x:Name="userReg2"/>
                 <Label Grid.Row="4" Grid.Column="0" 
-                       Text="Use API Android Xfer"/>
+                       Text="Use API Android Xfer" 
+                       HorizontalTextAlignment="End" VerticalOptions="Center"/>
                 <Switch  Grid.Row="4" Grid.Column="1"
-                        Toggled="OnToggled"                      
-                         x:Name="switchUseApiAndroidXfer" />
+                        x:Name="switchUseApiAndroidXfer" Toggled="OnToggled" 
+                        HorizontalOptions="Start" VerticalOptions="Center"/>
+                <Picker Grid.Row="4" Grid.Column="2" Grid.ColumnSpan="2"
+                        Title="Select a device type" 
+                        x:Name="PickerDllDevice" SelectedIndexChanged="Picker_SelectedIndexChanged"
+                        VerticalOptions="CenterAndExpand">
+                </Picker>
                 <Button Grid.Row="6"
                         Grid.Column="0"
                         Grid.ColumnSpan="2"
