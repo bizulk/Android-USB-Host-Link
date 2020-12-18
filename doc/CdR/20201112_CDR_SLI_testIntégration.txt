@@ -146,3 +146,20 @@ Mercredi 16/12/2020
 	A noter qu'il y aura en terme de données un overhead d'une dizaine d'octets pour chaque transaction.
 	J'ai reçu un mail de la communauté libusb, qui me propose de reprendre le test avec la version officielle => Je fais ça demain.
 	
+-------------------------------------------------------------------------------	
+Vendredi 18/12
+
+	J'ai donc mis en place la version officielle d'android et utilisé le code que l'on m'a envoyé. Cela fonctionne parfaitement.
+	J'ai essayé les tablettes suivantes :
+	Cube iWork 10 - android 5 - API 22
+		x câble direct uUSB Male <--> uUSB Male : OK
+		x câble adaptateur uUSB-c <--> USB femelle : OK
+	Samsung Galaxy Tab 10 - android 9 - API 28
+		x câble direct uUSB Male + adaptateur usbc <--> uUSB Male : Ne fonctionne pas
+		x câble adaptateur uUSB-c <--> USB femelle : OK
+	Lenovo TBX304L - Android 8.1 - API 27
+		x câble direct uUSB Male <--> uUSB Male : Ne fonctionne pas
+		x câble adaptateur uUSB-c <--> USB femelle : OK
+	
+Lorsque le câble direct ne fonctionne pas, la LED Nucleo témoin de la connexion USB ne s'allume même pas, et la tablette android ne détecte pas la carte. C'est vraiment le câble qui est en cause.
+Il faudra prendre en compte ce résultat pour le support client. Clairement lui expliquer comment connecter les appareils et quels câbles utiliser, voir même leur fournir la référence à utiliser pour avoir un support.
