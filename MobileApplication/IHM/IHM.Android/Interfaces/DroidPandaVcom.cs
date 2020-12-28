@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -26,8 +26,10 @@ namespace IHM.Droid.Interfaces
     /// TODO : I manage to make wit work without the userserial package, get rid of it or create another spécific implementation that use it.
     /// Selso LIBERADO selso.liberado@ciose.fr
     /// </summary>
-    class DroidPandaVcom : IUsbManager
+    public class DroidPandaVcom : IUsbManager
     {
+        public const string LOG_TAG = "pandavcom";
+
         /// This class will keep all android hardware usb stuff
         public class DroidDevHandle
         {
@@ -127,7 +129,7 @@ namespace IHM.Droid.Interfaces
         /// <param name="epIn"></param>
         /// <param name="epOut"></param>
         /// <returns></returns>
-        protected int usbInterfaceGetBulkEndpoints(UsbInterface usbIface, ref UsbEndpoint epIn, ref UsbEndpoint epOut)
+        protected int InterfaceGetBulkEndpoints(UsbInterface usbIface, ref UsbEndpoint epIn, ref UsbEndpoint epOut)
         {
             int i;
             int ret;
@@ -177,7 +179,7 @@ namespace IHM.Droid.Interfaces
                 if (connection.ClaimInterface(usbIface, true))
                 {
                     // Now search IO endpoints
-                    if (usbInterfaceGetBulkEndpoints(usbIface, ref epIn, ref epOut) == 0)
+                    if (InterfaceGetBulkEndpoints(usbIface, ref epIn, ref epOut) == 0)
                     {
                         connection.SetInterface(usbIface);
                         return 0;
@@ -318,7 +320,7 @@ namespace IHM.Droid.Interfaces
             int ret = _devHandle.connection.BulkTransfer(_devHandle.ep_out, buffer, 0, buffer.Length, BULK_XFER_TOUT_MS);
             if (ret >= 0)
             {
-                Log.Debug("pandavcom", "xfer : successfully sent nb bytes : " + ret);
+                Log.Debug(DroidPandaVcom.LOG_TAG, "xfer : successfully sent nb bytes : " + ret);
                 // Receive the reply frame
                 // First version - take the answer with the max size possible
                 // TODO : Handle timeout as done by the library and returns its error.
@@ -354,12 +356,12 @@ namespace IHM.Droid.Interfaces
                 }
                 else
                 {
-                    Log.Debug("pandavcom", "read : failed to read nb bytes");
+                    Log.Debug(DroidPandaVcom.LOG_TAG, "read : failed to read nb bytes");
                 }
             }
             else
             {
-                Log.Debug("pandavcom", "write : failed to sent nb bytes");
+                Log.Debug(DroidPandaVcom.LOG_TAG, "write : failed to sent nb bytes");
             }
             return ret;
         }
@@ -382,7 +384,7 @@ namespace IHM.Droid.Interfaces
             int ret = _devHandle.connection.BulkTransfer(_devHandle.ep_out, buffer, 0, buffer.Length, BULK_XFER_TOUT_MS);
             if (ret >= 0)
             {
-                Log.Debug("pandavcom", "xfer : successfully sent nb bytes : " + ret);
+                Log.Debug(DroidPandaVcom.LOG_TAG, "xfer : successfully sent nb bytes : " + ret);
                 // Receive the reply frame
                 // First version - take the answer with the max size possible
                 // Remember that the protocol expect the peer to seed **at most** the max frame size.
@@ -411,7 +413,7 @@ namespace IHM.Droid.Interfaces
                 }
                 else
                 {
-                    Log.Debug("pandavcom", "xfer : failed to sent bytes");
+                    Log.Debug(DroidPandaVcom.LOG_TAG, "xfer : failed to sent bytes");
                 }
             }
             return ret;
@@ -424,11 +426,11 @@ namespace IHM.Droid.Interfaces
             int ret = _devHandle.connection.BulkTransfer(_devHandle.ep_out, data, 0, data.Length, BULK_XFER_TOUT_MS);
             if (ret >= 0)
             {
-                Log.Debug("pandavcom", "xfer : successfully sent nb bytes : " + ret);
+                Log.Debug(DroidPandaVcom.LOG_TAG, "xfer : successfully sent nb bytes : " + ret);
             }
             else
             {
-                Log.Debug("pandavcom", "xfer : failed to sent bytes retcode : " + ret);
+                Log.Debug(DroidPandaVcom.LOG_TAG, "xfer : failed to sent bytes retcode : " + ret);
             }
             return (ret == data.Length) ? 0 : -1;
         }
@@ -441,11 +443,11 @@ namespace IHM.Droid.Interfaces
             int ret = _devHandle.connection.BulkTransfer(_devHandle.ep_in, data, 0, len, BULK_XFER_TOUT_MS);
             if (ret >= 0)
             {
-                Log.Debug("pandavcom", "xfer : successfully read nb bytes : ", +ret);
+                Log.Debug(DroidPandaVcom.LOG_TAG, "xfer : successfully read nb bytes : ", +ret);
             }
             else
             {
-                Log.Debug("pandavcom", "xfer : failed to read bytes retcode : " + ret);
+                Log.Debug(DroidPandaVcom.LOG_TAG, "xfer : failed to read bytes retcode : " + ret);
             }
             return ret ;
         }
