@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -18,6 +18,49 @@ using IHM;
 
 namespace IHM.Droid.Interfaces
 {
+    public class USBBroadCastReceiver : BroadcastReceiver
+    {
+
+        /// <summary>
+        /// This string must match the Android Manifest XML file
+        /// </summary>
+        public static String ACTION_USB_PERMISSION = "com.cio.USB_PERMISSION";
+
+        private DroidPandaVcom _droidPandaVcom;
+
+        public USBBroadCastReceiver(DroidPandaVcom droidPandaVcom)
+        {
+            _droidPandaVcom = droidPandaVcom;
+        }
+
+        /// <summary>
+        /// Receive the user input permission and call the Interface method to open device
+        /// </summary>
+        /// <param name="context"></param>
+        /// <param name="intent"></param>
+        public override void OnReceive(Context context, Intent intent)
+        {
+            String action = intent.Action;
+            if (ACTION_USB_PERMISSION.Equals(action))
+            {
+                UsbDevice device = (UsbDevice)intent.GetParcelableExtra(UsbManager.ExtraDevice);
+
+                if (intent.GetBooleanExtra(UsbManager.ExtraPermissionGranted, false))
+                {
+                    if (device != null)
+                    {
+                        _droidPandaVcom.OpenDevice();
+                    }
+                }
+                else
+                {
+                    Log.Debug(DroidPandaVcom.LOG_TAG, "permission denied for device " + device);
+                }
+            }
+
+        }
+    }
+
     /// <summary>
     /// THIS IS THE USB INTERFACE WE ARE WORKING ON 
     /// It requires the nuget package USBSerialForAndroid
@@ -49,12 +92,12 @@ namespace IHM.Droid.Interfaces
                 // everything else is set to null 
             }
         }
+
         ////////////////////////////
         // CONFIG SECTION
         private const bool bConfUseUsbManagerOnly = true; // Select method to install interface (usbserial package, or android API only)
         public const int BULK_XFER_TOUT_MS = 1000;
         // END
-        public static String ACTION_USB_PERMISSION = "com.android.example.USB_PERMISSION";
         public const int iVendorId = 0x0483; // Id for the STM32Nucleo
         public const int iProductID = 0x5740; // Id for the STM32Nucleo
 
@@ -62,8 +105,10 @@ namespace IHM.Droid.Interfaces
         private IList<IUsbSerialDriver> _availableDrivers; // Manage all available driver from package
         private IUsbSerialDriver _currDriverIface; // Currently applied driver
         // android.hardware.usb stuff
-        Object _context; // Android activity context
+        ContextWrapper _context; // Android activity context
         DroidDevHandle _devHandle = new DroidDevHandle(); // System file descriptor we will pass to dllCom library.
+        PendingIntent _usbPermissionIntent; // The permission intent is handled in the OS Interface
+        USBBroadCastReceiver _USBBroadCastReceiver; // The permission broadcast receiver for USB permission intent
 
         /// <summary>
         /// We initialize all Android context
@@ -71,8 +116,13 @@ namespace IHM.Droid.Interfaces
         /// <param name="context"></param>
         public void Init(Object context)
         {
-            _context = context;
-            _devHandle.usbManager = (UsbManager)((ContextWrapper)context).GetSystemService(Context.UsbService);
+            _context = (ContextWrapper)context;
+            _devHandle.usbManager = (UsbManager)_context.GetSystemService(Context.UsbService);
+
+            _usbPermissionIntent = PendingIntent.GetBroadcast(_context, 0, new Intent(USBBroadCastReceiver.ACTION_USB_PERMISSION), 0);
+            IntentFilter filter = new IntentFilter(USBBroadCastReceiver.ACTION_USB_PERMISSION);
+            _context.RegisterReceiver(_USBBroadCastReceiver, filter);
+            _USBBroadCastReceiver = new USBBroadCastReceiver(this);
         }
 
         // Retreive the physically connected devices.
@@ -202,32 +252,13 @@ namespace IHM.Droid.Interfaces
                 // Ask for permission to access the created device
                 if (!_devHandle.usbManager.HasPermission(_devHandle.usbdev))
                 {
-                    PendingIntent pi = PendingIntent.GetBroadcast((ContextWrapper)_context, 0, new Intent(ACTION_USB_PERMISSION), 0);
-                    _devHandle.usbManager.RequestPermission(_devHandle.usbdev, pi);
-                    
-                    // FIXME : The wapp don't wait for user input and crash when asking permission 1st time, we must move this code to an event receiver
-                    /* We check the permission was given
-                     */
-                    if (!_devHandle.usbManager.HasPermission(_devHandle.usbdev))
-                    {
-                        // Loose !
-                        Log.Debug("pandavcom", "FAILED : did not have persmission to open device" + _devHandle.usbdev.DeviceName);
-                        return;
-                    }
+                    _devHandle.usbManager.RequestPermission(_devHandle.usbdev, _usbPermissionIntent);
+                    OpenDevice();
                 }
-                // Now open the port, with  the USB Manager : we get the fd/enpoints and pass it to library, no more
-                _devHandle.connection = _devHandle.usbManager.OpenDevice(_devHandle.usbdev);
-                if (_devHandle.connection != null)
+                else
                 {
-                    if (OpenInterface(_devHandle.usbdev, _devHandle.connection, ref _devHandle.usbIface, ref _devHandle.ep_in, ref _devHandle.ep_out) == 0)
-                    {
-                        _devHandle.fd = _devHandle.connection.FileDescriptor;
-                        Log.Debug("pandavcom", "opened device endpoint" + _devHandle.usbdev.DeviceName + "with descriptor: " + _devHandle.fd);
-                    }
-                    else
-                    {
-                        Log.Debug("pandavcom", "FAILED : open device endpoint" + _devHandle.usbdev.DeviceName);
-                    }
+                    // The wapp don't wait for user input and crash when asking permission 1st time
+                    // We must Wait for user input for opening connection.
                 }
             }
             else
@@ -258,6 +289,29 @@ namespace IHM.Droid.Interfaces
                 ports[0].Open(connection);
                 // TODO....
             }
+        }
+
+
+        public void OpenDevice()
+        {
+            // At this stage Persmission must Have been granted
+            if (!_devHandle.usbManager.HasPermission(_devHandle.usbdev))
+            {
+                // Now open the port, with  the USB Manager : we get the fd/enpoints and pass it to library, no more
+                _devHandle.connection = _devHandle.usbManager.OpenDevice(_devHandle.usbdev);
+                if (_devHandle.connection != null)
+                {
+                    if (OpenInterface(_devHandle.usbdev, _devHandle.connection, ref _devHandle.usbIface, ref _devHandle.ep_in, ref _devHandle.ep_out) == 0)
+                    {
+                        _devHandle.fd = _devHandle.connection.FileDescriptor;
+                        Log.Debug(DroidPandaVcom.LOG_TAG, "opened device endpoint" + _devHandle.usbdev.DeviceName + "with descriptor: " + _devHandle.fd);
+                    }
+                    else
+                    {
+                        Log.Debug(DroidPandaVcom.LOG_TAG, "FAILED : open device endpoint" + _devHandle.usbdev.DeviceName);
+                    }
+                }
+            } 
         }
 
         /// <summary>
