@@ -27,6 +27,7 @@ namespace IHM.Droid
             base.OnCreate(savedInstanceState);
 
             //Fichier de log
+            // FIXME - filename is also specified in the xamarin.forms.
             Plugin.XFLogger.CrossXFLogger.Current.Configure(Plugin.XFLogger.Abstractions.LogTimeOption.DateTimeNow, "FileLog.log", 3, 1024, Plugin.XFLogger.Abstractions.LogLevel.Info, true);
 
             //Pour l'utilisation du service de partage
