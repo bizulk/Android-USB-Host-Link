@@ -308,7 +308,9 @@ namespace IHM
                 // So if we did not selected with the emulsave type selector we force it now
                 // FIXME - maybe we need to update the picker to the right value
                 _eConfDllDevice = DllDeviceType.devtype_emulslave;
-                _IsConnected = (_dll_if.Open(_dll_if.CreateEmulslave(), "") ==0); 
+                SWIGTYPE_p_proto_Device_t dev = _dll_if.CreateEmulslave();
+                _IsConnected = (_dll_if.Open(dev, "") == 0);
+                OnDeviceconnected();
             }
             else
             {
@@ -328,8 +330,6 @@ namespace IHM
                 switch (_eConfDllDevice)
                 {
                     case DllDeviceType.devtype_emulslave:
-                        dev = _dll_if.CreateEmulslave();
-                        _IsConnected = (_dll_if.Open(dev, "") == 0);
                         break;
                     /* May be we shall just passe the device type we wish to the dll so that it creates the device it self */
                     case DllDeviceType.devtype_serial:
