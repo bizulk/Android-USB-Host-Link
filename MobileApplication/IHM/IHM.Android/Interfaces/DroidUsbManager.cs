@@ -28,6 +28,7 @@ namespace IHM.Droid.Interfaces
     {
         private UsbManager usbManager_;
         private string selectedDevice;
+        public event EventHandler<bool> NotifyPermRequestCompleted;
 
         public DroidUsbManager() {}
 
@@ -77,24 +78,35 @@ namespace IHM.Droid.Interfaces
         public int ReadRegisterFromDevice(byte uiRegister, ref byte value)
         {
             // not implemented
-            return -1;
+            throw new NotImplementedException();
         }
 
         public int WriteRegisterToDevice(byte uiRegister, byte value)
         {
             // not implemented
-            return -1;
+            throw new NotImplementedException();
         }
 
         public int WriteToDevice(byte[] data)
         {
             // not implemented
-            return -1;
+            throw new NotImplementedException();
         }
         public int ReadFromDevice(byte[] data, int len)
         {
             // not implemented
-            return -1;
+            throw new NotImplementedException();
         }
-}
+
+        public bool CheckPermStatusAsync(string szDevName)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void RequestPermAsync(string szDevName)
+        {
+            throw new NotImplementedException();
+        }
+
+    }
 }

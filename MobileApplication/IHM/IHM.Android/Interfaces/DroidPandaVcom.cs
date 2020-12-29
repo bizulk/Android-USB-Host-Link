@@ -26,6 +26,15 @@ namespace IHM.Droid.Interfaces
         /// </summary>
         public static String ACTION_USB_PERMISSION = "com.cio.USB_PERMISSION";
 
+        /// <summary>
+        /// Use an event to notify that the permission completed
+        /// </summary>
+        public event EventHandler<bool> NotifyUsbPermissionCompleted;
+
+        /// <summary>
+        /// We complete the opening device process in the brodcast receive
+        /// FIXME - don't do that, just send event and let the task that triggered the permission request complete its process
+        /// </summary>
         private DroidPandaVcom _droidPandaVcom;
 
         public USBBroadCastReceiver(DroidPandaVcom droidPandaVcom)
@@ -44,20 +53,14 @@ namespace IHM.Droid.Interfaces
             if (ACTION_USB_PERMISSION.Equals(action))
             {
                 UsbDevice device = (UsbDevice)intent.GetParcelableExtra(UsbManager.ExtraDevice);
-
-                if (intent.GetBooleanExtra(UsbManager.ExtraPermissionGranted, false))
+                bool bPermissionGranted = false;             
+                if (device != null)
                 {
-                    if (device != null)
-                    {
-                        _droidPandaVcom.OpenDevice();
-                    }
+                    bPermissionGranted = intent.GetBooleanExtra(UsbManager.ExtraPermissionGranted, false);
                 }
-                else
-                {
-                    Log.Debug(DroidPandaVcom.LOG_TAG, "permission denied for device " + device);
-                }
+                EventHandler<bool> handler = NotifyUsbPermissionCompleted;
+                handler(this, bPermissionGranted);
             }
-
         }
     }
 
@@ -92,14 +95,20 @@ namespace IHM.Droid.Interfaces
                 // everything else is set to null 
             }
         }
+        
+        /// <summary>
+        /// The Event declared in the interface
+        /// </summary>
+        public event EventHandler<bool> NotifyPermRequestCompleted;
 
         ////////////////////////////
         // CONFIG SECTION
         private const bool bConfUseUsbManagerOnly = true; // Select method to install interface (usbserial package, or android API only)
         public const int BULK_XFER_TOUT_MS = 1000;
-        // END
         public const int iVendorId = 0x0483; // Id for the STM32Nucleo
         public const int iProductID = 0x5740; // Id for the STM32Nucleo
+        // END
+
 
         // usb-to-serial stuff
         private IList<IUsbSerialDriver> _availableDrivers; // Manage all available driver from package
@@ -118,11 +127,26 @@ namespace IHM.Droid.Interfaces
         {
             _context = (ContextWrapper)context;
             _devHandle.usbManager = (UsbManager)_context.GetSystemService(Context.UsbService);
-
             _usbPermissionIntent = PendingIntent.GetBroadcast(_context, 0, new Intent(USBBroadCastReceiver.ACTION_USB_PERMISSION), 0);
             IntentFilter filter = new IntentFilter(USBBroadCastReceiver.ACTION_USB_PERMISSION);
-            _context.RegisterReceiver(_USBBroadCastReceiver, filter);
             _USBBroadCastReceiver = new USBBroadCastReceiver(this);
+            _USBBroadCastReceiver.NotifyUsbPermissionCompleted += _USBBroadCastReceiver_NotifyUsbPermissionCompleted;
+            _context.RegisterReceiver(_USBBroadCastReceiver, filter);           
+        }
+
+        private void _USBBroadCastReceiver_NotifyUsbPermissionCompleted(object sender, bool bPermissionGranted)
+        {
+            if (bPermissionGranted)
+            {
+                OpenDevice();
+                // https://docs.microsoft.com/fr-fr/dotnet/api/system.eventhandler-1?view=net-5.0
+                EventHandler<bool> handler = NotifyPermRequestCompleted;
+                handler(this, true);
+            }
+            else
+            {
+                Log.Debug(LOG_TAG, "permission denied for device " + _devHandle.usbdev.DeviceName);
+            }
         }
 
         // Retreive the physically connected devices.
@@ -243,20 +267,36 @@ namespace IHM.Droid.Interfaces
             return ret;
         }
 
+        public bool CheckPermStatusAsync(string szDevName)
+        {
+            var usbDevice = _devHandle.usbManager.DeviceList[szDevName];
+            // Ask for permission to access the created device
+            return _devHandle.usbManager.HasPermission(usbDevice);
+        }
+
+        public void RequestPermAsync(string szDevName)
+        {
+            var usbDevice = _devHandle.usbManager.DeviceList[szDevName];
+            _devHandle.usbManager.RequestPermission(usbDevice, _usbPermissionIntent);
+        }
+
         public void selectDevice(string name)
         {
             if (bConfUseUsbManagerOnly)
             {
 
                 _devHandle.usbdev = _devHandle.usbManager.DeviceList[name];
-                // Ask for permission to access the created device
-                if (!_devHandle.usbManager.HasPermission(_devHandle.usbdev))
-                {
-                    _devHandle.usbManager.RequestPermission(_devHandle.usbdev, _usbPermissionIntent);
+                // Check and Ask for permission to access the created device
+                if (_devHandle.usbManager.HasPermission(_devHandle.usbdev))
+                {                   
                     OpenDevice();
+                    // https://docs.microsoft.com/fr-fr/dotnet/api/system.eventhandler-1?view=net-5.0
+                    EventHandler<bool> handler = NotifyPermRequestCompleted;
+                    handler(this, true);
                 }
                 else
                 {
+                    _devHandle.usbManager.RequestPermission(_devHandle.usbdev, _usbPermissionIntent);
                     // The wapp don't wait for user input and crash when asking permission 1st time
                     // We must Wait for user input for opening connection.
                 }
@@ -295,7 +335,7 @@ namespace IHM.Droid.Interfaces
         public void OpenDevice()
         {
             // At this stage Persmission must Have been granted
-            if (!_devHandle.usbManager.HasPermission(_devHandle.usbdev))
+            if (_devHandle.usbManager.HasPermission(_devHandle.usbdev))
             {
                 // Now open the port, with  the USB Manager : we get the fd/enpoints and pass it to library, no more
                 _devHandle.connection = _devHandle.usbManager.OpenDevice(_devHandle.usbdev);
@@ -311,7 +351,11 @@ namespace IHM.Droid.Interfaces
                         Log.Debug(DroidPandaVcom.LOG_TAG, "FAILED : open device endpoint" + _devHandle.usbdev.DeviceName);
                     }
                 }
-            } 
+            }
+            else
+            {
+                throw new NotSupportedException("We shall have permission to device");
+            }
         }
 
         /// <summary>

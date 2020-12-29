@@ -18,9 +18,8 @@ namespace IHM.Droid
     {
         protected override void OnCreate(Bundle savedInstanceState)
         {
-            //Pour l'utilisation du service de l'USBManager
+            // Setup the USB Android Interface we want to use.
             Xamarin.Forms.DependencyService.Register<DroidPandaVcom>();
-
             TabLayoutResource = Resource.Layout.Tabbar;
             ToolbarResource = Resource.Layout.Toolbar;
 
@@ -39,7 +38,6 @@ namespace IHM.Droid
             Xamarin.Forms.Forms.Init(this, savedInstanceState);
             Xamarin.Forms.DependencyService.Get<IUsbManager>().Init(this);
             LoadApplication(new App());
-
         }
     }
 }

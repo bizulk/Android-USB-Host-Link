@@ -31,6 +31,10 @@ namespace IHM
     /// </summary>
     public interface IUsbManager
     {
+        /// <summary>
+        /// This event will be sent when the requested permission has been completed : granted or not
+        /// </summary>
+        event EventHandler<bool> NotifyPermRequestCompleted;
 
         /// <summary>
         /// Some custom Initialization
@@ -50,11 +54,23 @@ namespace IHM
         /// <returns></returns>
        Task<ICollection<string>> getListOfConnectionsAsync();
 
+       /// <summary>
+       /// Request USB permission for device
+       /// </summary>
+       /// <returns> true is permission granted otherwise false </returns>
+       bool CheckPermStatusAsync(string szDevName);
+
+        /// <summary>
+        /// Request USB permission for device
+        /// </summary>
+        /// <returns></returns>
+       void RequestPermAsync(string szDevName);
+
         /// <summary>
         /// Select device from the the connected list. After this call the device is ready for communication
         /// </summary>
         /// <returns></returns>
-        void selectDevice(string name);
+        void selectDevice(string szDevName);
 
         /// <summary>
         /// Returns a system File descriptor for the opened connection

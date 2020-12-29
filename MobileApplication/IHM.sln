@@ -5,7 +5,7 @@ VisualStudioVersion = 15.0.28307.1082
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IHM.Android", "IHM\IHM.Android\IHM.Android.csproj", "{BE5A8A0A-5A57-486F-82C2-E51124B94857}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IHM", "IHM\IHM\IHM.csproj", "{BD2E3759-DFF1-4368-B8ED-6F78F9692D16}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IHM", "IHM\IHM\IHM.csproj", "{BD2E3759-DFF1-4368-B8ED-6F78F9692D16}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
