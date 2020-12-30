@@ -1,4 +1,4 @@
-/** Ce fichier sert a lister et sélectionner nos tests unitaires
+/** Ce fichier sert a lister et sÃ©lectionner notre APPLICATION
  *
  */
 
@@ -7,5 +7,6 @@
 
 //#define TST_HELLOWORD_USB
 //#define TST_USB_ECHO
+/* dllcom slave */
 #define TST_PROTOCOMM
 #endif
