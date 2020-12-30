@@ -271,6 +271,8 @@ namespace IHM
         /// </summary>
         void OnDeviceconnected()
         {
+            // In case we forced the selected dive (emulslave) refresh display
+            PickerDllDevice.SelectedIndex = (int)_eConfDllDevice;
             // Gestion de l'affichage
             if (_IsConnected)
             {
