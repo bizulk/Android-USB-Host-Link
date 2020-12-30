@@ -14,18 +14,10 @@ namespace IHM
 
         ////////////////////////////
         // CONFIG SECTION
-        public enum DllDeviceType
-        {
-            devtype_emulslave,
-            devtype_serial,
-            devtype_usbdev,
-            devtype_libusb,
-            devtype_proxy,
-        };
 
         /// <summary>
         /// List used to display the supported protocol devices
-        /// the list is indexed by enum DllDeviceType
+        /// the list is indexed by enum proto_iodev_devices_t
         /// </summary>
         private readonly IList<string> _ilist_dllDev = new List<string>
             {
@@ -35,7 +27,7 @@ namespace IHM
                 "Dev type libusb",
                 "Dev type proxy"
             };
-        DllDeviceType   _eConfDllDevice = DllDeviceType.devtype_libusb; // Select dll device
+        proto_iodev_devices_t _eConfDllDevice = proto_iodev_devices_t.PROTO_DEV_LIBUSB; // Select dll device
         bool            _bConfUseAndroidforIOaccess = false; // select dll for R/W Operation OR the android usb hardware API 
         ushort          _usConfProxyPort = 5000;
         string          _szDevName; /* USB device Name */
@@ -233,7 +225,7 @@ namespace IHM
             ObservableCollection<string> usbNames = new ObservableCollection<string>();
             popupView.IsVisible = true;
             // We add the emulslave as it is a pseudo device
-            usbNames.Add(_ilist_dllDev[(int)DllDeviceType.devtype_emulslave]);
+            usbNames.Add(_ilist_dllDev[(int)proto_iodev_devices_t.PROTO_DEV_EMULSLAVE]);
             ICollection<string> allNames = _iusbManager.getListOfConnections();
             foreach (string name in allNames)
             {
@@ -247,7 +239,7 @@ namespace IHM
             // Fermeture de la connexion     
             _dll_if.Close();
             // Stop proxy server
-            if (_eConfDllDevice == DllDeviceType.devtype_proxy)
+            if (_eConfDllDevice == proto_iodev_devices_t.PROTO_DEV_PROXY)
             {
                 _iusbProxy.Stop();
             }
@@ -319,10 +311,10 @@ namespace IHM
         {
             _szDevName = szUsbDevName;
             /* We call the underlying USB connection except for emulsave*/
-            if (_szDevName == _ilist_dllDev[(int)DllDeviceType.devtype_emulslave]) 
+            if (_szDevName == _ilist_dllDev[(int)proto_iodev_devices_t.PROTO_DEV_EMULSLAVE]) 
             {
                 // So if we did not selected with the emulsave type selector we force it now
-                _eConfDllDevice = DllDeviceType.devtype_emulslave;
+                _eConfDllDevice = proto_iodev_devices_t.PROTO_DEV_EMULSLAVE;
                 proto_IfaceIODevice_t dev = _dll_if.CreateEmulslave();
                 _IsConnected = (_dll_if.Open(dev, "") == 0);
                 OnDeviceconnected();
@@ -330,7 +322,7 @@ namespace IHM
             else
             {
                 // Check we did not selected unappropriate device type
-                if (_eConfDllDevice == DllDeviceType.devtype_emulslave)
+                if (_eConfDllDevice == proto_iodev_devices_t.PROTO_DEV_EMULSLAVE)
                 {
                     DisplayAlert("Erreur", "Device type incorrect, select another", "Annuler");
                     return;
@@ -350,10 +342,10 @@ namespace IHM
                 int ret = 0;
                 switch (_eConfDllDevice)
                 {
-                    case DllDeviceType.devtype_emulslave:
+                    case proto_iodev_devices_t.PROTO_DEV_EMULSLAVE:
                         break;
                     /* May be we shall just passe the device type we wish to the dll so that it creates the device it self */
-                    case DllDeviceType.devtype_serial:
+                    case proto_iodev_devices_t.PROTO_DEV_SERIAL:
                         // On demande a la dll de s'initialiser sans essayer d'ouvrir un port, car on va s'en occuper
                         dev = _dll_if.CreateDevSerial();
                         ret = _dll_if.SerialSetFd(dev, _iusbManager.GetDeviceConnection());                       
@@ -362,7 +354,7 @@ namespace IHM
                             _IsConnected = (0 == _dll_if.Open(dev, ""));
                         };
                         break;
-                    case DllDeviceType.devtype_usbdev:
+                    case proto_iodev_devices_t.PROTO_DEV_USBDEV:
                         dev = _dll_if.CreateDevUsbDev();
                         ret = _dll_if.UsbDevSetFd(dev, _iusbManager.GetDeviceConnection());                       
                         if (ret == 0)
@@ -370,7 +362,7 @@ namespace IHM
                             _IsConnected = (0 == _dll_if.Open(dev, ""));
                         }
                         break;
-                    case DllDeviceType.devtype_libusb:
+                    case proto_iodev_devices_t.PROTO_DEV_LIBUSB:
                         dev = _dll_if.CreateDevLibUsb();
                         ret = _dll_if.LibUsbSetFd(dev, _iusbManager.GetDeviceConnection());
                         if (ret == 0)
@@ -378,7 +370,7 @@ namespace IHM
                             _IsConnected = (0 == _dll_if.Open(dev, _szDevName));
                         }
                         break;
-                    case DllDeviceType.devtype_proxy:
+                    case proto_iodev_devices_t.PROTO_DEV_PROXY:
                         dev = _dll_if.CreateDevProxy();
                         _iusbProxy = new UsbProxy();
                         _iusbProxy.SetIUsbManager(ref _iusbManager);
@@ -435,7 +427,7 @@ namespace IHM
         {
             if (sender == PickerDllDevice)
             {
-                _eConfDllDevice = (DllDeviceType)PickerDllDevice.SelectedIndex;
+                _eConfDllDevice = (proto_iodev_devices_t)PickerDllDevice.SelectedIndex;
             }
         }
         // ******************* Pour le log ***************************
