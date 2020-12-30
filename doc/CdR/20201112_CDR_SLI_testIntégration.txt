@@ -179,4 +179,9 @@ Lundi 29/12
 	
 	PISTE 3 OK : on traite en asynchrone le résultat de la demande de permission. On ajoute un évènement dans le broadcast receiver, relayé par l'interface IUsbManager, pour que l'application continue le process de connexion.
 	
+-------------------------------------------------------------------------------	
+Lundi 30/12
+
+	Issue 18 et 21 corrigé (correction crash connexion & déconnexion).
+	Des bugs d'IHM corrigé, ainsi que le crash du log qui arrive parfois.
 	
