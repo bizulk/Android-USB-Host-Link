@@ -128,26 +128,14 @@ namespace IHM
         }
 
         /// <summary>
-        /// Retourne une instance de device d'émulation de slave
+        /// Return an instance of the selected device
         /// </summary>
         /// <returns> Instance de notre device </returns>
-        public proto_IfaceIODevice_t CreateEmulslave()
+        public proto_IfaceIODevice_t CreateDevice(proto_iodev_devices_t type)
         {
             proto_IfaceIODevice_t ret;
-            ret = protocomm.devemulslave_create();
+            ret = protocomm.device_create(type);
             return ret;
-        }
-
-        /// <summary>
-        /// Creation du device serial
-        /// Pour démonstration de l'utilisation de l'interface Android
-        /// </summary>
-        /// <returns></returns>
-        public proto_IfaceIODevice_t CreateDevSerial()
-        {
-            proto_IfaceIODevice_t dev;
-            dev = protocomm.devserial_create();
-            return dev;
         }
 
         public int SerialSetFd(proto_IfaceIODevice_t dev, DevHandle devh)
@@ -156,25 +144,12 @@ namespace IHM
             return ret;
         }
 
-        public proto_IfaceIODevice_t CreateDevUsbDev()
-        {
-            proto_IfaceIODevice_t dev;
-            dev = protocomm.devusbdev_create();
-            return dev;
-        }
-
         public int UsbDevSetFd(proto_IfaceIODevice_t dev, DevHandle devh)
         {
             int ret = protocomm.devusbdev_setDev(dev, devh.fd, devh.ep_in, devh.ep_out, devh.max_pkt_size);
             return ret;
         }
 
-        public proto_IfaceIODevice_t CreateDevLibUsb()
-        {
-            proto_IfaceIODevice_t dev;
-            dev = protocomm.devlibusb_create();
-            return dev;
-        }
 
         public int LibUsbSetFd(proto_IfaceIODevice_t dev, DevHandle devh)
         {
@@ -182,12 +157,6 @@ namespace IHM
             return ret;
         }
 
-        public proto_IfaceIODevice_t CreateDevProxy()
-        {
-            proto_IfaceIODevice_t dev;
-            dev = protocomm.devproxy_create();
-            return dev;
-        }
         /// <summary>
         /// Fournit une string de description du status
         /// </summary>

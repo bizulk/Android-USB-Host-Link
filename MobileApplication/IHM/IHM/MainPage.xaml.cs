@@ -315,7 +315,7 @@ namespace IHM
             {
                 // So if we did not selected with the emulsave type selector we force it now
                 _eConfDllDevice = proto_iodev_devices_t.PROTO_DEV_EMULSLAVE;
-                proto_IfaceIODevice_t dev = _dll_if.CreateEmulslave();
+                proto_IfaceIODevice_t dev = _dll_if.CreateDevice(proto_iodev_devices_t.PROTO_DEV_EMULSLAVE);
                 _IsConnected = (_dll_if.Open(dev, "") == 0);
                 OnDeviceconnected();
             }
@@ -338,16 +338,13 @@ namespace IHM
             // Permission has been granted so ask for connection
             if (bPermissionGranted == true)
             {
-                proto_IfaceIODevice_t dev;
+                proto_IfaceIODevice_t dev = _dll_if.CreateDevice(_eConfDllDevice);
                 int ret = 0;
                 switch (_eConfDllDevice)
                 {
                     case proto_iodev_devices_t.PROTO_DEV_EMULSLAVE:
-                        break;
-                    /* May be we shall just passe the device type we wish to the dll so that it creates the device it self */
+                        break;                  
                     case proto_iodev_devices_t.PROTO_DEV_SERIAL:
-                        // On demande a la dll de s'initialiser sans essayer d'ouvrir un port, car on va s'en occuper
-                        dev = _dll_if.CreateDevSerial();
                         ret = _dll_if.SerialSetFd(dev, _iusbManager.GetDeviceConnection());                       
                         if (ret == 0)
                         {
@@ -355,7 +352,6 @@ namespace IHM
                         };
                         break;
                     case proto_iodev_devices_t.PROTO_DEV_USBDEV:
-                        dev = _dll_if.CreateDevUsbDev();
                         ret = _dll_if.UsbDevSetFd(dev, _iusbManager.GetDeviceConnection());                       
                         if (ret == 0)
                         {
@@ -363,7 +359,6 @@ namespace IHM
                         }
                         break;
                     case proto_iodev_devices_t.PROTO_DEV_LIBUSB:
-                        dev = _dll_if.CreateDevLibUsb();
                         ret = _dll_if.LibUsbSetFd(dev, _iusbManager.GetDeviceConnection());
                         if (ret == 0)
                         {
@@ -371,7 +366,6 @@ namespace IHM
                         }
                         break;
                     case proto_iodev_devices_t.PROTO_DEV_PROXY:
-                        dev = _dll_if.CreateDevProxy();
                         _iusbProxy = new UsbProxy();
                         _iusbProxy.SetIUsbManager(ref _iusbManager);
                         if (_iusbProxy.Start(_usConfProxyPort))
