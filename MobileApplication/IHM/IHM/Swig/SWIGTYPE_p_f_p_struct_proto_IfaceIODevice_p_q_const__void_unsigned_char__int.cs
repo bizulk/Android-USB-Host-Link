@@ -9,18 +9,18 @@
 //------------------------------------------------------------------------------
 
 
-public class SWIGTYPE_p_proto_Device_t {
+public class SWIGTYPE_p_f_p_struct_proto_IfaceIODevice_p_q_const__void_unsigned_char__int {
   private global::System.Runtime.InteropServices.HandleRef swigCPtr;
 
-  internal SWIGTYPE_p_proto_Device_t(global::System.IntPtr cPtr, bool futureUse) {
+  internal SWIGTYPE_p_f_p_struct_proto_IfaceIODevice_p_q_const__void_unsigned_char__int(global::System.IntPtr cPtr, bool futureUse) {
     swigCPtr = new global::System.Runtime.InteropServices.HandleRef(this, cPtr);
   }
 
-  protected SWIGTYPE_p_proto_Device_t() {
+  protected SWIGTYPE_p_f_p_struct_proto_IfaceIODevice_p_q_const__void_unsigned_char__int() {
     swigCPtr = new global::System.Runtime.InteropServices.HandleRef(null, global::System.IntPtr.Zero);
   }
 
-  internal static global::System.Runtime.InteropServices.HandleRef getCPtr(SWIGTYPE_p_proto_Device_t obj) {
+  internal static global::System.Runtime.InteropServices.HandleRef getCPtr(SWIGTYPE_p_f_p_struct_proto_IfaceIODevice_p_q_const__void_unsigned_char__int obj) {
     return (obj == null) ? new global::System.Runtime.InteropServices.HandleRef(null, global::System.IntPtr.Zero) : obj.swigCPtr;
   }
 }

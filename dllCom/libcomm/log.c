@@ -161,6 +161,11 @@ int log_global_pop(char * szMsg)
 //-----------------------------------------------------------------------------
 int log_global_pop_msg(msg_t * pMsg)
 {
+	if (!_log_global_this)
+	{
+		pMsg->szMsg[0] = '\0';
+		return 0;
+	}
     return log_pop(_log_global_this, pMsg->szMsg);
 }
 

@@ -82,14 +82,13 @@ public class proto_hdle_t : global::System.IDisposable {
     } 
   }
 
-  public SWIGTYPE_p_proto_Device_t priv_iodevice {
+  public proto_IfaceIODevice_t priv_iodevice {
     set {
-      protocommPINVOKE.proto_hdle_t_priv_iodevice_set(swigCPtr, SWIGTYPE_p_proto_Device_t.getCPtr(value));
-      if (protocommPINVOKE.SWIGPendingException.Pending) throw protocommPINVOKE.SWIGPendingException.Retrieve();
+      protocommPINVOKE.proto_hdle_t_priv_iodevice_set(swigCPtr, proto_IfaceIODevice_t.getCPtr(value));
     } 
     get {
-      SWIGTYPE_p_proto_Device_t ret = new SWIGTYPE_p_proto_Device_t(protocommPINVOKE.proto_hdle_t_priv_iodevice_get(swigCPtr), true);
-      if (protocommPINVOKE.SWIGPendingException.Pending) throw protocommPINVOKE.SWIGPendingException.Retrieve();
+      global::System.IntPtr cPtr = protocommPINVOKE.proto_hdle_t_priv_iodevice_get(swigCPtr);
+      proto_IfaceIODevice_t ret = (cPtr == global::System.IntPtr.Zero) ? null : new proto_IfaceIODevice_t(cPtr, false);
       return ret;
     } 
   }

@@ -20,7 +20,7 @@ namespace IHM
         private proto_hdle_t m_handle;
         public const int _iLogGlobalNbMsg = 30;
         //Device (exception si on initialise à NULL)
-        SWIGTYPE_p_proto_Device_t m_device;
+        proto_IfaceIODevice_t m_device;
 
         public static dll_if GetInstance
         {
@@ -41,24 +41,27 @@ namespace IHM
             }
         }
 
+        dll_if()
+        {
+            protocomm.log_global_create(_iLogGlobalNbMsg);
+        }
+
+        ~dll_if()
+        {
+            protocomm.log_global_destroy();
+        }
+
         /// <summary>
         /// Initialize library
         /// </summary>
         /// <param name="device"> device pour la connexion </param>
         /// <param name="szPath"> path à passer au protocole </param>
         /// <returns> 0 if OK, otherwise < 0</returns>
-        public int Open(SWIGTYPE_p_proto_Device_t device, string szPath)
+        public int Open(proto_IfaceIODevice_t device, string szPath)
         {
             int ret = 0;
 
             m_device = device;
-
-            // First create the dll log system
-            ret = protocomm.log_global_create(_iLogGlobalNbMsg);
-            if (ret != 0)
-            {
-                return -1;
-            }
 
             // On cree l'instance de protocole
             m_handle = protocomm.proto_master_create(m_device); //5s de timeout TODO a moditifer plus tard pour le rendre paramètrable
@@ -87,8 +90,6 @@ namespace IHM
             protocomm.proto_master_destroy(m_handle);
             //On met l'handle à null pour signifier qu'on s'est déconnecté
             m_handle = null;
-            // Réinitialisation du log
-            protocomm.log_global_destroy();
         }
 
         /// <summary>
@@ -130,9 +131,9 @@ namespace IHM
         /// Retourne une instance de device d'émulation de slave
         /// </summary>
         /// <returns> Instance de notre device </returns>
-        public SWIGTYPE_p_proto_Device_t CreateEmulslave()
+        public proto_IfaceIODevice_t CreateEmulslave()
         {
-            SWIGTYPE_p_proto_Device_t ret;
+            proto_IfaceIODevice_t ret;
             ret = protocomm.devemulslave_create();
             return ret;
         }
@@ -142,48 +143,48 @@ namespace IHM
         /// Pour démonstration de l'utilisation de l'interface Android
         /// </summary>
         /// <returns></returns>
-        public SWIGTYPE_p_proto_Device_t CreateDevSerial()
+        public proto_IfaceIODevice_t CreateDevSerial()
         {
-            SWIGTYPE_p_proto_Device_t dev;
+            proto_IfaceIODevice_t dev;
             dev = protocomm.devserial_create();
             return dev;
         }
 
-        public int SerialSetFd(SWIGTYPE_p_proto_Device_t dev, DevHandle devh)
+        public int SerialSetFd(proto_IfaceIODevice_t dev, DevHandle devh)
         {
             int ret = protocomm.devserial_setFD(dev, devh.fd);
             return ret;
         }
 
-        public SWIGTYPE_p_proto_Device_t CreateDevUsbDev()
+        public proto_IfaceIODevice_t CreateDevUsbDev()
         {
-            SWIGTYPE_p_proto_Device_t dev;
+            proto_IfaceIODevice_t dev;
             dev = protocomm.devusbdev_create();
             return dev;
         }
 
-        public int UsbDevSetFd(SWIGTYPE_p_proto_Device_t dev, DevHandle devh)
+        public int UsbDevSetFd(proto_IfaceIODevice_t dev, DevHandle devh)
         {
             int ret = protocomm.devusbdev_setDev(dev, devh.fd, devh.ep_in, devh.ep_out, devh.max_pkt_size);
             return ret;
         }
 
-        public SWIGTYPE_p_proto_Device_t CreateDevLibUsb()
+        public proto_IfaceIODevice_t CreateDevLibUsb()
         {
-            SWIGTYPE_p_proto_Device_t dev;
+            proto_IfaceIODevice_t dev;
             dev = protocomm.devlibusb_create();
             return dev;
         }
 
-        public int LibUsbSetFd(SWIGTYPE_p_proto_Device_t dev, DevHandle devh)
+        public int LibUsbSetFd(proto_IfaceIODevice_t dev, DevHandle devh)
         {
             int ret = protocomm.devlibusb_setFD(dev, devh.fd, devh.ep_in, devh.ep_out, devh.max_pkt_size);
             return ret;
         }
 
-        public SWIGTYPE_p_proto_Device_t CreateDevProxy()
+        public proto_IfaceIODevice_t CreateDevProxy()
         {
-            SWIGTYPE_p_proto_Device_t dev;
+            proto_IfaceIODevice_t dev;
             dev = protocomm.devproxy_create();
             return dev;
         }

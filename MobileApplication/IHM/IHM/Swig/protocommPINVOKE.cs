@@ -547,6 +547,51 @@ class protocommPINVOKE {
   [global::System.Runtime.InteropServices.DllImport("protocomm", EntryPoint="CSharp_log_global_clear")]
   public static extern void log_global_clear();
 
+  [global::System.Runtime.InteropServices.DllImport("protocomm", EntryPoint="CSharp_proto_IfaceIODevice_t_open_set")]
+  public static extern void proto_IfaceIODevice_t_open_set(global::System.Runtime.InteropServices.HandleRef jarg1, global::System.Runtime.InteropServices.HandleRef jarg2);
+
+  [global::System.Runtime.InteropServices.DllImport("protocomm", EntryPoint="CSharp_proto_IfaceIODevice_t_open_get")]
+  public static extern global::System.IntPtr proto_IfaceIODevice_t_open_get(global::System.Runtime.InteropServices.HandleRef jarg1);
+
+  [global::System.Runtime.InteropServices.DllImport("protocomm", EntryPoint="CSharp_proto_IfaceIODevice_t_close_set")]
+  public static extern void proto_IfaceIODevice_t_close_set(global::System.Runtime.InteropServices.HandleRef jarg1, global::System.Runtime.InteropServices.HandleRef jarg2);
+
+  [global::System.Runtime.InteropServices.DllImport("protocomm", EntryPoint="CSharp_proto_IfaceIODevice_t_close_get")]
+  public static extern global::System.IntPtr proto_IfaceIODevice_t_close_get(global::System.Runtime.InteropServices.HandleRef jarg1);
+
+  [global::System.Runtime.InteropServices.DllImport("protocomm", EntryPoint="CSharp_proto_IfaceIODevice_t_destroy_set")]
+  public static extern void proto_IfaceIODevice_t_destroy_set(global::System.Runtime.InteropServices.HandleRef jarg1, global::System.Runtime.InteropServices.HandleRef jarg2);
+
+  [global::System.Runtime.InteropServices.DllImport("protocomm", EntryPoint="CSharp_proto_IfaceIODevice_t_destroy_get")]
+  public static extern global::System.IntPtr proto_IfaceIODevice_t_destroy_get(global::System.Runtime.InteropServices.HandleRef jarg1);
+
+  [global::System.Runtime.InteropServices.DllImport("protocomm", EntryPoint="CSharp_proto_IfaceIODevice_t_read_set")]
+  public static extern void proto_IfaceIODevice_t_read_set(global::System.Runtime.InteropServices.HandleRef jarg1, global::System.Runtime.InteropServices.HandleRef jarg2);
+
+  [global::System.Runtime.InteropServices.DllImport("protocomm", EntryPoint="CSharp_proto_IfaceIODevice_t_read_get")]
+  public static extern global::System.IntPtr proto_IfaceIODevice_t_read_get(global::System.Runtime.InteropServices.HandleRef jarg1);
+
+  [global::System.Runtime.InteropServices.DllImport("protocomm", EntryPoint="CSharp_proto_IfaceIODevice_t_write_set")]
+  public static extern void proto_IfaceIODevice_t_write_set(global::System.Runtime.InteropServices.HandleRef jarg1, global::System.Runtime.InteropServices.HandleRef jarg2);
+
+  [global::System.Runtime.InteropServices.DllImport("protocomm", EntryPoint="CSharp_proto_IfaceIODevice_t_write_get")]
+  public static extern global::System.IntPtr proto_IfaceIODevice_t_write_get(global::System.Runtime.InteropServices.HandleRef jarg1);
+
+  [global::System.Runtime.InteropServices.DllImport("protocomm", EntryPoint="CSharp_proto_IfaceIODevice_t_user_set")]
+  public static extern void proto_IfaceIODevice_t_user_set(global::System.Runtime.InteropServices.HandleRef jarg1, global::System.Runtime.InteropServices.HandleRef jarg2);
+
+  [global::System.Runtime.InteropServices.DllImport("protocomm", EntryPoint="CSharp_proto_IfaceIODevice_t_user_get")]
+  public static extern global::System.IntPtr proto_IfaceIODevice_t_user_get(global::System.Runtime.InteropServices.HandleRef jarg1);
+
+  [global::System.Runtime.InteropServices.DllImport("protocomm", EntryPoint="CSharp_new_proto_IfaceIODevice_t")]
+  public static extern global::System.IntPtr new_proto_IfaceIODevice_t();
+
+  [global::System.Runtime.InteropServices.DllImport("protocomm", EntryPoint="CSharp_delete_proto_IfaceIODevice_t")]
+  public static extern void delete_proto_IfaceIODevice_t(global::System.Runtime.InteropServices.HandleRef jarg1);
+
+  [global::System.Runtime.InteropServices.DllImport("protocomm", EntryPoint="CSharp_device_create")]
+  public static extern global::System.IntPtr device_create(int jarg1);
+
   [global::System.Runtime.InteropServices.DllImport("protocomm", EntryPoint="CSharp_protoframe_serialize")]
   public static extern void protoframe_serialize(global::System.Runtime.InteropServices.HandleRef jarg1, [global::System.Runtime.InteropServices.Out, global::System.Runtime.InteropServices.MarshalAs(global::System.Runtime.InteropServices.UnmanagedType.LPArray)]byte[] jarg2);
 

@@ -23,6 +23,7 @@ extern "C" {
 
 #include <stdint.h>
 #include <stddef.h>
+#include "libcomm_global.h"
 
 /// Enumerate all supported device
 /// Some of them are available only for some platforms
@@ -32,7 +33,8 @@ typedef enum
 	PROTO_DEV_SERIAL,
 	PROTO_DEV_USBDEV,
 	PROTO_DEV_LIBUSB,
-	PROTO_DEV_PROXY
+	PROTO_DEV_PROXY,
+	PROTO_DEV_STM32
 } proto_iodev_devices_t;
 
 typedef struct proto_IfaceIODevice * proto_Device_t;
@@ -95,6 +97,12 @@ typedef struct proto_IfaceIODevice {
 #ifndef UNUSED
 #define UNUSED(x) (void)x
 #endif
+
+/** Create a device
+	\param type device type we want
+	\return proto_Device_t device Handle, NULL if could not be created
+*/
+proto_Device_t LIBCOMM_EXPORT device_create(proto_iodev_devices_t type);
 
 #ifdef __cplusplus
 } // extern "C"
