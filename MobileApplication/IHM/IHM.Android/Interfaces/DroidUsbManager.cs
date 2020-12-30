@@ -28,7 +28,11 @@ namespace IHM.Droid.Interfaces
     {
         private UsbManager usbManager_;
         private string selectedDevice;
-        public event EventHandler<bool> NotifyPermRequestCompleted;
+        public event EventHandler<bool> NotifyPermRequestCompleted
+        {
+            add { throw new NotSupportedException(); }
+            remove { }
+        }
 
         public DroidUsbManager() {}
 
