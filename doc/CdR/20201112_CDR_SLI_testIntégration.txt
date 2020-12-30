@@ -163,3 +163,20 @@ Vendredi 18/12
 	
 Lorsque le câble direct ne fonctionne pas, la LED Nucleo témoin de la connexion USB ne s'allume même pas, et la tablette android ne détecte pas la carte. C'est vraiment le câble qui est en cause.
 Il faudra prendre en compte ce résultat pour le support client. Clairement lui expliquer comment connecter les appareils et quels câbles utiliser, voir même leur fournir la référence à utiliser pour avoir un support.
+
+-------------------------------------------------------------------------------	
+Lundi 29/12
+
+	Je tente de régler le problème de crash au premier connect usb : on gère mal la demande d'autorisation (issue 12 sur github).
+	PISTE 1 KO :  je conserve le process : tout est géré dans notre interface Android : j'ai donc "splité" la fonction selectDevice pour différer la connexion sur la réception de l'évènement (broadcast receiver).
+	==> Ca ne suffit pas car la part Xamarin.Forms appelante poursuit ses traitements, elle doit aussi attendre la réponse.
+	==> Impossible dans la partie Android d'attendre sur le broadcast receiver (ie créer une tâche attendant un signal)
+	==> note : la fonction de requête native à l'USB Manager n'est pas non plus une tâche.
+	
+	PISTE 2 KO : Je tente d'intégrer Xamarin.Essentials qui gère les permissions (mais pas l'USB). Je m'appuie sur les exemples pour créer une interface de gestion des permissions asynchrone. 
+	C'est pas simple car dans l'exemple quand on fait un request() on doit avoir la réponse hors il faut attendre le broadcast.
+	Mais avec cette solution le broadcastreceiver n'est pas du tout utilisé ==> il faut désactiver ce code je pense car il doit être en conflit avec Xamarin.Essentials.
+	
+	PISTE 3 OK : on traite en asynchrone le résultat de la demande de permission. On ajoute un évènement dans le broadcast receiver, relayé par l'interface IUsbManager, pour que l'application continue le process de connexion.
+	
+	

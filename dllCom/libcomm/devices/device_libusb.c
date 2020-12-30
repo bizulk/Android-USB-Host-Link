@@ -92,6 +92,7 @@ static int devlibusb_open(struct proto_IfaceIODevice* _this, const char * szPath
     assert(_this && szPath);
 	proto_dev_libusb_t* infos = _this->user;
 	int ret = 0;
+	// FIXME - Path not used 
 
 	// context must have been initialize at create.
 	assert(infos->ctx);
