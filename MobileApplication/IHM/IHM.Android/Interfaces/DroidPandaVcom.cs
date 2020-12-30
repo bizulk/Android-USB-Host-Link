@@ -11,13 +11,50 @@ using Android.Runtime;
 using Android.Views;
 using Android.Widget;
 using Android.Util;
-using Hoho.Android.UsbSerial.Driver;
-using Hoho.Android.UsbSerial.Util;
 
 using IHM;
 
 namespace IHM.Droid.Interfaces
 {
+    public class USBBroadCastReceiver : BroadcastReceiver
+    {
+
+        /// <summary>
+        /// This string must match the Android Manifest XML file
+        /// </summary>
+        public static String ACTION_USB_PERMISSION = "com.cio.USB_PERMISSION";
+
+        /// <summary>
+        /// Use an event to notify that the permission completed
+        /// </summary>
+        public event EventHandler<bool> NotifyUsbPermissionCompleted;
+
+        public USBBroadCastReceiver()
+        {
+        }
+
+        /// <summary>
+        /// Receive the user input permission and call the Interface method to open device
+        /// </summary>
+        /// <param name="context"></param>
+        /// <param name="intent"></param>
+        public override void OnReceive(Context context, Intent intent)
+        {
+            String action = intent.Action;
+            if (ACTION_USB_PERMISSION.Equals(action))
+            {
+                UsbDevice device = (UsbDevice)intent.GetParcelableExtra(UsbManager.ExtraDevice);
+                bool bPermissionGranted = false;             
+                if (device != null)
+                {
+                    bPermissionGranted = intent.GetBooleanExtra(UsbManager.ExtraPermissionGranted, false);
+                }
+                EventHandler<bool> handler = NotifyUsbPermissionCompleted;
+                handler(this, bPermissionGranted);
+            }
+        }
+    }
+
     /// <summary>
     /// THIS IS THE USB INTERFACE WE ARE WORKING ON 
     /// It requires the nuget package USBSerialForAndroid
@@ -26,8 +63,10 @@ namespace IHM.Droid.Interfaces
     /// TODO : I manage to make wit work without the userserial package, get rid of it or create another spécific implementation that use it.
     /// Selso LIBERADO selso.liberado@ciose.fr
     /// </summary>
-    class DroidPandaVcom : IUsbManager
+    public class DroidPandaVcom : IUsbManager
     {
+        public const string LOG_TAG = "pandavcom";
+
         /// This class will keep all android hardware usb stuff
         public class DroidDevHandle
         {
@@ -47,21 +86,25 @@ namespace IHM.Droid.Interfaces
                 // everything else is set to null 
             }
         }
+        
+        /// <summary>
+        /// The Event declared in the interface
+        /// </summary>
+        public event EventHandler<bool> NotifyPermRequestCompleted;
+
         ////////////////////////////
         // CONFIG SECTION
         private const bool bConfUseUsbManagerOnly = true; // Select method to install interface (usbserial package, or android API only)
         public const int BULK_XFER_TOUT_MS = 1000;
-        // END
-        public static String ACTION_USB_PERMISSION = "com.android.example.USB_PERMISSION";
         public const int iVendorId = 0x0483; // Id for the STM32Nucleo
         public const int iProductID = 0x5740; // Id for the STM32Nucleo
+        // END
 
-        // usb-to-serial stuff
-        private IList<IUsbSerialDriver> _availableDrivers; // Manage all available driver from package
-        private IUsbSerialDriver _currDriverIface; // Currently applied driver
         // android.hardware.usb stuff
-        Object _context; // Android activity context
+        ContextWrapper _context; // Android activity context
         DroidDevHandle _devHandle = new DroidDevHandle(); // System file descriptor we will pass to dllCom library.
+        PendingIntent _usbPermissionIntent; // The permission intent is handled in the OS Interface
+        USBBroadCastReceiver _USBBroadCastReceiver; // The permission broadcast receiver for USB permission intent
 
         /// <summary>
         /// We initialize all Android context
@@ -69,8 +112,28 @@ namespace IHM.Droid.Interfaces
         /// <param name="context"></param>
         public void Init(Object context)
         {
-            _context = context;
-            _devHandle.usbManager = (UsbManager)((ContextWrapper)context).GetSystemService(Context.UsbService);
+            _context = (ContextWrapper)context;
+            _devHandle.usbManager = (UsbManager)_context.GetSystemService(Context.UsbService);
+            _usbPermissionIntent = PendingIntent.GetBroadcast(_context, 0, new Intent(USBBroadCastReceiver.ACTION_USB_PERMISSION), 0);
+            IntentFilter filter = new IntentFilter(USBBroadCastReceiver.ACTION_USB_PERMISSION);
+            _USBBroadCastReceiver = new USBBroadCastReceiver();
+            _USBBroadCastReceiver.NotifyUsbPermissionCompleted += _USBBroadCastReceiver_NotifyUsbPermissionCompleted;
+            _context.RegisterReceiver(_USBBroadCastReceiver, filter);           
+        }
+
+        private void _USBBroadCastReceiver_NotifyUsbPermissionCompleted(object sender, bool bPermissionGranted)
+        {
+            if (bPermissionGranted)
+            {
+                OpenDevice();
+                // https://docs.microsoft.com/fr-fr/dotnet/api/system.eventhandler-1?view=net-5.0
+                EventHandler<bool> handler = NotifyPermRequestCompleted;
+                handler(this, true);
+            }
+            else
+            {
+                Log.Debug(LOG_TAG, "permission denied for device " + _devHandle.usbdev.DeviceName);
+            }
         }
 
         // Retreive the physically connected devices.
@@ -79,15 +142,7 @@ namespace IHM.Droid.Interfaces
             // Two ways : 
             // - Use the usbserial to retreive names
             // - Use the UsbManager (but we get system path, not pretty)
-            if (bConfUseUsbManagerOnly)
-            {
-                return _devHandle.usbManager.DeviceList.Keys;
-            }
-            else
-            {
-                // BUG : freezed code :(
-                return getListOfConnectionsAsync().GetAwaiter().GetResult();
-            }
+            return _devHandle.usbManager.DeviceList.Keys;
         }
 
         /// <summary>
@@ -98,26 +153,7 @@ namespace IHM.Droid.Interfaces
         /// <returns></returns>
         public async Task<ICollection<string>> getListOfConnectionsAsync()
         {
-
-            List<string> listStrDriver = new List<string>();
-            // setting a unique  driver  CDC Acm for the St Eval Board
-            var table = new ProbeTable();
-            table.AddProduct(iVendorId, iProductID, Java.Lang.Class.FromType(typeof(CdcAcmSerialDriver)));
-            var prober = new UsbSerialProber(table);
-
-            _availableDrivers = await prober.FindAllDriversAsync(_devHandle.usbManager);
-            if (_availableDrivers.Count == 0)
-            {
-                return listStrDriver;
-            }
-
-            foreach (var driver in _availableDrivers)
-            {
-                listStrDriver.Add(driver.ToString());
-            }
-
-
-            return listStrDriver;
+            throw new NotImplementedException();
         }
 
         /// <summary>
@@ -127,10 +163,11 @@ namespace IHM.Droid.Interfaces
         /// <param name="epIn"></param>
         /// <param name="epOut"></param>
         /// <returns></returns>
-        protected int usbInterfaceGetBulkEndpoints(UsbInterface usbIface, ref UsbEndpoint epIn, ref UsbEndpoint epOut)
+        protected int InterfaceGetBulkEndpoints(UsbInterface usbIface, ref UsbEndpoint epIn, ref UsbEndpoint epOut)
         {
             int i;
             int ret;
+            // We iterate over over the interface endpoint to find bulk in and out
             for (i = 0, ret = 0; (i < usbIface.EndpointCount) && (ret < 2); i++)
             {
                 UsbEndpoint ep = usbIface.GetEndpoint(i);
@@ -148,14 +185,8 @@ namespace IHM.Droid.Interfaces
                     }
                 }
             }
-            if (ret == 2)
-            {
-                return 0;
-            }
-            else
-            {
-                return -1;
-            }
+            // Did we find the two needed endpoints ?
+            return (ret == 2) ? 0 : -1;
         }
 
         /// <summary>
@@ -177,7 +208,7 @@ namespace IHM.Droid.Interfaces
                 if (connection.ClaimInterface(usbIface, true))
                 {
                     // Now search IO endpoints
-                    if (usbInterfaceGetBulkEndpoints(usbIface, ref epIn, ref epOut) == 0)
+                    if (InterfaceGetBulkEndpoints(usbIface, ref epIn, ref epOut) == 0)
                     {
                         connection.SetInterface(usbIface);
                         return 0;
@@ -191,28 +222,40 @@ namespace IHM.Droid.Interfaces
             return ret;
         }
 
-        public void selectDevice(string name)
+        public bool CheckPermStatus(string szDevName)
         {
-            if (bConfUseUsbManagerOnly)
-            {
+            var usbDevice = _devHandle.usbManager.DeviceList[szDevName];
+            // Ask for permission to access the created device
+            return _devHandle.usbManager.HasPermission(usbDevice);
+        }
 
-                _devHandle.usbdev = _devHandle.usbManager.DeviceList[name];
-                // Ask for permission to access the created device
-                if (!_devHandle.usbManager.HasPermission(_devHandle.usbdev))
-                {
-                    PendingIntent pi = PendingIntent.GetBroadcast((ContextWrapper)_context, 0, new Intent(ACTION_USB_PERMISSION), 0);
-                    _devHandle.usbManager.RequestPermission(_devHandle.usbdev, pi);
-                    
-                    // FIXME : The wapp don't wait for user input and crash when asking permission 1st time, we must move this code to an event receiver
-                    /* We check the permission was given
-                     */
-                    if (!_devHandle.usbManager.HasPermission(_devHandle.usbdev))
-                    {
-                        // Loose !
-                        Log.Debug("pandavcom", "FAILED : did not have persmission to open device" + _devHandle.usbdev.DeviceName);
-                        return;
-                    }
-                }
+        public void RequestPermAsync(string name)
+        {
+            _devHandle.usbdev = _devHandle.usbManager.DeviceList[name];
+            // Check and Ask for permission to access the created device
+            if (_devHandle.usbManager.HasPermission(_devHandle.usbdev))
+            {                   
+                OpenDevice();
+                // https://docs.microsoft.com/fr-fr/dotnet/api/system.eventhandler-1?view=net-5.0
+                EventHandler<bool> handler = NotifyPermRequestCompleted;
+                handler(this, true);
+            }
+            else
+            {
+                _devHandle.usbManager.RequestPermission(_devHandle.usbdev, _usbPermissionIntent);
+                // The wapp don't wait for user input and crash when asking permission 1st time
+                // We must Wait for user input for opening connection.
+            }
+        }
+
+        /// <summary>
+        /// Open a USB device connection and claim interface with the required endpoints
+        /// </summary>
+        public void OpenDevice()
+        {
+            // At this stage Persmission must Have been granted
+            if (_devHandle.usbManager.HasPermission(_devHandle.usbdev))
+            {
                 // Now open the port, with  the USB Manager : we get the fd/enpoints and pass it to library, no more
                 _devHandle.connection = _devHandle.usbManager.OpenDevice(_devHandle.usbdev);
                 if (_devHandle.connection != null)
@@ -220,41 +263,17 @@ namespace IHM.Droid.Interfaces
                     if (OpenInterface(_devHandle.usbdev, _devHandle.connection, ref _devHandle.usbIface, ref _devHandle.ep_in, ref _devHandle.ep_out) == 0)
                     {
                         _devHandle.fd = _devHandle.connection.FileDescriptor;
-                        Log.Debug("pandavcom", "opened device endpoint" + _devHandle.usbdev.DeviceName + "with descriptor: " + _devHandle.fd);
+                        Log.Debug(LOG_TAG, "opened device endpoint" + _devHandle.usbdev.DeviceName + "with descriptor: " + _devHandle.fd);
                     }
                     else
                     {
-                        Log.Debug("pandavcom", "FAILED : open device endpoint" + _devHandle.usbdev.DeviceName);
+                        Log.Debug(LOG_TAG, "FAILED : open device endpoint" + _devHandle.usbdev.DeviceName);
                     }
                 }
             }
             else
             {
-                // THIS IS WIP CODE THAT USES USBSERIAL.
-                // Because we did not use the UsbSerial to probe the device we do theses steps here 
-                // Steps are : 
-                //  - Probe device
-                //  ==> put out this UbSerial code
-                // Probing a unique  driver  CDC Acm for the St Eval Board
-                var table = new ProbeTable();
-                table.AddProduct(iVendorId, iProductID, Java.Lang.Class.FromType(typeof(CdcAcmSerialDriver)));
-                var prober = new UsbSerialProber(table);
-                _currDriverIface = prober.ProbeDevice(_devHandle.usbManager.DeviceList[name]);
-                _devHandle.usbdev = _currDriverIface.Device;
-
-                // TODO (mais le finder marche pas pour l'instant c'est bloqué)
-                CdcAcmSerialDriver cdcDriver = new CdcAcmSerialDriver(_currDriverIface.Device);
-                UsbDeviceConnection connection = _devHandle.usbManager.OpenDevice(_currDriverIface.Device);
-                if (connection != null)
-                {
-                    _devHandle.fd = connection.FileDescriptor;
-                }
-                IList<IUsbSerialPort> ports = cdcDriver.Ports;
-                if (ports.Count == 0)
-                    return;
-                // L'appel ici est pour réclamer l'interface
-                ports[0].Open(connection);
-                // TODO....
+                throw new NotSupportedException("We shall have permission to device");
             }
         }
 
@@ -263,7 +282,7 @@ namespace IHM.Droid.Interfaces
         /// 
         /// </summary>
         /// <returns> v </returns>
-        public DevHandle getDeviceConnection()
+        public DevHandle GetDeviceConnection()
         {
             int max_pkt_size = 0;
             // TODO place this code when retreiving info
@@ -318,7 +337,7 @@ namespace IHM.Droid.Interfaces
             int ret = _devHandle.connection.BulkTransfer(_devHandle.ep_out, buffer, 0, buffer.Length, BULK_XFER_TOUT_MS);
             if (ret >= 0)
             {
-                Log.Debug("pandavcom", "xfer : successfully sent nb bytes : " + ret);
+                Log.Debug(DroidPandaVcom.LOG_TAG, "xfer : successfully sent nb bytes : " + ret);
                 // Receive the reply frame
                 // First version - take the answer with the max size possible
                 // TODO : Handle timeout as done by the library and returns its error.
@@ -354,12 +373,12 @@ namespace IHM.Droid.Interfaces
                 }
                 else
                 {
-                    Log.Debug("pandavcom", "read : failed to read nb bytes");
+                    Log.Debug(DroidPandaVcom.LOG_TAG, "read : failed to read nb bytes");
                 }
             }
             else
             {
-                Log.Debug("pandavcom", "write : failed to sent nb bytes");
+                Log.Debug(DroidPandaVcom.LOG_TAG, "write : failed to sent nb bytes");
             }
             return ret;
         }
@@ -382,7 +401,7 @@ namespace IHM.Droid.Interfaces
             int ret = _devHandle.connection.BulkTransfer(_devHandle.ep_out, buffer, 0, buffer.Length, BULK_XFER_TOUT_MS);
             if (ret >= 0)
             {
-                Log.Debug("pandavcom", "xfer : successfully sent nb bytes : " + ret);
+                Log.Debug(DroidPandaVcom.LOG_TAG, "xfer : successfully sent nb bytes : " + ret);
                 // Receive the reply frame
                 // First version - take the answer with the max size possible
                 // Remember that the protocol expect the peer to seed **at most** the max frame size.
@@ -411,7 +430,7 @@ namespace IHM.Droid.Interfaces
                 }
                 else
                 {
-                    Log.Debug("pandavcom", "xfer : failed to sent bytes");
+                    Log.Debug(DroidPandaVcom.LOG_TAG, "xfer : failed to sent bytes");
                 }
             }
             return ret;
@@ -424,11 +443,11 @@ namespace IHM.Droid.Interfaces
             int ret = _devHandle.connection.BulkTransfer(_devHandle.ep_out, data, 0, data.Length, BULK_XFER_TOUT_MS);
             if (ret >= 0)
             {
-                Log.Debug("pandavcom", "xfer : successfully sent nb bytes : " + ret);
+                Log.Debug(DroidPandaVcom.LOG_TAG, "xfer : successfully sent nb bytes : " + ret);
             }
             else
             {
-                Log.Debug("pandavcom", "xfer : failed to sent bytes retcode : " + ret);
+                Log.Debug(DroidPandaVcom.LOG_TAG, "xfer : failed to sent bytes retcode : " + ret);
             }
             return (ret == data.Length) ? 0 : -1;
         }
@@ -441,11 +460,11 @@ namespace IHM.Droid.Interfaces
             int ret = _devHandle.connection.BulkTransfer(_devHandle.ep_in, data, 0, len, BULK_XFER_TOUT_MS);
             if (ret >= 0)
             {
-                Log.Debug("pandavcom", "xfer : successfully read nb bytes : ", +ret);
+                Log.Debug(DroidPandaVcom.LOG_TAG, "xfer : successfully read nb bytes : ", +ret);
             }
             else
             {
-                Log.Debug("pandavcom", "xfer : failed to read bytes retcode : " + ret);
+                Log.Debug(DroidPandaVcom.LOG_TAG, "xfer : failed to read bytes retcode : " + ret);
             }
             return ret ;
         }

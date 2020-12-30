@@ -18,15 +18,15 @@ namespace IHM.Droid
     {
         protected override void OnCreate(Bundle savedInstanceState)
         {
-            //Pour l'utilisation du service de l'USBManager
+            // Setup the USB Android Interface we want to use.
             Xamarin.Forms.DependencyService.Register<DroidPandaVcom>();
-
             TabLayoutResource = Resource.Layout.Tabbar;
             ToolbarResource = Resource.Layout.Toolbar;
 
             base.OnCreate(savedInstanceState);
 
             //Fichier de log
+            // FIXME - filename is also specified in the xamarin.forms.
             Plugin.XFLogger.CrossXFLogger.Current.Configure(Plugin.XFLogger.Abstractions.LogTimeOption.DateTimeNow, "FileLog.log", 3, 1024, Plugin.XFLogger.Abstractions.LogLevel.Info, true);
 
             //Pour l'utilisation du service de partage
@@ -38,7 +38,6 @@ namespace IHM.Droid
             Xamarin.Forms.Forms.Init(this, savedInstanceState);
             Xamarin.Forms.DependencyService.Get<IUsbManager>().Init(this);
             LoadApplication(new App());
-
         }
     }
 }

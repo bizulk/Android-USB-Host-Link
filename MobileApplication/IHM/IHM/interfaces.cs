@@ -31,17 +31,21 @@ namespace IHM
     /// </summary>
     public interface IUsbManager
     {
+        /// <summary>
+        /// This event will be sent when the requested permission has been completed : granted or not
+        /// </summary>
+        event EventHandler<bool> NotifyPermRequestCompleted;
 
         /// <summary>
         /// Some custom Initialization
         /// </summary>
-        /// <returns> pourquoi pas le FD, pour l'instant je fais comme ça</returns>
+        /// <returns></returns>
         void Init(Object context);
 
         /// <summary>
-        /// Retrieve all the USB corrently connected devices
+        /// Retrieve all the USB corrently physically connected devices
         /// </summary>
-        /// <returns> une liste du nom de chaque connexion </returns>
+        /// <returns> USB Device Name list </returns>
         ICollection<string> getListOfConnections();
 
         /// <summary>
@@ -50,17 +54,24 @@ namespace IHM
         /// <returns></returns>
        Task<ICollection<string>> getListOfConnectionsAsync();
 
-        /// <summary>
-        /// Select device from the the connected list. After this call the device is ready for communication
-        /// </summary>
-        /// <returns></returns>
-        void selectDevice(string name);
+       /// <summary>
+       /// Check if permission was granted for the usb device
+       /// </summary>
+       /// <returns> true is permission granted otherwise false </returns>
+       bool CheckPermStatus(string szDevName);
 
         /// <summary>
-        /// Returns a system File descriptor for the opened connection
+        /// Request USB permission for device
+        /// We will not receive here the permission result, caller must connect to the "NotifyPermRequestCompleted"
+        /// </summary>
+        /// <returns></returns>
+        void RequestPermAsync(string szDevName);
+
+        /// <summary>
+        /// Returns a system File descriptor & more USB info for the opened connection
         /// </summary>
         /// <returns>Devide info</returns>
-        DevHandle getDeviceConnection();
+        DevHandle GetDeviceConnection();
 
         /// <summary>
         /// Closes all currently opened connection.
