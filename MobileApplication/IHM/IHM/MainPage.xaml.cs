@@ -318,11 +318,10 @@ namespace IHM
         void Backend_connect(string szUsbDevName)
         {
             _szDevName = szUsbDevName;
-            /* We call the underlying USB connection expect for emulsave*/
+            /* We call the underlying USB connection except for emulsave*/
             if (_szDevName == _ilist_dllDev[(int)DllDeviceType.devtype_emulslave]) 
             {
                 // So if we did not selected with the emulsave type selector we force it now
-                // FIXME - maybe we need to update the picker to the right value
                 _eConfDllDevice = DllDeviceType.devtype_emulslave;
                 proto_IfaceIODevice_t dev = _dll_if.CreateEmulslave();
                 _IsConnected = (_dll_if.Open(dev, "") == 0);
@@ -330,6 +329,12 @@ namespace IHM
             }
             else
             {
+                // Check we did not selected unappropriate device type
+                if (_eConfDllDevice == DllDeviceType.devtype_emulslave)
+                {
+                    DisplayAlert("Erreur", "Device type incorrect, select another", "Annuler");
+                    return;
+                }
                 // We assynchronously run the permission 
                 // everything else is a true USB device
                 _iusbManager.RequestPermAsync(szUsbDevName);
