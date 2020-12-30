@@ -11,8 +11,6 @@ using Android.Runtime;
 using Android.Views;
 using Android.Widget;
 using Android.Util;
-using Hoho.Android.UsbSerial.Driver;
-using Hoho.Android.UsbSerial.Util;
 
 using IHM;
 
@@ -102,10 +100,6 @@ namespace IHM.Droid.Interfaces
         public const int iProductID = 0x5740; // Id for the STM32Nucleo
         // END
 
-
-        // usb-to-serial stuff
-        private IList<IUsbSerialDriver> _availableDrivers; // Manage all available driver from package
-        private IUsbSerialDriver _currDriverIface; // Currently applied driver
         // android.hardware.usb stuff
         ContextWrapper _context; // Android activity context
         DroidDevHandle _devHandle = new DroidDevHandle(); // System file descriptor we will pass to dllCom library.
@@ -148,15 +142,7 @@ namespace IHM.Droid.Interfaces
             // Two ways : 
             // - Use the usbserial to retreive names
             // - Use the UsbManager (but we get system path, not pretty)
-            if (bConfUseUsbManagerOnly)
-            {
-                return _devHandle.usbManager.DeviceList.Keys;
-            }
-            else
-            {
-                // BUG : freezed code :(
-                return getListOfConnectionsAsync().GetAwaiter().GetResult();
-            }
+            return _devHandle.usbManager.DeviceList.Keys;
         }
 
         /// <summary>
@@ -167,26 +153,7 @@ namespace IHM.Droid.Interfaces
         /// <returns></returns>
         public async Task<ICollection<string>> getListOfConnectionsAsync()
         {
-
-            List<string> listStrDriver = new List<string>();
-            // setting a unique  driver  CDC Acm for the St Eval Board
-            var table = new ProbeTable();
-            table.AddProduct(iVendorId, iProductID, Java.Lang.Class.FromType(typeof(CdcAcmSerialDriver)));
-            var prober = new UsbSerialProber(table);
-
-            _availableDrivers = await prober.FindAllDriversAsync(_devHandle.usbManager);
-            if (_availableDrivers.Count == 0)
-            {
-                return listStrDriver;
-            }
-
-            foreach (var driver in _availableDrivers)
-            {
-                listStrDriver.Add(driver.ToString());
-            }
-
-
-            return listStrDriver;
+            throw new NotImplementedException();
         }
 
         /// <summary>
@@ -264,52 +231,20 @@ namespace IHM.Droid.Interfaces
 
         public void RequestPermAsync(string name)
         {
-            if (bConfUseUsbManagerOnly)
-            {
-
-                _devHandle.usbdev = _devHandle.usbManager.DeviceList[name];
-                // Check and Ask for permission to access the created device
-                if (_devHandle.usbManager.HasPermission(_devHandle.usbdev))
-                {                   
-                    OpenDevice();
-                    // https://docs.microsoft.com/fr-fr/dotnet/api/system.eventhandler-1?view=net-5.0
-                    EventHandler<bool> handler = NotifyPermRequestCompleted;
-                    handler(this, true);
-                }
-                else
-                {
-                    _devHandle.usbManager.RequestPermission(_devHandle.usbdev, _usbPermissionIntent);
-                    // The wapp don't wait for user input and crash when asking permission 1st time
-                    // We must Wait for user input for opening connection.
-                }
+            _devHandle.usbdev = _devHandle.usbManager.DeviceList[name];
+            // Check and Ask for permission to access the created device
+            if (_devHandle.usbManager.HasPermission(_devHandle.usbdev))
+            {                   
+                OpenDevice();
+                // https://docs.microsoft.com/fr-fr/dotnet/api/system.eventhandler-1?view=net-5.0
+                EventHandler<bool> handler = NotifyPermRequestCompleted;
+                handler(this, true);
             }
             else
             {
-                // THIS IS WIP CODE THAT USES USBSERIAL.
-                // Because we did not use the UsbSerial to probe the device we do theses steps here 
-                // Steps are : 
-                //  - Probe device
-                //  ==> put out this UbSerial code
-                // Probing a unique  driver  CDC Acm for the St Eval Board
-                var table = new ProbeTable();
-                table.AddProduct(iVendorId, iProductID, Java.Lang.Class.FromType(typeof(CdcAcmSerialDriver)));
-                var prober = new UsbSerialProber(table);
-                _currDriverIface = prober.ProbeDevice(_devHandle.usbManager.DeviceList[name]);
-                _devHandle.usbdev = _currDriverIface.Device;
-
-                // TODO (mais le finder marche pas pour l'instant c'est bloqué)
-                CdcAcmSerialDriver cdcDriver = new CdcAcmSerialDriver(_currDriverIface.Device);
-                UsbDeviceConnection connection = _devHandle.usbManager.OpenDevice(_currDriverIface.Device);
-                if (connection != null)
-                {
-                    _devHandle.fd = connection.FileDescriptor;
-                }
-                IList<IUsbSerialPort> ports = cdcDriver.Ports;
-                if (ports.Count == 0)
-                    return;
-                // L'appel ici est pour réclamer l'interface
-                ports[0].Open(connection);
-                // TODO....
+                _devHandle.usbManager.RequestPermission(_devHandle.usbdev, _usbPermissionIntent);
+                // The wapp don't wait for user input and crash when asking permission 1st time
+                // We must Wait for user input for opening connection.
             }
         }
 
