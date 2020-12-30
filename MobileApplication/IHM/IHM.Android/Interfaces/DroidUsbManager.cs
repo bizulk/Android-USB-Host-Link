@@ -48,7 +48,7 @@ namespace IHM.Droid.Interfaces
             return new Task<ICollection<string>> (getListOfConnections);
         }
 
-        public void selectDevice(string name)
+        public void RequestPermAsync(string name)
         {
             if (usbManager_.DeviceList.ContainsKey(name)) 
             {
@@ -60,7 +60,7 @@ namespace IHM.Droid.Interfaces
             }
         }
 
-        public DevHandle getDeviceConnection()
+        public DevHandle GetDeviceConnection()
         {
             DevHandle devHandle = new DevHandle();
             if (!selectedDevice.Equals("null"))
@@ -98,15 +98,9 @@ namespace IHM.Droid.Interfaces
             throw new NotImplementedException();
         }
 
-        public bool CheckPermStatusAsync(string szDevName)
+        public bool CheckPermStatus(string szDevName)
         {
             throw new NotImplementedException();
         }
-
-        public void RequestPermAsync(string szDevName)
-        {
-            throw new NotImplementedException();
-        }
-
     }
 }

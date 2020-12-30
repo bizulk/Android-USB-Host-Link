@@ -318,7 +318,7 @@ namespace IHM
             {
                 // We assynchronously run the permission 
                 // everything else is a true USB device
-                _iusbManager.selectDevice(szUsbDevName);
+                _iusbManager.RequestPermAsync(szUsbDevName);
             }
         }
 
@@ -341,7 +341,7 @@ namespace IHM
                         if (_IsConnected)
                         {
                             // Récupére notre FD avec l'USBManager pour l'affecter à la lib
-                            ret = _dll_if.SerialSetFd(dev, _iusbManager.getDeviceConnection());
+                            ret = _dll_if.SerialSetFd(dev, _iusbManager.GetDeviceConnection());
                         };
                         break;
                     case DllDeviceType.devtype_usbdev:
@@ -349,12 +349,12 @@ namespace IHM
                         _IsConnected = (0 == _dll_if.Open(dev, ""));
                         if (_IsConnected)
                         {
-                            ret = _dll_if.UsbDevSetFd(dev, _iusbManager.getDeviceConnection());
+                            ret = _dll_if.UsbDevSetFd(dev, _iusbManager.GetDeviceConnection());
                         }
                         break;
                     case DllDeviceType.devtype_libusb:
                         dev = _dll_if.CreateDevLibUsb();
-                        ret = _dll_if.LibUsbSetFd(dev, _iusbManager.getDeviceConnection());
+                        ret = _dll_if.LibUsbSetFd(dev, _iusbManager.GetDeviceConnection());
                         if (ret == 0)
                         {
                             _IsConnected = (0 == _dll_if.Open(dev, _szDevName));

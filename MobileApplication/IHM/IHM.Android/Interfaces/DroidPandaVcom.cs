@@ -255,20 +255,14 @@ namespace IHM.Droid.Interfaces
             return ret;
         }
 
-        public bool CheckPermStatusAsync(string szDevName)
+        public bool CheckPermStatus(string szDevName)
         {
             var usbDevice = _devHandle.usbManager.DeviceList[szDevName];
             // Ask for permission to access the created device
             return _devHandle.usbManager.HasPermission(usbDevice);
         }
 
-        public void RequestPermAsync(string szDevName)
-        {
-            var usbDevice = _devHandle.usbManager.DeviceList[szDevName];
-            _devHandle.usbManager.RequestPermission(usbDevice, _usbPermissionIntent);
-        }
-
-        public void selectDevice(string name)
+        public void RequestPermAsync(string name)
         {
             if (bConfUseUsbManagerOnly)
             {
@@ -353,7 +347,7 @@ namespace IHM.Droid.Interfaces
         /// 
         /// </summary>
         /// <returns> v </returns>
-        public DevHandle getDeviceConnection()
+        public DevHandle GetDeviceConnection()
         {
             int max_pkt_size = 0;
             // TODO place this code when retreiving info
