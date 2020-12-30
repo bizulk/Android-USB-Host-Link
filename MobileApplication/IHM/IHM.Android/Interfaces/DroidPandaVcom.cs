@@ -314,7 +314,7 @@ namespace IHM.Droid.Interfaces
         }
 
         /// <summary>
-        /// Open a USB device connection and clai
+        /// Open a USB device connection and claim interface with the required endpoints
         /// </summary>
         public void OpenDevice()
         {
