@@ -84,7 +84,7 @@ namespace IHM
             };
 
             _iusbManager = Xamarin.Forms.DependencyService.Get<IUsbManager>();
-            _iusbManager.NotifyPermRequestCompleted += OnPermReqCompleted;
+            _iusbManager.NotifyPermRequestCompleted += Backend_OnPermReqCompleted;
 
             // Pour le log
             _Logfilename = "FileLog.log";
@@ -241,20 +241,34 @@ namespace IHM
             }
             usbList.ItemsSource = usbNames;
         }
-        void OnButtonDisconnectClicked(object sender, EventArgs e)
-        {
-            string msgDeco = "Disconnected";
 
-            // Fermeture de la connexion
+        void Backend_Disconnect()
+        {
+            // Fermeture de la connexion     
             _dll_if.Close();
+            // Stop proxy server
+            if (_eConfDllDevice == DllDeviceType.devtype_proxy)
+            {
+                _iusbProxy.Stop();
+            }
+            _iusbManager.Close();
             _IsConnected = false;
+
+            string msgDeco = "Disconnected";
             _logfile.Info(msgDeco, ""); // Pour le stockage dans le fichier
             _lisLogs.Insert(0, DateTime.Now.ToString(" HH:mm ") + " " + msgDeco);   //Pour l'affichage en temps réelle dans la dialogue
+        }
+
+        void OnButtonDisconnectClicked(object sender, EventArgs e)
+        {
+           
+            Backend_Disconnect();
             connectButton.IsEnabled = true;
             receiveButton.IsEnabled = false;
             sendButton.IsEnabled = false;
             disconnectButton.IsEnabled = false;
             PickerDllDevice.IsEnabled = true;
+            PopDllLogs();
         }
         void OnButtonCancelClicked(object sender, EventArgs e) // Annuler la selection de device
         {
@@ -263,7 +277,7 @@ namespace IHM
         void OnButtonValidateClicked(object sender, EventArgs e) // Valider la selection de device
         {
             popupView.IsVisible = false;
-            connect((string)usbList.SelectedItem);
+            Backend_connect((string)usbList.SelectedItem);
         }
 
         /// <summary>
@@ -301,7 +315,7 @@ namespace IHM
         /// Performs de the connection first step : ask for permission
         /// </summary>
         /// <param name="szUsbDevName"></param>
-        void connect(string szUsbDevName)
+        void Backend_connect(string szUsbDevName)
         {
             _szDevName = szUsbDevName;
             /* We call the underlying USB connection expect for emulsave*/
@@ -310,7 +324,7 @@ namespace IHM
                 // So if we did not selected with the emulsave type selector we force it now
                 // FIXME - maybe we need to update the picker to the right value
                 _eConfDllDevice = DllDeviceType.devtype_emulslave;
-                SWIGTYPE_p_proto_Device_t dev = _dll_if.CreateEmulslave();
+                proto_IfaceIODevice_t dev = _dll_if.CreateEmulslave();
                 _IsConnected = (_dll_if.Open(dev, "") == 0);
                 OnDeviceconnected();
             }
@@ -322,12 +336,12 @@ namespace IHM
             }
         }
 
-        private void OnPermReqCompleted(object sender, bool bPermissionGranted)
+        private void Backend_OnPermReqCompleted(object sender, bool bPermissionGranted)
         {
             // Permission has been granted so ask for connection
             if (bPermissionGranted == true)
             {
-                SWIGTYPE_p_proto_Device_t dev;
+                proto_IfaceIODevice_t dev;
                 int ret = 0;
                 switch (_eConfDllDevice)
                 {
@@ -337,19 +351,18 @@ namespace IHM
                     case DllDeviceType.devtype_serial:
                         // On demande a la dll de s'initialiser sans essayer d'ouvrir un port, car on va s'en occuper
                         dev = _dll_if.CreateDevSerial();
-                        _IsConnected = (0 == _dll_if.Open(dev, ""));
-                        if (_IsConnected)
+                        ret = _dll_if.SerialSetFd(dev, _iusbManager.GetDeviceConnection());                       
+                        if (ret == 0)
                         {
-                            // Récupére notre FD avec l'USBManager pour l'affecter à la lib
-                            ret = _dll_if.SerialSetFd(dev, _iusbManager.GetDeviceConnection());
+                            _IsConnected = (0 == _dll_if.Open(dev, ""));
                         };
                         break;
                     case DllDeviceType.devtype_usbdev:
                         dev = _dll_if.CreateDevUsbDev();
-                        _IsConnected = (0 == _dll_if.Open(dev, ""));
-                        if (_IsConnected)
+                        ret = _dll_if.UsbDevSetFd(dev, _iusbManager.GetDeviceConnection());                       
+                        if (ret == 0)
                         {
-                            ret = _dll_if.UsbDevSetFd(dev, _iusbManager.GetDeviceConnection());
+                            _IsConnected = (0 == _dll_if.Open(dev, ""));
                         }
                         break;
                     case DllDeviceType.devtype_libusb:

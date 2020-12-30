@@ -85,6 +85,17 @@ namespace IHM.Droid.Interfaces
                 max_pkt_size = 0;
                 // everything else is set to null 
             }
+
+            public void Close()
+            {
+                connection = null;
+                fd = -1;
+                usbdev = null;
+                usbIface = null;
+                ep_in = null;
+                ep_out = null;
+                max_pkt_size = 0;
+            }
         }
         
         /// <summary>
@@ -94,7 +105,6 @@ namespace IHM.Droid.Interfaces
 
         ////////////////////////////
         // CONFIG SECTION
-        private const bool bConfUseUsbManagerOnly = true; // Select method to install interface (usbserial package, or android API only)
         public const int BULK_XFER_TOUT_MS = 1000;
         public const int iVendorId = 0x0483; // Id for the STM32Nucleo
         public const int iProductID = 0x5740; // Id for the STM32Nucleo
@@ -312,7 +322,17 @@ namespace IHM.Droid.Interfaces
         /// <returns></returns>
         public int Close()
         {
-            /*TODO */
+            // TODO - move this operation in the droid dev handle object
+            if (_devHandle.connection != null)
+            {
+                if (_devHandle.usbIface != null)
+                {
+                    _devHandle.connection.ReleaseInterface(_devHandle.usbIface);
+                }
+                _devHandle.connection.Close();
+            }
+            _devHandle.Close();
+
             return 0;
         }
 
@@ -330,7 +350,7 @@ namespace IHM.Droid.Interfaces
             protocomm.protoframe_serialize(frame, buffer);
 
             // Create a protocole instance from frame decoding (device will not be used)
-            SWIGTYPE_p_proto_Device_t protodev = protocomm.devemulslave_create();
+            proto_IfaceIODevice_t protodev = protocomm.devemulslave_create();
             var protoHdle = protocomm.proto_master_create(protodev);
 
             // Send request and receive reply
@@ -395,7 +415,7 @@ namespace IHM.Droid.Interfaces
             protocomm.protoframe_serialize(frame, buffer);
 
             // Create a protocole instance from frame decoding (device will not be used)
-            SWIGTYPE_p_proto_Device_t protodev = protocomm.devemulslave_create();
+            proto_IfaceIODevice_t protodev = protocomm.devemulslave_create();
             var protoHdle = protocomm.proto_master_create(protodev);
            
             int ret = _devHandle.connection.BulkTransfer(_devHandle.ep_out, buffer, 0, buffer.Length, BULK_XFER_TOUT_MS);

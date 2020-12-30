@@ -21,7 +21,14 @@
 typedef struct
 {
     int fd; // Descripteur de fichier ouvert
+	int flags;
 } proto_dev_serial_t ;
+
+#define FLAG_EXTERNAL_FD 1
+
+#define FLAG_CLEAR(flags, flag)  do { (flags) &= ~(flag); } while(0)
+#define FLAG_SET(flags, flag)  do { (flags)|=(flag) ; } while(0)
+#define FLAG_ISSET(flags, flag) ((flags)&flag)
 
 /******************************************************************************
  * LOCAL PROTO
@@ -99,12 +106,14 @@ static int devserial_close(struct proto_IfaceIODevice* _this)
 
     proto_dev_serial_t* infos = _this->user;
 
-	if (infos->fd >=0)
+	// close fd only if WE created it
+	if( (infos->fd >=0) && !(FLAG_ISSET(infos->flags, FLAG_EXTERNAL_FD)) )
 	{
 		ret = close(infos->fd);
-		// Invalidate the descriptor to block further use.
-		infos->fd = -1;
 	}
+	// Invalidate the descriptor to block further use.
+	infos->fd = -1;
+	FLAG_CLEAR(infos->flags, FLAG_EXTERNAL_FD);
 
 	return ret;
 }
@@ -120,6 +129,8 @@ static int devserial_open(struct proto_IfaceIODevice* _this, const char * szPath
 	/* allow empty path : that means that the fd will be provided */
 	if (strlen(szPath) > 0)
 	{
+		// If a external FD was set it is lost
+		FLAG_CLEAR(infos->flags, FLAG_EXTERNAL_FD);
 		int fd = open(szPath, O_RDWR);
 		LOG("OPEN fd :%d", fd);
 		if (fd < 0)
@@ -180,12 +191,12 @@ static int devserial_write(struct proto_IfaceIODevice* _this, const void * buffe
 int devserial_setFD(proto_Device_t _this, int fd) {
     assert(_this);
 
-	if (fd < 0)
+	proto_dev_serial_t* infos = _this->user;
+	if (infos->fd >= 0)
+	{
+		LOG("error : you must first close your connexion");
 		return -1;
-
-	// On ferme les ressources existantes
-	devserial_close(_this);
-
+	}
 // 20200924 SLI - Maybe not needed for android, in particular for USB layers. 
 #ifdef ENABLE_SET_FD_MODE
     int ret = setFdMode(fd, 0, 0);
@@ -195,8 +206,8 @@ int devserial_setFD(proto_Device_t _this, int fd) {
 		return -1;
 	}
 #endif
-    proto_dev_serial_t* infos = _this->user;
     infos->fd = fd;
+	FLAG_SET(infos->flags, FLAG_EXTERNAL_FD);
     return 0;
 }
 

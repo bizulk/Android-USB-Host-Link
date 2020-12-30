@@ -61,12 +61,14 @@ void devlibusb_destroy(proto_Device_t _this)
     /// Liberation des structures
 	LOG("destroying ressources");
 
-	// The contexte is one step befor open/close operation, it is kept alive until we free the device.
+
+    _this->close(_this);
+	// The context is one step before open/close operation, it is kept alive until we free the device.
 	if (infos->ctx)
 	{
 		libusb_exit(infos->ctx);
+		infos->ctx = NULL;
 	}
-    _this->close(_this);
     free(_this->user);
     free(_this);
 }
@@ -83,6 +85,12 @@ static int devlibusb_close(struct proto_IfaceIODevice* _this)
 	{
 		infos->fd = DEVLIBUSB_FD_INVALID;
 	}
+	if (infos->devh !=NULL)
+	{
+		libusb_close(infos->devh);
+		infos->devh = NULL;
+	}
+	infos->dev = NULL;
 
 	return ret;
 }
@@ -225,15 +233,14 @@ static int devlibusb_write(struct proto_IfaceIODevice* _this, const void * buffe
 int devlibusb_setFD(proto_Device_t _this, int fd, int ep_in, int ep_out, int max_pkt_size)
 {
     assert(_this);
-	assert(infos->ctx || infos->devh);
 	proto_dev_libusb_t* infos = _this->user;
 	if(fd < 0)
 		return -1;
 
 	// if a  device already exist refuse to assign because caller must first open the newly device node.
-	if( (infos->fd != DEVLIBUSB_FD_INVALID) || (infos->devh) )
+	if( (infos->fd != DEVLIBUSB_FD_INVALID) || (infos->devh != NULL) )
 	{
-		LOG("error : you must first close the currently opened device");
+		LOG("error : you must first close the currently opened device (%d, %p)", infos->fd, infos->devh);
 		return -1;
 	}
 	// We just copy the parameters, the device handle shall be created in open().
@@ -274,6 +281,7 @@ int devlibusb_init(proto_Device_t _this)
 	int ret;
 
 	// Initialize 'user' field to invalid state
+	memset(infos, 0, sizeof(*infos));
     infos->fd		= -1;
 
 	// Do specific libusb initialization

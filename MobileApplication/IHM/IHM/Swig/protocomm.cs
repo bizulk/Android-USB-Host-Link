@@ -66,10 +66,9 @@ public class protocomm {
     return ret;
   }
 
-  public static proto_hdle_t proto_master_create(SWIGTYPE_p_proto_Device_t iodevice) {
-    global::System.IntPtr cPtr = protocommPINVOKE.proto_master_create(SWIGTYPE_p_proto_Device_t.getCPtr(iodevice));
+  public static proto_hdle_t proto_master_create(proto_IfaceIODevice_t iodevice) {
+    global::System.IntPtr cPtr = protocommPINVOKE.proto_master_create(proto_IfaceIODevice_t.getCPtr(iodevice));
     proto_hdle_t ret = (cPtr == global::System.IntPtr.Zero) ? null : new proto_hdle_t(cPtr, false);
-    if (protocommPINVOKE.SWIGPendingException.Pending) throw protocommPINVOKE.SWIGPendingException.Retrieve();
     return ret;
   }
 
@@ -97,16 +96,14 @@ public class protocomm {
     return ret;
   }
 
-  public static proto_hdle_t proto_create(SWIGTYPE_p_proto_Device_t iodevice) {
-    global::System.IntPtr cPtr = protocommPINVOKE.proto_create(SWIGTYPE_p_proto_Device_t.getCPtr(iodevice));
+  public static proto_hdle_t proto_create(proto_IfaceIODevice_t iodevice) {
+    global::System.IntPtr cPtr = protocommPINVOKE.proto_create(proto_IfaceIODevice_t.getCPtr(iodevice));
     proto_hdle_t ret = (cPtr == global::System.IntPtr.Zero) ? null : new proto_hdle_t(cPtr, false);
-    if (protocommPINVOKE.SWIGPendingException.Pending) throw protocommPINVOKE.SWIGPendingException.Retrieve();
     return ret;
   }
 
-  public static void proto_init(proto_hdle_t _this, SWIGTYPE_p_proto_Device_t iodevice) {
-    protocommPINVOKE.proto_init(proto_hdle_t.getCPtr(_this), SWIGTYPE_p_proto_Device_t.getCPtr(iodevice));
-    if (protocommPINVOKE.SWIGPendingException.Pending) throw protocommPINVOKE.SWIGPendingException.Retrieve();
+  public static void proto_init(proto_hdle_t _this, proto_IfaceIODevice_t iodevice) {
+    protocommPINVOKE.proto_init(proto_hdle_t.getCPtr(_this), proto_IfaceIODevice_t.getCPtr(iodevice));
   }
 
   public static void proto_destroy(proto_hdle_t _this) {
@@ -157,81 +154,77 @@ public class protocomm {
     return ret;
   }
 
-  public static SWIGTYPE_p_proto_Device_t devemulslave_create() {
-    SWIGTYPE_p_proto_Device_t ret = new SWIGTYPE_p_proto_Device_t(protocommPINVOKE.devemulslave_create(), true);
+  public static proto_IfaceIODevice_t devemulslave_create() {
+    global::System.IntPtr cPtr = protocommPINVOKE.devemulslave_create();
+    proto_IfaceIODevice_t ret = (cPtr == global::System.IntPtr.Zero) ? null : new proto_IfaceIODevice_t(cPtr, false);
     return ret;
   }
 
-  public static SWIGTYPE_p_unsigned_char devemulslave_getRegisters(SWIGTYPE_p_proto_Device_t _this) {
-    global::System.IntPtr cPtr = protocommPINVOKE.devemulslave_getRegisters(SWIGTYPE_p_proto_Device_t.getCPtr(_this));
+  public static SWIGTYPE_p_unsigned_char devemulslave_getRegisters(proto_IfaceIODevice_t _this) {
+    global::System.IntPtr cPtr = protocommPINVOKE.devemulslave_getRegisters(proto_IfaceIODevice_t.getCPtr(_this));
     SWIGTYPE_p_unsigned_char ret = (cPtr == global::System.IntPtr.Zero) ? null : new SWIGTYPE_p_unsigned_char(cPtr, false);
-    if (protocommPINVOKE.SWIGPendingException.Pending) throw protocommPINVOKE.SWIGPendingException.Retrieve();
     return ret;
   }
 
-  public static void devemulslave_setFlags(SWIGTYPE_p_proto_Device_t _this, byte FLAGS) {
-    protocommPINVOKE.devemulslave_setFlags(SWIGTYPE_p_proto_Device_t.getCPtr(_this), FLAGS);
-    if (protocommPINVOKE.SWIGPendingException.Pending) throw protocommPINVOKE.SWIGPendingException.Retrieve();
+  public static void devemulslave_setFlags(proto_IfaceIODevice_t _this, byte FLAGS) {
+    protocommPINVOKE.devemulslave_setFlags(proto_IfaceIODevice_t.getCPtr(_this), FLAGS);
   }
 
-  public static void devemulslave_getFlags(SWIGTYPE_p_proto_Device_t _this, SWIGTYPE_p_unsigned_char FLAGS) {
-    protocommPINVOKE.devemulslave_getFlags(SWIGTYPE_p_proto_Device_t.getCPtr(_this), SWIGTYPE_p_unsigned_char.getCPtr(FLAGS));
-    if (protocommPINVOKE.SWIGPendingException.Pending) throw protocommPINVOKE.SWIGPendingException.Retrieve();
+  public static void devemulslave_getFlags(proto_IfaceIODevice_t _this, SWIGTYPE_p_unsigned_char FLAGS) {
+    protocommPINVOKE.devemulslave_getFlags(proto_IfaceIODevice_t.getCPtr(_this), SWIGTYPE_p_unsigned_char.getCPtr(FLAGS));
   }
 
-  public static SWIGTYPE_p_proto_Device_t devserial_create() {
-    SWIGTYPE_p_proto_Device_t ret = new SWIGTYPE_p_proto_Device_t(protocommPINVOKE.devserial_create(), true);
+  public static proto_IfaceIODevice_t devserial_create() {
+    global::System.IntPtr cPtr = protocommPINVOKE.devserial_create();
+    proto_IfaceIODevice_t ret = (cPtr == global::System.IntPtr.Zero) ? null : new proto_IfaceIODevice_t(cPtr, false);
     return ret;
   }
 
-  public static int devserial_setFD(SWIGTYPE_p_proto_Device_t _this, int fd) {
-    int ret = protocommPINVOKE.devserial_setFD(SWIGTYPE_p_proto_Device_t.getCPtr(_this), fd);
-    if (protocommPINVOKE.SWIGPendingException.Pending) throw protocommPINVOKE.SWIGPendingException.Retrieve();
+  public static int devserial_setFD(proto_IfaceIODevice_t _this, int fd) {
+    int ret = protocommPINVOKE.devserial_setFD(proto_IfaceIODevice_t.getCPtr(_this), fd);
     return ret;
   }
 
-  public static int devserial_getFD(SWIGTYPE_p_proto_Device_t _this) {
-    int ret = protocommPINVOKE.devserial_getFD(SWIGTYPE_p_proto_Device_t.getCPtr(_this));
-    if (protocommPINVOKE.SWIGPendingException.Pending) throw protocommPINVOKE.SWIGPendingException.Retrieve();
+  public static int devserial_getFD(proto_IfaceIODevice_t _this) {
+    int ret = protocommPINVOKE.devserial_getFD(proto_IfaceIODevice_t.getCPtr(_this));
     return ret;
   }
 
-  public static SWIGTYPE_p_proto_Device_t devusbdev_create() {
-    SWIGTYPE_p_proto_Device_t ret = new SWIGTYPE_p_proto_Device_t(protocommPINVOKE.devusbdev_create(), true);
+  public static proto_IfaceIODevice_t devusbdev_create() {
+    global::System.IntPtr cPtr = protocommPINVOKE.devusbdev_create();
+    proto_IfaceIODevice_t ret = (cPtr == global::System.IntPtr.Zero) ? null : new proto_IfaceIODevice_t(cPtr, false);
     return ret;
   }
 
-  public static int devusbdev_setDev(SWIGTYPE_p_proto_Device_t _this, int fd, int ep_in, int ep_out, int max_pkt_size) {
-    int ret = protocommPINVOKE.devusbdev_setDev(SWIGTYPE_p_proto_Device_t.getCPtr(_this), fd, ep_in, ep_out, max_pkt_size);
-    if (protocommPINVOKE.SWIGPendingException.Pending) throw protocommPINVOKE.SWIGPendingException.Retrieve();
+  public static int devusbdev_setDev(proto_IfaceIODevice_t _this, int fd, int ep_in, int ep_out, int max_pkt_size) {
+    int ret = protocommPINVOKE.devusbdev_setDev(proto_IfaceIODevice_t.getCPtr(_this), fd, ep_in, ep_out, max_pkt_size);
     return ret;
   }
 
-  public static int devusbdev_getFD(SWIGTYPE_p_proto_Device_t _this) {
-    int ret = protocommPINVOKE.devusbdev_getFD(SWIGTYPE_p_proto_Device_t.getCPtr(_this));
-    if (protocommPINVOKE.SWIGPendingException.Pending) throw protocommPINVOKE.SWIGPendingException.Retrieve();
+  public static int devusbdev_getFD(proto_IfaceIODevice_t _this) {
+    int ret = protocommPINVOKE.devusbdev_getFD(proto_IfaceIODevice_t.getCPtr(_this));
     return ret;
   }
 
-  public static SWIGTYPE_p_proto_Device_t devlibusb_create() {
-    SWIGTYPE_p_proto_Device_t ret = new SWIGTYPE_p_proto_Device_t(protocommPINVOKE.devlibusb_create(), true);
+  public static proto_IfaceIODevice_t devlibusb_create() {
+    global::System.IntPtr cPtr = protocommPINVOKE.devlibusb_create();
+    proto_IfaceIODevice_t ret = (cPtr == global::System.IntPtr.Zero) ? null : new proto_IfaceIODevice_t(cPtr, false);
     return ret;
   }
 
-  public static int devlibusb_setFD(SWIGTYPE_p_proto_Device_t _this, int fd, int ep_in, int ep_out, int max_pkt_size) {
-    int ret = protocommPINVOKE.devlibusb_setFD(SWIGTYPE_p_proto_Device_t.getCPtr(_this), fd, ep_in, ep_out, max_pkt_size);
-    if (protocommPINVOKE.SWIGPendingException.Pending) throw protocommPINVOKE.SWIGPendingException.Retrieve();
+  public static int devlibusb_setFD(proto_IfaceIODevice_t _this, int fd, int ep_in, int ep_out, int max_pkt_size) {
+    int ret = protocommPINVOKE.devlibusb_setFD(proto_IfaceIODevice_t.getCPtr(_this), fd, ep_in, ep_out, max_pkt_size);
     return ret;
   }
 
-  public static int devlibusb_getFD(SWIGTYPE_p_proto_Device_t _this) {
-    int ret = protocommPINVOKE.devlibusb_getFD(SWIGTYPE_p_proto_Device_t.getCPtr(_this));
-    if (protocommPINVOKE.SWIGPendingException.Pending) throw protocommPINVOKE.SWIGPendingException.Retrieve();
+  public static int devlibusb_getFD(proto_IfaceIODevice_t _this) {
+    int ret = protocommPINVOKE.devlibusb_getFD(proto_IfaceIODevice_t.getCPtr(_this));
     return ret;
   }
 
-  public static SWIGTYPE_p_proto_Device_t devproxy_create() {
-    SWIGTYPE_p_proto_Device_t ret = new SWIGTYPE_p_proto_Device_t(protocommPINVOKE.devproxy_create(), true);
+  public static proto_IfaceIODevice_t devproxy_create() {
+    global::System.IntPtr cPtr = protocommPINVOKE.devproxy_create();
+    proto_IfaceIODevice_t ret = (cPtr == global::System.IntPtr.Zero) ? null : new proto_IfaceIODevice_t(cPtr, false);
     return ret;
   }
 
@@ -307,6 +300,12 @@ public class protocomm {
 
   public static void log_global_clear() {
     protocommPINVOKE.log_global_clear();
+  }
+
+  public static proto_IfaceIODevice_t device_create(proto_iodev_devices_t type) {
+    global::System.IntPtr cPtr = protocommPINVOKE.device_create((int)type);
+    proto_IfaceIODevice_t ret = (cPtr == global::System.IntPtr.Zero) ? null : new proto_IfaceIODevice_t(cPtr, false);
+    return ret;
   }
 
   public static void protoframe_serialize(proto_Frame_t pframe, byte[] buf) {

@@ -8,6 +8,8 @@
 	#include "devices/device_usbdev.h"
 	#include "devices/device_libusb.h"
 	#include "devices/device_proxy.h"
+	#include "proto_iodevice.h"
+	
 	void protoframe_serialize(proto_Frame_t * pframe, uint8_t * buf )
 	{ 
 		/* No other way found than a memcpy */
@@ -48,7 +50,7 @@ CSHARP_ARRAYS(char, byte)
 %include "device_libusb.h"
 %include "device_proxy.h" 
 %include "log.h"
-
+%include "proto_iodevice.h"
 
 /* Extra function for helping to interact with the dll 
 	pointer_cast does not work it converts char to string, not handled then. We make a specific data copy to byte buffer

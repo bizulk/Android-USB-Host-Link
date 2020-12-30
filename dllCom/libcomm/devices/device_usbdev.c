@@ -145,10 +145,14 @@ int devusbdev_setDev(proto_Device_t _this, int fd, int ep_in, int ep_out, int ma
 	if( (fd < 0) || (ep_in < 0) || (ep_out < 0) )
 		return -1;
 
-	// On ferme les ressources existantes
-	devusbdev_close(_this);
+	// if a  device already exist refuse to assign because caller must first open the newly device node.
+	if (infos->fd != -1)
+	{
+		LOG("error : you must first close the currently opened device");
+		return -1;
+	}
     infos->fd = fd;
-	infos->ep_in = fd;
+	infos->ep_in = ep_in;
 	infos->ep_out = ep_out;
 	infos->max_pkt_size = max_pkt_size;
 
