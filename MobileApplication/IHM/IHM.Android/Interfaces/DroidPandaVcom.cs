@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -200,6 +200,7 @@ namespace IHM.Droid.Interfaces
         {
             int i;
             int ret;
+            // We iterate over over the interface endpoint to find bulk in and out
             for (i = 0, ret = 0; (i < usbIface.EndpointCount) && (ret < 2); i++)
             {
                 UsbEndpoint ep = usbIface.GetEndpoint(i);
@@ -217,14 +218,8 @@ namespace IHM.Droid.Interfaces
                     }
                 }
             }
-            if (ret == 2)
-            {
-                return 0;
-            }
-            else
-            {
-                return -1;
-            }
+            // Did we find the two needed endpoints ?
+            return (ret == 2) ? 0 : -1;
         }
 
         /// <summary>
@@ -324,7 +319,9 @@ namespace IHM.Droid.Interfaces
             }
         }
 
-
+        /// <summary>
+        /// Open a USB device connection and clai
+        /// </summary>
         public void OpenDevice()
         {
             // At this stage Persmission must Have been granted
@@ -337,11 +334,11 @@ namespace IHM.Droid.Interfaces
                     if (OpenInterface(_devHandle.usbdev, _devHandle.connection, ref _devHandle.usbIface, ref _devHandle.ep_in, ref _devHandle.ep_out) == 0)
                     {
                         _devHandle.fd = _devHandle.connection.FileDescriptor;
-                        Log.Debug(DroidPandaVcom.LOG_TAG, "opened device endpoint" + _devHandle.usbdev.DeviceName + "with descriptor: " + _devHandle.fd);
+                        Log.Debug(LOG_TAG, "opened device endpoint" + _devHandle.usbdev.DeviceName + "with descriptor: " + _devHandle.fd);
                     }
                     else
                     {
-                        Log.Debug(DroidPandaVcom.LOG_TAG, "FAILED : open device endpoint" + _devHandle.usbdev.DeviceName);
+                        Log.Debug(LOG_TAG, "FAILED : open device endpoint" + _devHandle.usbdev.DeviceName);
                     }
                 }
             }
