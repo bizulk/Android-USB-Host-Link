@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -31,15 +31,8 @@ namespace IHM.Droid.Interfaces
         /// </summary>
         public event EventHandler<bool> NotifyUsbPermissionCompleted;
 
-        /// <summary>
-        /// We complete the opening device process in the brodcast receive
-        /// FIXME - don't do that, just send event and let the task that triggered the permission request complete its process
-        /// </summary>
-        private DroidPandaVcom _droidPandaVcom;
-
-        public USBBroadCastReceiver(DroidPandaVcom droidPandaVcom)
+        public USBBroadCastReceiver()
         {
-            _droidPandaVcom = droidPandaVcom;
         }
 
         /// <summary>
@@ -129,7 +122,7 @@ namespace IHM.Droid.Interfaces
             _devHandle.usbManager = (UsbManager)_context.GetSystemService(Context.UsbService);
             _usbPermissionIntent = PendingIntent.GetBroadcast(_context, 0, new Intent(USBBroadCastReceiver.ACTION_USB_PERMISSION), 0);
             IntentFilter filter = new IntentFilter(USBBroadCastReceiver.ACTION_USB_PERMISSION);
-            _USBBroadCastReceiver = new USBBroadCastReceiver(this);
+            _USBBroadCastReceiver = new USBBroadCastReceiver();
             _USBBroadCastReceiver.NotifyUsbPermissionCompleted += _USBBroadCastReceiver_NotifyUsbPermissionCompleted;
             _context.RegisterReceiver(_USBBroadCastReceiver, filter);           
         }
