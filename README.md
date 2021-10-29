@@ -1,6 +1,9 @@
-# AndroidFilaire
+# Android USB Host Link
 
-Please consult the power point english presentation.
+This is a POOC Project explorating solutions to implement communication between an Android Device - Acting as Host, and a another Device as ARM board (with proprietary software), using *USB Cable*.
+We target to embbed a complete native interface implementation without rooting the device, so that solution would be suitable for commercial software.
+
+Please consult the power point english presentation for more details.
 There are many readme in each directory to explain content.
 
 
